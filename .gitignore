@@ -3,4 +3,8 @@
 .fvm/flutter_sdk_version
 .fvm/fvm_config.json
 
+# VSCode y Cursor
+.vscode/
+.cursor/
+
 # Existing rules 
