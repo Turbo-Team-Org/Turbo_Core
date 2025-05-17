@@ -1,15 +1,18 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:core/src/turbo_core_repositories/turbo_core_repositories.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:get_it/get_it.dart';
 
 /// Instance of [GetIt] service locator
 final sl = GetIt.instance;
 
 /// Initialize dependencies
-Future<void> initCoreDependencies() async {
+Future<void> initCoreDependencies({required FirebaseApp firebaseApp}) async {
   // Register services
   sl
-    ..registerLazySingleton<FirebaseFirestore>(() => FirebaseFirestore.instance)
+    ..registerLazySingleton<FirebaseFirestore>(
+      () => FirebaseFirestore.instanceFor(app: firebaseApp),
+    )
     ..registerLazySingleton<EventService>(
       () => EventService(firestore: sl<FirebaseFirestore>()),
     )
