@@ -2,3 +2,4 @@
 library;
 
 export 'src/core.dart';
+export 'src/dependency_inyection/init_config.dart';
