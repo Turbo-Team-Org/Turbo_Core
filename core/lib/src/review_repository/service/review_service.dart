@@ -49,18 +49,19 @@ class ReviewService implements ReviewInterface {
       final placeRef = firestore.collection('places').doc(placeId);
       final reviewRef = placeRef.collection('reviews').doc(review.id);
 
-      // Usamos una transacción para asegurar la consistencia de los datos
+      //Use a transaction to ensure the consistency of the data
+
       await firestore.runTransaction((transaction) async {
-        // Añadir la reseña
+        // Add the review
         transaction.set(reviewRef, review.toJson());
 
-        // Actualizar el contador de reseñas y el rating promedio
+        // Update the review count and the average rating
         final placeDoc = await transaction.get(placeRef);
         final currentData = placeDoc.data() ?? {};
         final currentCount = (currentData['reviews_count'] ?? 0) as int;
         final currentRating = (currentData['rating'] ?? 0.0) as double;
 
-        // Calcular nuevo rating promedio
+        // Calculate the new average rating
         final newRating =
             ((currentRating * currentCount) + review.rating) /
             (currentCount + 1);
@@ -78,7 +79,7 @@ class ReviewService implements ReviewInterface {
   @override
   Future<void> updateReview(Review review) async {
     try {
-      // Primero necesitamos encontrar el lugar al que pertenece la reseña
+      // First we need to find the place that the review belongs to
       final querySnapshot =
           await firestore
               .collectionGroup('reviews')
@@ -86,7 +87,7 @@ class ReviewService implements ReviewInterface {
               .get();
 
       if (querySnapshot.docs.isEmpty) {
-        throw Exception('No se encontró la reseña');
+        throw Exception('Review not found');
       }
 
       final doc = querySnapshot.docs.first;
@@ -99,7 +100,7 @@ class ReviewService implements ReviewInterface {
   @override
   Future<void> deleteReview(String reviewId) async {
     try {
-      // Primero necesitamos encontrar el lugar al que pertenece la reseña
+      // First we need to find the place that the review belongs to
       final querySnapshot =
           await firestore
               .collectionGroup('reviews')
@@ -107,28 +108,28 @@ class ReviewService implements ReviewInterface {
               .get();
 
       if (querySnapshot.docs.isEmpty) {
-        throw Exception('No se encontró la reseña');
+        throw Exception('Review not found');
       }
 
       final doc = querySnapshot.docs.first;
       final placeRef = doc.reference.parent.parent!;
 
-      // Usamos una transacción para actualizar también el contador y rating
+      // Use a transaction to also update the count and rating
       await firestore.runTransaction((transaction) async {
         final reviewDoc = await transaction.get(doc.reference);
         final review = Review.fromFirestore(reviewDoc.data()!);
 
-        // Eliminar la reseña
+        // Delete the review
         transaction.delete(doc.reference);
 
-        // Actualizar el contador y rating del lugar
+        // Update the count and rating of the place
         final placeDoc = await transaction.get(placeRef);
         final currentData = placeDoc.data() ?? {};
         final currentCount = (currentData['reviews_count'] ?? 0) as int;
         final currentRating = (currentData['rating'] ?? 0.0) as double;
 
         if (currentCount > 1) {
-          // Recalcular el rating promedio excluyendo la reseña eliminada
+          // Recalculate the average rating excluding the deleted review
           final newRating =
               ((currentRating * currentCount) - review.rating) /
               (currentCount - 1);
@@ -137,7 +138,7 @@ class ReviewService implements ReviewInterface {
             'rating': newRating,
           });
         } else {
-          // Si era la última reseña, resetear los valores
+          // If it was the last review, reset the values
           transaction.update(placeRef, {'reviews_count': 0, 'rating': 0.0});
         }
       });

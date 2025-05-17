@@ -1,14 +1,17 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:turbo/places/place_repository/interface/place_interface.dart';
-import 'package:turbo/places/place_repository/models/place/place.dart';
+import 'package:core/src/place_repository/interface/place_interface.dart';
+import 'package:core/src/place_repository/models/offer/offer.dart';
+import 'package:core/src/place_repository/models/place/place.dart';
+import 'package:core/src/review_repository/models/review.dart';
 
-import '../../../reviews/review_repository/models/review.dart';
-import '../models/offer/offer.dart';
-
+/// Place service
 class PlaceService implements PlaceInterface {
+  /// Constructor
+  PlaceService({required this.firestore});
+
+  /// Firebase firestore
   final FirebaseFirestore firestore;
 
-  PlaceService({required this.firestore});
   @override
   Future<List<Place>> getPlaces() async {
     try {
@@ -31,10 +34,7 @@ class PlaceService implements PlaceInterface {
                   .where('placeId', isEqualTo: place.id)
                   .get();
 
-          final offers =
-              offersSnapshot.docs
-                  .map((offerDoc) => Offer.fromFirestore(offerDoc))
-                  .toList();
+          final offers = offersSnapshot.docs.map(Offer.fromFirestore).toList();
 
           final reviews =
               reviewsSnapshot.docs
@@ -49,5 +49,17 @@ class PlaceService implements PlaceInterface {
     } catch (e) {
       throw Exception(e);
     }
+  }
+
+  @override
+  Future<Place> getPlaceById(String id) {
+    // TODO: implement getPlaceById
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<Place> getPlaceByName(String name) {
+    // TODO: implement getPlaceByName
+    throw UnimplementedError();
   }
 }

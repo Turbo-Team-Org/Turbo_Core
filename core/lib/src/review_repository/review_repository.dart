@@ -1,28 +1,36 @@
-import 'package:turbo/reviews/review_repository/models/review.dart';
-import 'service/review_service.dart';
+import 'package:core/src/review_repository/models/review.dart';
+import 'package:core/src/review_repository/service/review_service.dart';
 
+/// Review repository
 class ReviewRepository {
-  final ReviewService reviewService;
-
+  /// Constructor
   ReviewRepository({required this.reviewService});
 
+  /// Review service
+  final ReviewService reviewService;
+
+  /// Get reviews
   Future<List<Review>> getReviews() async {
-    return await reviewService.getReviews();
+    return reviewService.getReviews();
   }
 
+  /// Get reviews from a place
   Future<List<Review>> getReviewsFromAPlace(String placeId) async {
-    return await reviewService.getReviewsFromAPlace(placeId);
+    return reviewService.getReviewsFromAPlace(placeId);
   }
 
+  /// Add review
   Future<void> addReview(Review review, String placeId) async {
-    return await reviewService.addReview(review, placeId);
+    return reviewService.addReview(review, placeId);
   }
 
+  /// Update review
   Future<void> updateReview(Review review) async {
-    return await reviewService.updateReview(review);
+    return reviewService.updateReview(review);
   }
 
+  /// Delete review
   Future<void> deleteReview(String id) async {
-    return await reviewService.deleteReview(id);
+    return reviewService.deleteReview(id);
   }
 }

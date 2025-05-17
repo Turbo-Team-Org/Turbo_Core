@@ -1,67 +1,64 @@
-# Core
+# Turbo Core
 
-[![style: very good analysis][very_good_analysis_badge]][very_good_analysis_link]
-[![Powered by Mason](https://img.shields.io/endpoint?url=https%3A%2F%2Ftinyurl.com%2Fmason-badge)](https://github.com/felangel/mason)
-[![License: MIT][license_badge]][license_link]
+Turbo Core es el paquete base del monorepo Turbo, diseñado para centralizar la lógica de negocio, entidades, servicios y utilidades compartidas entre los diferentes módulos de la plataforma Turbo.
 
-A Very Good Project created by Very Good CLI.
+## 🚀 ¿Qué es Turbo Core?
 
-## Installation 💻
+Turbo Core es el núcleo de la arquitectura de la plataforma Turbo. Aquí se definen los modelos, repositorios, servicios y utilidades que pueden ser reutilizados por otros paquetes y aplicaciones dentro del monorepo. El objetivo es garantizar consistencia, escalabilidad y mantenibilidad en todos los proyectos Turbo.
 
-**❗ In order to start using Core you must have the [Flutter SDK][flutter_install_link] installed on your machine.**
+## 🏗️ Arquitectura
 
-Install via `flutter pub add`:
+Este paquete sigue los principios de **Clean Architecture** y **SOLID**, organizando el código en capas:
 
-```sh
-dart pub add core
+- **Domain:** Entidades, repositorios abstractos y casos de uso.
+- **Data:** Implementaciones concretas, modelos y servicios de acceso a datos (ej. Firebase).
+- **Presentation:** (Opcional) Widgets o utilidades de UI compartidas.
+
+Además, se utiliza el enfoque **feature-first** para facilitar la escalabilidad y modularidad.
+
+## 📦 Dependencias principales
+
+- [freezed](https://pub.dev/packages/freezed) para modelos inmutables y generación de código.
+- [cloud_firestore](https://pub.dev/packages/cloud_firestore) para integración con Firebase.
+- [firebase_auth](https://pub.dev/packages/firebase_auth) para autenticación.
+- [get_it](https://pub.dev/packages/get_it) para inyección de dependencias.
+- [dartz](https://pub.dev/packages/dartz) para programación funcional.
+- [json_serializable](https://pub.dev/packages/json_serializable) para serialización JSON.
+
+## 📁 Estructura del paquete
+
 ```
+lib/
+  src/
+    authentication_repository/
+    event_repository/
+    place_repository/
+    review_repository/
+    monorepo_utils/
+  core.dart
+```
+
+## 🛠️ Cómo usar
+
+1. Añade Turbo Core como dependencia en tu `pubspec.yaml` de otro paquete o app dentro del monorepo.
+2. Importa los modelos, repositorios o servicios que necesites:
+   ```dart
+   import 'package:core/core.dart';
+   import 'package:core/src/event_repository/models/event.dart';
+   ```
+3. Sigue la arquitectura y patrones definidos para mantener la coherencia.
+
+## 🤝 Contribuir
+
+- Sigue las buenas prácticas de Clean Architecture y SOLID.
+- Documenta tus clases y métodos públicos.
+- Añade pruebas unitarias para nuevas funcionalidades.
+- Mantén las dependencias y el código actualizado.
+
+## 📄 Licencia
+
+Este proyecto está bajo la licencia MIT.
 
 ---
 
-## Continuous Integration 🤖
-
-Core comes with a built-in [GitHub Actions workflow][github_actions_link] powered by [Very Good Workflows][very_good_workflows_link] but you can also add your preferred CI/CD solution.
-
-Out of the box, on each pull request and push, the CI `formats`, `lints`, and `tests` the code. This ensures the code remains consistent and behaves correctly as you add functionality or make changes. The project uses [Very Good Analysis][very_good_analysis_link] for a strict set of analysis options used by our team. Code coverage is enforced using the [Very Good Workflows][very_good_coverage_link].
-
----
-
-## Running Tests 🧪
-
-For first time users, install the [very_good_cli][very_good_cli_link]:
-
-```sh
-dart pub global activate very_good_cli
-```
-
-To run all unit tests:
-
-```sh
-very_good test --coverage
-```
-
-To view the generated coverage report you can use [lcov](https://github.com/linux-test-project/lcov).
-
-```sh
-# Generate Coverage Report
-genhtml coverage/lcov.info -o coverage/
-
-# Open Coverage Report
-open coverage/index.html
-```
-
-[flutter_install_link]: https://docs.flutter.dev/get-started/install
-[github_actions_link]: https://docs.github.com/en/actions/learn-github-actions
-[license_badge]: https://img.shields.io/badge/license-MIT-blue.svg
-[license_link]: https://opensource.org/licenses/MIT
-[logo_black]: https://raw.githubusercontent.com/VGVentures/very_good_brand/main/styles/README/vgv_logo_black.png#gh-light-mode-only
-[logo_white]: https://raw.githubusercontent.com/VGVentures/very_good_brand/main/styles/README/vgv_logo_white.png#gh-dark-mode-only
-[mason_link]: https://github.com/felangel/mason
-[very_good_analysis_badge]: https://img.shields.io/badge/style-very_good_analysis-B22C89.svg
-[very_good_analysis_link]: https://pub.dev/packages/very_good_analysis
-[very_good_cli_link]: https://pub.dev/packages/very_good_cli
-[very_good_coverage_link]: https://github.com/marketplace/actions/very-good-coverage
-[very_good_ventures_link]: https://verygood.ventures
-[very_good_ventures_link_light]: https://verygood.ventures#gh-light-mode-only
-[very_good_ventures_link_dark]: https://verygood.ventures#gh-dark-mode-only
-[very_good_workflows_link]: https://github.com/VeryGoodOpenSource/very_good_workflows
+¿Dudas o sugerencias? ¡Abre un issue o contacta al equipo de Turbo!

@@ -22,9 +22,9 @@ sealed class Place with _$Place {
     @Default([]) List<String> tags,
     @Default(false) bool isOpen,
     @Default([]) List<Schedule> schedules,
-    @Default("") String mainImage,
+    @Default('') String mainImage,
     @Default(0) int favoriteCount,
-    @Default("") String menuUrl,
+    @Default('') String menuUrl,
   }) = _Place;
 
   factory Place.fromJson(Map<String, dynamic> json) => _$PlaceFromJson(json);
@@ -51,7 +51,7 @@ sealed class Place with _$Place {
     List<Map<String, dynamic>> asMapList(dynamic value) =>
         value is Iterable
             ? value
-                .where((e) => e is Map<String, dynamic>)
+                .whereType<Map<String, dynamic>>()
                 .cast<Map<String, dynamic>>()
                 .toList()
             : [];
@@ -65,16 +65,10 @@ sealed class Place with _$Place {
       imageUrls: asStringList(data?['imageUrls']),
       rating: asDouble(data?['rating']),
       reviews: [], // You can implement review parsing if needed
-      offers:
-          asMapList(
-            data?['offers'],
-          ).map((offerData) => Offer.fromJson(offerData)).toList(),
+      offers: asMapList(data?['offers']).map(Offer.fromJson).toList(),
       tags: asStringList(data?['tags']),
       isOpen: asBool(data?['isOpen']),
-      schedules:
-          asMapList(
-            data?['schedules'],
-          ).map((scheduleData) => Schedule.fromJson(scheduleData)).toList(),
+      schedules: asMapList(data?['schedules']).map(Schedule.fromJson).toList(),
       mainImage:
           asString(data?['mainImage']).isNotEmpty
               ? asString(data?['mainImage'])

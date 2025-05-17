@@ -1,27 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:core/src/monorepo_utils/timestamp_converter.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 part 'offer.freezed.dart';
 part 'offer.g.dart';
-
-/// Custom converter to handle both Timestamp and String for DateTime
-class TimestampDateTimeConverter implements JsonConverter<DateTime, dynamic> {
-  const TimestampDateTimeConverter();
-
-  @override
-  DateTime fromJson(dynamic value) {
-    if (value is Timestamp) {
-      return value.toDate();
-    } else if (value is String) {
-      return DateTime.parse(value);
-    } else if (value is DateTime) {
-      return value;
-    }
-    return DateTime.now();
-  }
-
-  @override
-  dynamic toJson(DateTime dateTime) => dateTime.toIso8601String();
-}
 
 @Freezed()
 sealed class Offer with _$Offer {

@@ -1,7 +1,7 @@
 import 'dart:async';
 
-import 'package:core/src/location_repository/models/location_data.dart';
 import 'package:core/src/location_repository/interface/location_interface.dart';
+import 'package:core/src/location_repository/models/location_data.dart';
 import 'package:geolocator/geolocator.dart';
 
 /// Location service
@@ -27,7 +27,9 @@ class LocationService implements LocationInterface {
   Future<LocationData> getCurrentLocation() async {
     try {
       final position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high,
+        locationSettings: const LocationSettings(
+          accuracy: LocationAccuracy.high,
+        ),
       );
 
       return LocationData(
@@ -45,44 +47,15 @@ class LocationService implements LocationInterface {
   }
 
   @override
-  Future<bool> checkLocationPermission() async {
-    try {
-      // Verificar si los servicios de ubicación están habilitados
-      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-      if (!serviceEnabled) {
-        return false;
-      }
-
-      // Verificar el estado del permiso
-      LocationPermission permission = await Geolocator.checkPermission();
-
-      // Verificar también con permission_handler
-      final status = await Permission.location.status;
-
-      return (permission == LocationPermission.whileInUse ||
-              permission == LocationPermission.always) &&
-          (status.isGranted || status.isLimited);
-    } catch (e) {
-      return false;
-    }
-  }
-
-  @override
   Future<void> startLocationTracking() async {
-    // Verificar que tenemos permiso
-    final hasPermission = await checkLocationPermission();
-    if (!hasPermission) {
-      throw Exception('No se tienen permisos para rastrear la ubicación');
-    }
-
-    // Iniciar la suscripción a las actualizaciones de ubicación
+    // Start location tracking
     Geolocator.getPositionStream(
       locationSettings: const LocationSettings(
         accuracy: LocationAccuracy.high,
-        distanceFilter: 10, // actualiza cada 10 metros de movimiento
+        distanceFilter: 10, // update every 10 meters of movement
       ),
     ).listen((Position position) {
-      // Convertir a nuestro modelo y emitir al stream
+      // Convert to our model and emit to the stream
       final locationData = LocationData(
         latitude: position.latitude,
         longitude: position.longitude,
@@ -99,15 +72,15 @@ class LocationService implements LocationInterface {
 
   @override
   Future<void> stopLocationTracking() async {
-    // No necesitamos hacer nada específico para detener el rastreo
-    // ya que el sistema de Flutter/Dart se encargará de limpiar los listeners
-    // al destruir la instancia
+    // We don't need to do anything specific to stop the tracking
+    // since the Flutter/Dart system will clean up the listeners
+    // when the instance is destroyed
   }
 
   @override
   Stream<LocationData> get locationStream => _locationController.stream;
 
-  // Limpieza de recursos
+  /// Dispose
   void dispose() {
     _locationController.close();
   }

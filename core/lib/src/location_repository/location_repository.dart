@@ -1,41 +1,34 @@
-import 'models/location_data.dart';
-import 'interface/location_interface.dart';
-import 'service/location_service.dart';
+import 'package:core/src/location_repository/models/location_data.dart';
+import 'package:core/src/location_repository/service/location_service.dart';
 
-class LocationRepository implements LocationRepositoryInterface {
-  final LocationService _locationService;
-
+/// Location repository
+class LocationRepository {
+  /// Constructor
   LocationRepository({LocationService? locationService})
     : _locationService = locationService ?? LocationService();
 
-  @override
+  /// Location service
+  final LocationService _locationService;
+
+  /// Get current location
   Future<LocationData> getCurrentLocation() {
     return _locationService.getCurrentLocation();
   }
 
-  @override
-  Future<bool> requestLocationPermission() {
-    return _locationService.requestLocationPermission();
-  }
-
-  @override
-  Future<bool> checkLocationPermission() {
-    return _locationService.checkLocationPermission();
-  }
-
-  @override
+  /// Start location tracking
   Future<void> startLocationTracking() {
     return _locationService.startLocationTracking();
   }
 
-  @override
+  /// Stop location tracking
   Future<void> stopLocationTracking() {
     return _locationService.stopLocationTracking();
   }
 
-  @override
+  /// Get location stream
   Stream<LocationData> get locationStream => _locationService.locationStream;
 
+  /// Dispose
   void dispose() {
     _locationService.dispose();
   }
