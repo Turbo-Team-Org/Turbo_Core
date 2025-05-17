@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:core/src/turbo_core_repositories/turbo_core_repositories.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:get_it/get_it.dart';
 
@@ -12,6 +13,9 @@ Future<void> initCoreDependencies({required FirebaseApp firebaseApp}) async {
   sl
     ..registerLazySingleton<FirebaseFirestore>(
       () => FirebaseFirestore.instanceFor(app: firebaseApp),
+    )
+    ..registerSingleton<FirebaseAuth>(
+      FirebaseAuth.instanceFor(app: firebaseApp),
     )
     ..registerLazySingleton<EventService>(
       () => EventService(firestore: sl<FirebaseFirestore>()),
@@ -26,7 +30,10 @@ Future<void> initCoreDependencies({required FirebaseApp firebaseApp}) async {
       () => FavoriteService(firestore: sl<FirebaseFirestore>()),
     )
     ..registerLazySingleton<AuthenticationService>(
-      () => AuthenticationService(firestore: sl<FirebaseFirestore>()),
+      () => AuthenticationService(
+        firestore: sl<FirebaseFirestore>(),
+        firebaseAuth: sl<FirebaseAuth>(),
+      ),
     )
     ..registerLazySingleton<CategoryService>(
       () => CategoryService(firestore: sl<FirebaseFirestore>()),
