@@ -41,9 +41,6 @@ Future<void> initCoreDependencies({
     ..registerLazySingleton<PlaceCategoryService>(
       () => PlaceCategoryService(firestore: sl<FirebaseFirestore>()),
     )
-    ..registerLazySingleton<EventService>(
-      () => EventService(firestore: sl<FirebaseFirestore>()),
-    )
     ..registerLazySingleton<LocationService>(LocationService.new)
     // Register repositories
     ..registerLazySingleton<CategoryRepository>(
