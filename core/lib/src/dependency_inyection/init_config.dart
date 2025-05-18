@@ -4,11 +4,11 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:get_it/get_it.dart';
 
-/// Instance of [GetIt] service locator
-final sl = GetIt.instance;
-
 /// Initialize dependencies
-Future<void> initCoreDependencies({required FirebaseApp firebaseApp}) async {
+Future<void> initCoreDependencies({
+  required FirebaseApp firebaseApp,
+  required GetIt sl,
+}) async {
   // Register services
   sl
     ..registerLazySingleton<FirebaseFirestore>(
