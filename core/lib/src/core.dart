@@ -10,6 +10,7 @@ export 'dependency_inyection/init_config.dart';
 export 'monorepo_utils/environments.dart';
 export 'turbo_core_repositories/turbo_core_repositories.dart';
 
+/// Core class
 class Core {
   /// {@macro core}
   const Core();
