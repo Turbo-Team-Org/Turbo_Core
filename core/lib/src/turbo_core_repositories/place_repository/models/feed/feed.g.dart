@@ -6,19 +6,18 @@ part of 'feed.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$FeedImpl _$$FeedImplFromJson(Map<String, dynamic> json) => _$FeedImpl(
-      id: (json['id'] as num).toInt(),
-      author: json['author'] as String,
-      content: json['content'] as String,
-      imageUrl: json['imageUrl'] as String,
-      timestamp: DateTime.parse(json['timestamp'] as String),
-    );
+_Feed _$FeedFromJson(Map<String, dynamic> json) => _Feed(
+  id: (json['id'] as num).toInt(),
+  author: json['author'] as String,
+  content: json['content'] as String,
+  imageUrl: json['imageUrl'] as String,
+  timestamp: DateTime.parse(json['timestamp'] as String),
+);
 
-Map<String, dynamic> _$$FeedImplToJson(_$FeedImpl instance) =>
-    <String, dynamic>{
-      'id': instance.id,
-      'author': instance.author,
-      'content': instance.content,
-      'imageUrl': instance.imageUrl,
-      'timestamp': instance.timestamp.toIso8601String(),
-    };
+Map<String, dynamic> _$FeedToJson(_Feed instance) => <String, dynamic>{
+  'id': instance.id,
+  'author': instance.author,
+  'content': instance.content,
+  'imageUrl': instance.imageUrl,
+  'timestamp': instance.timestamp.toIso8601String(),
+};

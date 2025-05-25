@@ -1,3 +1,4 @@
+// dart format width=80
 // coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint
@@ -9,252 +10,175 @@ part of 'favorite.dart';
 // FreezedGenerator
 // **************************************************************************
 
+// dart format off
 T _$identity<T>(T value) => value;
-
-final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
-
-Favorite _$FavoriteFromJson(Map<String, dynamic> json) {
-  return _Favorite.fromJson(json);
-}
 
 /// @nodoc
 mixin _$Favorite {
-  String get id => throw _privateConstructorUsedError;
-  String get userId => throw _privateConstructorUsedError;
-  String get placeId => throw _privateConstructorUsedError;
-  DateTime get date => throw _privateConstructorUsedError;
-  Place? get place => throw _privateConstructorUsedError;
+
+ String get id; String get userId; String get placeId; DateTime get date; Place? get place;
+/// Create a copy of Favorite
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$FavoriteCopyWith<Favorite> get copyWith => _$FavoriteCopyWithImpl<Favorite>(this as Favorite, _$identity);
 
   /// Serializes this Favorite to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  Map<String, dynamic> toJson();
 
-  /// Create a copy of Favorite
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  $FavoriteCopyWith<Favorite> get copyWith =>
-      throw _privateConstructorUsedError;
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is Favorite&&(identical(other.id, id) || other.id == id)&&(identical(other.userId, userId) || other.userId == userId)&&(identical(other.placeId, placeId) || other.placeId == placeId)&&(identical(other.date, date) || other.date == date)&&(identical(other.place, place) || other.place == place));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,id,userId,placeId,date,place);
+
+@override
+String toString() {
+  return 'Favorite(id: $id, userId: $userId, placeId: $placeId, date: $date, place: $place)';
+}
+
+
 }
 
 /// @nodoc
-abstract class $FavoriteCopyWith<$Res> {
-  factory $FavoriteCopyWith(Favorite value, $Res Function(Favorite) then) =
-      _$FavoriteCopyWithImpl<$Res, Favorite>;
-  @useResult
-  $Res call(
-      {String id, String userId, String placeId, DateTime date, Place? place});
+abstract mixin class $FavoriteCopyWith<$Res>  {
+  factory $FavoriteCopyWith(Favorite value, $Res Function(Favorite) _then) = _$FavoriteCopyWithImpl;
+@useResult
+$Res call({
+ String id, String userId, String placeId, DateTime date, Place? place
+});
 
-  $PlaceCopyWith<$Res>? get place;
+
+$PlaceCopyWith<$Res>? get place;
+
 }
-
 /// @nodoc
-class _$FavoriteCopyWithImpl<$Res, $Val extends Favorite>
+class _$FavoriteCopyWithImpl<$Res>
     implements $FavoriteCopyWith<$Res> {
-  _$FavoriteCopyWithImpl(this._value, this._then);
+  _$FavoriteCopyWithImpl(this._self, this._then);
 
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
+  final Favorite _self;
+  final $Res Function(Favorite) _then;
 
-  /// Create a copy of Favorite
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? id = null,
-    Object? userId = null,
-    Object? placeId = null,
-    Object? date = null,
-    Object? place = freezed,
-  }) {
-    return _then(_value.copyWith(
-      id: null == id
-          ? _value.id
-          : id // ignore: cast_nullable_to_non_nullable
-              as String,
-      userId: null == userId
-          ? _value.userId
-          : userId // ignore: cast_nullable_to_non_nullable
-              as String,
-      placeId: null == placeId
-          ? _value.placeId
-          : placeId // ignore: cast_nullable_to_non_nullable
-              as String,
-      date: null == date
-          ? _value.date
-          : date // ignore: cast_nullable_to_non_nullable
-              as DateTime,
-      place: freezed == place
-          ? _value.place
-          : place // ignore: cast_nullable_to_non_nullable
-              as Place?,
-    ) as $Val);
+/// Create a copy of Favorite
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? userId = null,Object? placeId = null,Object? date = null,Object? place = freezed,}) {
+  return _then(_self.copyWith(
+id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as String,userId: null == userId ? _self.userId : userId // ignore: cast_nullable_to_non_nullable
+as String,placeId: null == placeId ? _self.placeId : placeId // ignore: cast_nullable_to_non_nullable
+as String,date: null == date ? _self.date : date // ignore: cast_nullable_to_non_nullable
+as DateTime,place: freezed == place ? _self.place : place // ignore: cast_nullable_to_non_nullable
+as Place?,
+  ));
+}
+/// Create a copy of Favorite
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$PlaceCopyWith<$Res>? get place {
+    if (_self.place == null) {
+    return null;
   }
 
-  /// Create a copy of Favorite
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @pragma('vm:prefer-inline')
-  $PlaceCopyWith<$Res>? get place {
-    if (_value.place == null) {
-      return null;
-    }
-
-    return $PlaceCopyWith<$Res>(_value.place!, (value) {
-      return _then(_value.copyWith(place: value) as $Val);
-    });
-  }
+  return $PlaceCopyWith<$Res>(_self.place!, (value) {
+    return _then(_self.copyWith(place: value));
+  });
+}
 }
 
-/// @nodoc
-abstract class _$$FavoriteImplCopyWith<$Res>
-    implements $FavoriteCopyWith<$Res> {
-  factory _$$FavoriteImplCopyWith(
-          _$FavoriteImpl value, $Res Function(_$FavoriteImpl) then) =
-      __$$FavoriteImplCopyWithImpl<$Res>;
-  @override
-  @useResult
-  $Res call(
-      {String id, String userId, String placeId, DateTime date, Place? place});
-
-  @override
-  $PlaceCopyWith<$Res>? get place;
-}
-
-/// @nodoc
-class __$$FavoriteImplCopyWithImpl<$Res>
-    extends _$FavoriteCopyWithImpl<$Res, _$FavoriteImpl>
-    implements _$$FavoriteImplCopyWith<$Res> {
-  __$$FavoriteImplCopyWithImpl(
-      _$FavoriteImpl _value, $Res Function(_$FavoriteImpl) _then)
-      : super(_value, _then);
-
-  /// Create a copy of Favorite
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? id = null,
-    Object? userId = null,
-    Object? placeId = null,
-    Object? date = null,
-    Object? place = freezed,
-  }) {
-    return _then(_$FavoriteImpl(
-      id: null == id
-          ? _value.id
-          : id // ignore: cast_nullable_to_non_nullable
-              as String,
-      userId: null == userId
-          ? _value.userId
-          : userId // ignore: cast_nullable_to_non_nullable
-              as String,
-      placeId: null == placeId
-          ? _value.placeId
-          : placeId // ignore: cast_nullable_to_non_nullable
-              as String,
-      date: null == date
-          ? _value.date
-          : date // ignore: cast_nullable_to_non_nullable
-              as DateTime,
-      place: freezed == place
-          ? _value.place
-          : place // ignore: cast_nullable_to_non_nullable
-              as Place?,
-    ));
-  }
-}
 
 /// @nodoc
 @JsonSerializable()
-class _$FavoriteImpl implements _Favorite {
-  const _$FavoriteImpl(
-      {required this.id,
-      required this.userId,
-      required this.placeId,
-      required this.date,
-      this.place = null});
 
-  factory _$FavoriteImpl.fromJson(Map<String, dynamic> json) =>
-      _$$FavoriteImplFromJson(json);
+class _Favorite implements Favorite {
+  const _Favorite({required this.id, required this.userId, required this.placeId, required this.date, this.place = null});
+  factory _Favorite.fromJson(Map<String, dynamic> json) => _$FavoriteFromJson(json);
 
-  @override
-  final String id;
-  @override
-  final String userId;
-  @override
-  final String placeId;
-  @override
-  final DateTime date;
-  @override
-  @JsonKey()
-  final Place? place;
+@override final  String id;
+@override final  String userId;
+@override final  String placeId;
+@override final  DateTime date;
+@override@JsonKey() final  Place? place;
 
-  @override
-  String toString() {
-    return 'Favorite(id: $id, userId: $userId, placeId: $placeId, date: $date, place: $place)';
-  }
+/// Create a copy of Favorite
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$FavoriteCopyWith<_Favorite> get copyWith => __$FavoriteCopyWithImpl<_Favorite>(this, _$identity);
 
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is _$FavoriteImpl &&
-            (identical(other.id, id) || other.id == id) &&
-            (identical(other.userId, userId) || other.userId == userId) &&
-            (identical(other.placeId, placeId) || other.placeId == placeId) &&
-            (identical(other.date, date) || other.date == date) &&
-            (identical(other.place, place) || other.place == place));
-  }
-
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  int get hashCode =>
-      Object.hash(runtimeType, id, userId, placeId, date, place);
-
-  /// Create a copy of Favorite
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  @pragma('vm:prefer-inline')
-  _$$FavoriteImplCopyWith<_$FavoriteImpl> get copyWith =>
-      __$$FavoriteImplCopyWithImpl<_$FavoriteImpl>(this, _$identity);
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$FavoriteImplToJson(
-      this,
-    );
-  }
+@override
+Map<String, dynamic> toJson() {
+  return _$FavoriteToJson(this, );
 }
 
-abstract class _Favorite implements Favorite {
-  const factory _Favorite(
-      {required final String id,
-      required final String userId,
-      required final String placeId,
-      required final DateTime date,
-      final Place? place}) = _$FavoriteImpl;
-
-  factory _Favorite.fromJson(Map<String, dynamic> json) =
-      _$FavoriteImpl.fromJson;
-
-  @override
-  String get id;
-  @override
-  String get userId;
-  @override
-  String get placeId;
-  @override
-  DateTime get date;
-  @override
-  Place? get place;
-
-  /// Create a copy of Favorite
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$FavoriteImplCopyWith<_$FavoriteImpl> get copyWith =>
-      throw _privateConstructorUsedError;
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Favorite&&(identical(other.id, id) || other.id == id)&&(identical(other.userId, userId) || other.userId == userId)&&(identical(other.placeId, placeId) || other.placeId == placeId)&&(identical(other.date, date) || other.date == date)&&(identical(other.place, place) || other.place == place));
 }
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,id,userId,placeId,date,place);
+
+@override
+String toString() {
+  return 'Favorite(id: $id, userId: $userId, placeId: $placeId, date: $date, place: $place)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$FavoriteCopyWith<$Res> implements $FavoriteCopyWith<$Res> {
+  factory _$FavoriteCopyWith(_Favorite value, $Res Function(_Favorite) _then) = __$FavoriteCopyWithImpl;
+@override @useResult
+$Res call({
+ String id, String userId, String placeId, DateTime date, Place? place
+});
+
+
+@override $PlaceCopyWith<$Res>? get place;
+
+}
+/// @nodoc
+class __$FavoriteCopyWithImpl<$Res>
+    implements _$FavoriteCopyWith<$Res> {
+  __$FavoriteCopyWithImpl(this._self, this._then);
+
+  final _Favorite _self;
+  final $Res Function(_Favorite) _then;
+
+/// Create a copy of Favorite
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? userId = null,Object? placeId = null,Object? date = null,Object? place = freezed,}) {
+  return _then(_Favorite(
+id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as String,userId: null == userId ? _self.userId : userId // ignore: cast_nullable_to_non_nullable
+as String,placeId: null == placeId ? _self.placeId : placeId // ignore: cast_nullable_to_non_nullable
+as String,date: null == date ? _self.date : date // ignore: cast_nullable_to_non_nullable
+as DateTime,place: freezed == place ? _self.place : place // ignore: cast_nullable_to_non_nullable
+as Place?,
+  ));
+}
+
+/// Create a copy of Favorite
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$PlaceCopyWith<$Res>? get place {
+    if (_self.place == null) {
+    return null;
+  }
+
+  return $PlaceCopyWith<$Res>(_self.place!, (value) {
+    return _then(_self.copyWith(place: value));
+  });
+}
+}
+
+// dart format on

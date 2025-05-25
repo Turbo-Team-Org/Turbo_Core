@@ -2,7 +2,7 @@ import 'package:core/src/turbo_core_repositories/place_repository/models/place/p
 
 /// Place interface
 abstract class PlaceInterface {
-  /// Get places
+  /// Get all places
   Future<List<Place>> getPlaces();
 
   /// Get place by id
@@ -10,4 +10,16 @@ abstract class PlaceInterface {
 
   /// Get place by name
   Future<Place> getPlaceByName(String name);
+
+  /// Get places by category
+  Future<List<Place>> getPlacesByCategory(String categoryId);
+
+  /// Add a new place
+  Future<void> addPlace(Place place);
+
+  /// Update an existing place
+  Future<void> updatePlace(Place place);
+
+  /// Delete a place
+  Future<void> deletePlace(String id);
 }

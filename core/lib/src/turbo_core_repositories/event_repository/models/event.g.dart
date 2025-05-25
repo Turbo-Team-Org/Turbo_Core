@@ -6,7 +6,7 @@ part of 'event.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$EventImpl _$$EventImplFromJson(Map<String, dynamic> json) => _$EventImpl(
+_Event _$EventFromJson(Map<String, dynamic> json) => _Event(
   id: json['id'] as String,
   title: json['title'] as String,
   description: json['description'] as String,
@@ -29,24 +29,23 @@ _$EventImpl _$$EventImplFromJson(Map<String, dynamic> json) => _$EventImpl(
   link: json['link'] as String?,
 );
 
-Map<String, dynamic> _$$EventImplToJson(_$EventImpl instance) =>
-    <String, dynamic>{
-      'id': instance.id,
-      'title': instance.title,
-      'description': instance.description,
-      'date': instance.date.toIso8601String(),
-      'location': instance.location,
-      'imageUrl': instance.imageUrl,
-      'type': _$EventTypeEnumMap[instance.type],
-      'placeId': instance.placeId,
-      'price': instance.price,
-      'isHighlighted': instance.isHighlighted,
-      'tags': instance.tags,
-      'organizerName': instance.organizerName,
-      'organizerContact': instance.organizerContact,
-      'endDate': instance.endDate?.toIso8601String(),
-      'link': instance.link,
-    };
+Map<String, dynamic> _$EventToJson(_Event instance) => <String, dynamic>{
+  'id': instance.id,
+  'title': instance.title,
+  'description': instance.description,
+  'date': instance.date.toIso8601String(),
+  'location': instance.location,
+  'imageUrl': instance.imageUrl,
+  'type': _$EventTypeEnumMap[instance.type]!,
+  'placeId': instance.placeId,
+  'price': instance.price,
+  'isHighlighted': instance.isHighlighted,
+  'tags': instance.tags,
+  'organizerName': instance.organizerName,
+  'organizerContact': instance.organizerContact,
+  'endDate': instance.endDate?.toIso8601String(),
+  'link': instance.link,
+};
 
 const _$EventTypeEnumMap = {
   EventType.party: 'party',

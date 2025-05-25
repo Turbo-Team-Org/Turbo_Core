@@ -6,8 +6,8 @@ part of 'location_data.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$LocationDataImpl _$$LocationDataImplFromJson(Map<String, dynamic> json) =>
-    _$LocationDataImpl(
+_LocationData _$LocationDataFromJson(Map<String, dynamic> json) =>
+    _LocationData(
       latitude: (json['latitude'] as num).toDouble(),
       longitude: (json['longitude'] as num).toDouble(),
       address: json['address'] as String?,
@@ -15,12 +15,13 @@ _$LocationDataImpl _$$LocationDataImplFromJson(Map<String, dynamic> json) =>
       altitude: (json['altitude'] as num?)?.toDouble(),
       speed: (json['speed'] as num?)?.toDouble(),
       heading: (json['heading'] as num?)?.toDouble(),
-      timestamp: json['timestamp'] == null
-          ? null
-          : DateTime.parse(json['timestamp'] as String),
+      timestamp:
+          json['timestamp'] == null
+              ? null
+              : DateTime.parse(json['timestamp'] as String),
     );
 
-Map<String, dynamic> _$$LocationDataImplToJson(_$LocationDataImpl instance) =>
+Map<String, dynamic> _$LocationDataToJson(_LocationData instance) =>
     <String, dynamic>{
       'latitude': instance.latitude,
       'longitude': instance.longitude,

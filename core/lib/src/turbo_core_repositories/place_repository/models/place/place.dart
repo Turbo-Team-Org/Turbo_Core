@@ -26,6 +26,16 @@ sealed class Place with _$Place {
     @Default('') String mainImage,
     @Default(0) int favoriteCount,
     @Default('') String menuUrl,
+    @Default(0.0) double latitude,
+    @Default(0.0) double longitude,
+    @Default('') String categoryId,
+    @Default('') String categoryName,
+    @Default('') String categoryIcon,
+    @Default({}) Map<String, Map<String, String>> openingHours,
+    @Default('') String phone,
+    @Default('') String website,
+    @Default(0) int priceLevel,
+    @Default({}) Map<String, dynamic> metadata,
   }) = _Place;
 
   factory Place.fromJson(Map<String, dynamic> json) => _$PlaceFromJson(json);
@@ -57,6 +67,20 @@ sealed class Place with _$Place {
                 .toList()
             : [];
 
+    Map<String, Map<String, String>> asOpeningHours(dynamic value) {
+      if (value is! Map) return {};
+      return Map.fromEntries(
+        value.entries.map(
+          (e) => MapEntry(
+            e.key.toString(),
+            (e.value as Map).map(
+              (k, v) => MapEntry(k.toString(), v.toString()),
+            ),
+          ),
+        ),
+      );
+    }
+
     return Place(
       id: doc.id,
       name: asString(data?['name']),
@@ -78,6 +102,16 @@ sealed class Place with _$Place {
                   : ''),
       favoriteCount: asInt(data?['favoriteCount']),
       menuUrl: asString(data?['menuUrl']),
+      latitude: asDouble(data?['latitude']),
+      longitude: asDouble(data?['longitude']),
+      categoryId: asString(data?['categoryId']),
+      categoryName: asString(data?['categoryName']),
+      categoryIcon: asString(data?['categoryIcon']),
+      openingHours: asOpeningHours(data?['openingHours']),
+      phone: asString(data?['phone']),
+      website: asString(data?['website']),
+      priceLevel: asInt(data?['priceLevel']),
+      metadata: data?['metadata'] as Map<String, dynamic>? ?? {},
     );
   }
 }

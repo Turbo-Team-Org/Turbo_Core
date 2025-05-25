@@ -1,3 +1,4 @@
+// dart format width=80
 // coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint
@@ -9,217 +10,148 @@ part of 'schedule.dart';
 // FreezedGenerator
 // **************************************************************************
 
+// dart format off
 T _$identity<T>(T value) => value;
-
-final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
-
-Schedule _$ScheduleFromJson(Map<String, dynamic> json) {
-  return _Schedule.fromJson(json);
-}
 
 /// @nodoc
 mixin _$Schedule {
-  String get opening => throw _privateConstructorUsedError;
-  String get closing => throw _privateConstructorUsedError;
-  bool get isFullDay => throw _privateConstructorUsedError;
-  String get dayName => throw _privateConstructorUsedError;
+
+ String get opening; String get closing; bool get isFullDay; String get dayName;
+/// Create a copy of Schedule
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$ScheduleCopyWith<Schedule> get copyWith => _$ScheduleCopyWithImpl<Schedule>(this as Schedule, _$identity);
 
   /// Serializes this Schedule to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  Map<String, dynamic> toJson();
 
-  /// Create a copy of Schedule
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  $ScheduleCopyWith<Schedule> get copyWith =>
-      throw _privateConstructorUsedError;
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is Schedule&&(identical(other.opening, opening) || other.opening == opening)&&(identical(other.closing, closing) || other.closing == closing)&&(identical(other.isFullDay, isFullDay) || other.isFullDay == isFullDay)&&(identical(other.dayName, dayName) || other.dayName == dayName));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,opening,closing,isFullDay,dayName);
+
+@override
+String toString() {
+  return 'Schedule(opening: $opening, closing: $closing, isFullDay: $isFullDay, dayName: $dayName)';
+}
+
+
 }
 
 /// @nodoc
-abstract class $ScheduleCopyWith<$Res> {
-  factory $ScheduleCopyWith(Schedule value, $Res Function(Schedule) then) =
-      _$ScheduleCopyWithImpl<$Res, Schedule>;
-  @useResult
-  $Res call({String opening, String closing, bool isFullDay, String dayName});
-}
+abstract mixin class $ScheduleCopyWith<$Res>  {
+  factory $ScheduleCopyWith(Schedule value, $Res Function(Schedule) _then) = _$ScheduleCopyWithImpl;
+@useResult
+$Res call({
+ String opening, String closing, bool isFullDay, String dayName
+});
 
+
+
+
+}
 /// @nodoc
-class _$ScheduleCopyWithImpl<$Res, $Val extends Schedule>
+class _$ScheduleCopyWithImpl<$Res>
     implements $ScheduleCopyWith<$Res> {
-  _$ScheduleCopyWithImpl(this._value, this._then);
+  _$ScheduleCopyWithImpl(this._self, this._then);
 
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
+  final Schedule _self;
+  final $Res Function(Schedule) _then;
 
-  /// Create a copy of Schedule
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? opening = null,
-    Object? closing = null,
-    Object? isFullDay = null,
-    Object? dayName = null,
-  }) {
-    return _then(_value.copyWith(
-      opening: null == opening
-          ? _value.opening
-          : opening // ignore: cast_nullable_to_non_nullable
-              as String,
-      closing: null == closing
-          ? _value.closing
-          : closing // ignore: cast_nullable_to_non_nullable
-              as String,
-      isFullDay: null == isFullDay
-          ? _value.isFullDay
-          : isFullDay // ignore: cast_nullable_to_non_nullable
-              as bool,
-      dayName: null == dayName
-          ? _value.dayName
-          : dayName // ignore: cast_nullable_to_non_nullable
-              as String,
-    ) as $Val);
-  }
+/// Create a copy of Schedule
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? opening = null,Object? closing = null,Object? isFullDay = null,Object? dayName = null,}) {
+  return _then(_self.copyWith(
+opening: null == opening ? _self.opening : opening // ignore: cast_nullable_to_non_nullable
+as String,closing: null == closing ? _self.closing : closing // ignore: cast_nullable_to_non_nullable
+as String,isFullDay: null == isFullDay ? _self.isFullDay : isFullDay // ignore: cast_nullable_to_non_nullable
+as bool,dayName: null == dayName ? _self.dayName : dayName // ignore: cast_nullable_to_non_nullable
+as String,
+  ));
 }
 
-/// @nodoc
-abstract class _$$ScheduleImplCopyWith<$Res>
-    implements $ScheduleCopyWith<$Res> {
-  factory _$$ScheduleImplCopyWith(
-          _$ScheduleImpl value, $Res Function(_$ScheduleImpl) then) =
-      __$$ScheduleImplCopyWithImpl<$Res>;
-  @override
-  @useResult
-  $Res call({String opening, String closing, bool isFullDay, String dayName});
 }
 
-/// @nodoc
-class __$$ScheduleImplCopyWithImpl<$Res>
-    extends _$ScheduleCopyWithImpl<$Res, _$ScheduleImpl>
-    implements _$$ScheduleImplCopyWith<$Res> {
-  __$$ScheduleImplCopyWithImpl(
-      _$ScheduleImpl _value, $Res Function(_$ScheduleImpl) _then)
-      : super(_value, _then);
-
-  /// Create a copy of Schedule
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? opening = null,
-    Object? closing = null,
-    Object? isFullDay = null,
-    Object? dayName = null,
-  }) {
-    return _then(_$ScheduleImpl(
-      opening: null == opening
-          ? _value.opening
-          : opening // ignore: cast_nullable_to_non_nullable
-              as String,
-      closing: null == closing
-          ? _value.closing
-          : closing // ignore: cast_nullable_to_non_nullable
-              as String,
-      isFullDay: null == isFullDay
-          ? _value.isFullDay
-          : isFullDay // ignore: cast_nullable_to_non_nullable
-              as bool,
-      dayName: null == dayName
-          ? _value.dayName
-          : dayName // ignore: cast_nullable_to_non_nullable
-              as String,
-    ));
-  }
-}
 
 /// @nodoc
 @JsonSerializable()
-class _$ScheduleImpl extends _Schedule {
-  const _$ScheduleImpl(
-      {required this.opening,
-      required this.closing,
-      this.isFullDay = false,
-      this.dayName = ''})
-      : super._();
 
-  factory _$ScheduleImpl.fromJson(Map<String, dynamic> json) =>
-      _$$ScheduleImplFromJson(json);
+class _Schedule extends Schedule {
+  const _Schedule({required this.opening, required this.closing, this.isFullDay = false, this.dayName = ''}): super._();
+  factory _Schedule.fromJson(Map<String, dynamic> json) => _$ScheduleFromJson(json);
 
-  @override
-  final String opening;
-  @override
-  final String closing;
-  @override
-  @JsonKey()
-  final bool isFullDay;
-  @override
-  @JsonKey()
-  final String dayName;
+@override final  String opening;
+@override final  String closing;
+@override@JsonKey() final  bool isFullDay;
+@override@JsonKey() final  String dayName;
 
-  @override
-  String toString() {
-    return 'Schedule(opening: $opening, closing: $closing, isFullDay: $isFullDay, dayName: $dayName)';
-  }
+/// Create a copy of Schedule
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$ScheduleCopyWith<_Schedule> get copyWith => __$ScheduleCopyWithImpl<_Schedule>(this, _$identity);
 
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is _$ScheduleImpl &&
-            (identical(other.opening, opening) || other.opening == opening) &&
-            (identical(other.closing, closing) || other.closing == closing) &&
-            (identical(other.isFullDay, isFullDay) ||
-                other.isFullDay == isFullDay) &&
-            (identical(other.dayName, dayName) || other.dayName == dayName));
-  }
-
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  int get hashCode =>
-      Object.hash(runtimeType, opening, closing, isFullDay, dayName);
-
-  /// Create a copy of Schedule
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  @pragma('vm:prefer-inline')
-  _$$ScheduleImplCopyWith<_$ScheduleImpl> get copyWith =>
-      __$$ScheduleImplCopyWithImpl<_$ScheduleImpl>(this, _$identity);
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$ScheduleImplToJson(
-      this,
-    );
-  }
+@override
+Map<String, dynamic> toJson() {
+  return _$ScheduleToJson(this, );
 }
 
-abstract class _Schedule extends Schedule {
-  const factory _Schedule(
-      {required final String opening,
-      required final String closing,
-      final bool isFullDay,
-      final String dayName}) = _$ScheduleImpl;
-  const _Schedule._() : super._();
-
-  factory _Schedule.fromJson(Map<String, dynamic> json) =
-      _$ScheduleImpl.fromJson;
-
-  @override
-  String get opening;
-  @override
-  String get closing;
-  @override
-  bool get isFullDay;
-  @override
-  String get dayName;
-
-  /// Create a copy of Schedule
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$ScheduleImplCopyWith<_$ScheduleImpl> get copyWith =>
-      throw _privateConstructorUsedError;
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Schedule&&(identical(other.opening, opening) || other.opening == opening)&&(identical(other.closing, closing) || other.closing == closing)&&(identical(other.isFullDay, isFullDay) || other.isFullDay == isFullDay)&&(identical(other.dayName, dayName) || other.dayName == dayName));
 }
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,opening,closing,isFullDay,dayName);
+
+@override
+String toString() {
+  return 'Schedule(opening: $opening, closing: $closing, isFullDay: $isFullDay, dayName: $dayName)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$ScheduleCopyWith<$Res> implements $ScheduleCopyWith<$Res> {
+  factory _$ScheduleCopyWith(_Schedule value, $Res Function(_Schedule) _then) = __$ScheduleCopyWithImpl;
+@override @useResult
+$Res call({
+ String opening, String closing, bool isFullDay, String dayName
+});
+
+
+
+
+}
+/// @nodoc
+class __$ScheduleCopyWithImpl<$Res>
+    implements _$ScheduleCopyWith<$Res> {
+  __$ScheduleCopyWithImpl(this._self, this._then);
+
+  final _Schedule _self;
+  final $Res Function(_Schedule) _then;
+
+/// Create a copy of Schedule
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? opening = null,Object? closing = null,Object? isFullDay = null,Object? dayName = null,}) {
+  return _then(_Schedule(
+opening: null == opening ? _self.opening : opening // ignore: cast_nullable_to_non_nullable
+as String,closing: null == closing ? _self.closing : closing // ignore: cast_nullable_to_non_nullable
+as String,isFullDay: null == isFullDay ? _self.isFullDay : isFullDay // ignore: cast_nullable_to_non_nullable
+as bool,dayName: null == dayName ? _self.dayName : dayName // ignore: cast_nullable_to_non_nullable
+as String,
+  ));
+}
+
+
+}
+
+// dart format on

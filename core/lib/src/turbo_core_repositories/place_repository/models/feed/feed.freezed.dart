@@ -1,3 +1,4 @@
+// dart format width=80
 // coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint
@@ -9,238 +10,151 @@ part of 'feed.dart';
 // FreezedGenerator
 // **************************************************************************
 
+// dart format off
 T _$identity<T>(T value) => value;
-
-final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
-
-Feed _$FeedFromJson(Map<String, dynamic> json) {
-  return _Feed.fromJson(json);
-}
 
 /// @nodoc
 mixin _$Feed {
-  int get id => throw _privateConstructorUsedError;
-  String get author => throw _privateConstructorUsedError;
-  String get content => throw _privateConstructorUsedError;
-  String get imageUrl => throw _privateConstructorUsedError;
-  DateTime get timestamp => throw _privateConstructorUsedError;
+
+ int get id; String get author; String get content; String get imageUrl; DateTime get timestamp;
+/// Create a copy of Feed
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$FeedCopyWith<Feed> get copyWith => _$FeedCopyWithImpl<Feed>(this as Feed, _$identity);
 
   /// Serializes this Feed to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  Map<String, dynamic> toJson();
 
-  /// Create a copy of Feed
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  $FeedCopyWith<Feed> get copyWith => throw _privateConstructorUsedError;
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is Feed&&(identical(other.id, id) || other.id == id)&&(identical(other.author, author) || other.author == author)&&(identical(other.content, content) || other.content == content)&&(identical(other.imageUrl, imageUrl) || other.imageUrl == imageUrl)&&(identical(other.timestamp, timestamp) || other.timestamp == timestamp));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,id,author,content,imageUrl,timestamp);
+
+@override
+String toString() {
+  return 'Feed(id: $id, author: $author, content: $content, imageUrl: $imageUrl, timestamp: $timestamp)';
+}
+
+
 }
 
 /// @nodoc
-abstract class $FeedCopyWith<$Res> {
-  factory $FeedCopyWith(Feed value, $Res Function(Feed) then) =
-      _$FeedCopyWithImpl<$Res, Feed>;
-  @useResult
-  $Res call(
-      {int id,
-      String author,
-      String content,
-      String imageUrl,
-      DateTime timestamp});
-}
+abstract mixin class $FeedCopyWith<$Res>  {
+  factory $FeedCopyWith(Feed value, $Res Function(Feed) _then) = _$FeedCopyWithImpl;
+@useResult
+$Res call({
+ int id, String author, String content, String imageUrl, DateTime timestamp
+});
 
+
+
+
+}
 /// @nodoc
-class _$FeedCopyWithImpl<$Res, $Val extends Feed>
+class _$FeedCopyWithImpl<$Res>
     implements $FeedCopyWith<$Res> {
-  _$FeedCopyWithImpl(this._value, this._then);
+  _$FeedCopyWithImpl(this._self, this._then);
 
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
+  final Feed _self;
+  final $Res Function(Feed) _then;
 
-  /// Create a copy of Feed
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? id = null,
-    Object? author = null,
-    Object? content = null,
-    Object? imageUrl = null,
-    Object? timestamp = null,
-  }) {
-    return _then(_value.copyWith(
-      id: null == id
-          ? _value.id
-          : id // ignore: cast_nullable_to_non_nullable
-              as int,
-      author: null == author
-          ? _value.author
-          : author // ignore: cast_nullable_to_non_nullable
-              as String,
-      content: null == content
-          ? _value.content
-          : content // ignore: cast_nullable_to_non_nullable
-              as String,
-      imageUrl: null == imageUrl
-          ? _value.imageUrl
-          : imageUrl // ignore: cast_nullable_to_non_nullable
-              as String,
-      timestamp: null == timestamp
-          ? _value.timestamp
-          : timestamp // ignore: cast_nullable_to_non_nullable
-              as DateTime,
-    ) as $Val);
-  }
+/// Create a copy of Feed
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? author = null,Object? content = null,Object? imageUrl = null,Object? timestamp = null,}) {
+  return _then(_self.copyWith(
+id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as int,author: null == author ? _self.author : author // ignore: cast_nullable_to_non_nullable
+as String,content: null == content ? _self.content : content // ignore: cast_nullable_to_non_nullable
+as String,imageUrl: null == imageUrl ? _self.imageUrl : imageUrl // ignore: cast_nullable_to_non_nullable
+as String,timestamp: null == timestamp ? _self.timestamp : timestamp // ignore: cast_nullable_to_non_nullable
+as DateTime,
+  ));
 }
 
-/// @nodoc
-abstract class _$$FeedImplCopyWith<$Res> implements $FeedCopyWith<$Res> {
-  factory _$$FeedImplCopyWith(
-          _$FeedImpl value, $Res Function(_$FeedImpl) then) =
-      __$$FeedImplCopyWithImpl<$Res>;
-  @override
-  @useResult
-  $Res call(
-      {int id,
-      String author,
-      String content,
-      String imageUrl,
-      DateTime timestamp});
 }
 
-/// @nodoc
-class __$$FeedImplCopyWithImpl<$Res>
-    extends _$FeedCopyWithImpl<$Res, _$FeedImpl>
-    implements _$$FeedImplCopyWith<$Res> {
-  __$$FeedImplCopyWithImpl(_$FeedImpl _value, $Res Function(_$FeedImpl) _then)
-      : super(_value, _then);
-
-  /// Create a copy of Feed
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? id = null,
-    Object? author = null,
-    Object? content = null,
-    Object? imageUrl = null,
-    Object? timestamp = null,
-  }) {
-    return _then(_$FeedImpl(
-      id: null == id
-          ? _value.id
-          : id // ignore: cast_nullable_to_non_nullable
-              as int,
-      author: null == author
-          ? _value.author
-          : author // ignore: cast_nullable_to_non_nullable
-              as String,
-      content: null == content
-          ? _value.content
-          : content // ignore: cast_nullable_to_non_nullable
-              as String,
-      imageUrl: null == imageUrl
-          ? _value.imageUrl
-          : imageUrl // ignore: cast_nullable_to_non_nullable
-              as String,
-      timestamp: null == timestamp
-          ? _value.timestamp
-          : timestamp // ignore: cast_nullable_to_non_nullable
-              as DateTime,
-    ));
-  }
-}
 
 /// @nodoc
 @JsonSerializable()
-class _$FeedImpl implements _Feed {
-  const _$FeedImpl(
-      {required this.id,
-      required this.author,
-      required this.content,
-      required this.imageUrl,
-      required this.timestamp});
 
-  factory _$FeedImpl.fromJson(Map<String, dynamic> json) =>
-      _$$FeedImplFromJson(json);
+class _Feed implements Feed {
+  const _Feed({required this.id, required this.author, required this.content, required this.imageUrl, required this.timestamp});
+  factory _Feed.fromJson(Map<String, dynamic> json) => _$FeedFromJson(json);
 
-  @override
-  final int id;
-  @override
-  final String author;
-  @override
-  final String content;
-  @override
-  final String imageUrl;
-  @override
-  final DateTime timestamp;
+@override final  int id;
+@override final  String author;
+@override final  String content;
+@override final  String imageUrl;
+@override final  DateTime timestamp;
 
-  @override
-  String toString() {
-    return 'Feed(id: $id, author: $author, content: $content, imageUrl: $imageUrl, timestamp: $timestamp)';
-  }
+/// Create a copy of Feed
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$FeedCopyWith<_Feed> get copyWith => __$FeedCopyWithImpl<_Feed>(this, _$identity);
 
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is _$FeedImpl &&
-            (identical(other.id, id) || other.id == id) &&
-            (identical(other.author, author) || other.author == author) &&
-            (identical(other.content, content) || other.content == content) &&
-            (identical(other.imageUrl, imageUrl) ||
-                other.imageUrl == imageUrl) &&
-            (identical(other.timestamp, timestamp) ||
-                other.timestamp == timestamp));
-  }
-
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  int get hashCode =>
-      Object.hash(runtimeType, id, author, content, imageUrl, timestamp);
-
-  /// Create a copy of Feed
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  @pragma('vm:prefer-inline')
-  _$$FeedImplCopyWith<_$FeedImpl> get copyWith =>
-      __$$FeedImplCopyWithImpl<_$FeedImpl>(this, _$identity);
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$FeedImplToJson(
-      this,
-    );
-  }
+@override
+Map<String, dynamic> toJson() {
+  return _$FeedToJson(this, );
 }
 
-abstract class _Feed implements Feed {
-  const factory _Feed(
-      {required final int id,
-      required final String author,
-      required final String content,
-      required final String imageUrl,
-      required final DateTime timestamp}) = _$FeedImpl;
-
-  factory _Feed.fromJson(Map<String, dynamic> json) = _$FeedImpl.fromJson;
-
-  @override
-  int get id;
-  @override
-  String get author;
-  @override
-  String get content;
-  @override
-  String get imageUrl;
-  @override
-  DateTime get timestamp;
-
-  /// Create a copy of Feed
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$FeedImplCopyWith<_$FeedImpl> get copyWith =>
-      throw _privateConstructorUsedError;
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Feed&&(identical(other.id, id) || other.id == id)&&(identical(other.author, author) || other.author == author)&&(identical(other.content, content) || other.content == content)&&(identical(other.imageUrl, imageUrl) || other.imageUrl == imageUrl)&&(identical(other.timestamp, timestamp) || other.timestamp == timestamp));
 }
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,id,author,content,imageUrl,timestamp);
+
+@override
+String toString() {
+  return 'Feed(id: $id, author: $author, content: $content, imageUrl: $imageUrl, timestamp: $timestamp)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$FeedCopyWith<$Res> implements $FeedCopyWith<$Res> {
+  factory _$FeedCopyWith(_Feed value, $Res Function(_Feed) _then) = __$FeedCopyWithImpl;
+@override @useResult
+$Res call({
+ int id, String author, String content, String imageUrl, DateTime timestamp
+});
+
+
+
+
+}
+/// @nodoc
+class __$FeedCopyWithImpl<$Res>
+    implements _$FeedCopyWith<$Res> {
+  __$FeedCopyWithImpl(this._self, this._then);
+
+  final _Feed _self;
+  final $Res Function(_Feed) _then;
+
+/// Create a copy of Feed
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? author = null,Object? content = null,Object? imageUrl = null,Object? timestamp = null,}) {
+  return _then(_Feed(
+id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as int,author: null == author ? _self.author : author // ignore: cast_nullable_to_non_nullable
+as String,content: null == content ? _self.content : content // ignore: cast_nullable_to_non_nullable
+as String,imageUrl: null == imageUrl ? _self.imageUrl : imageUrl // ignore: cast_nullable_to_non_nullable
+as String,timestamp: null == timestamp ? _self.timestamp : timestamp // ignore: cast_nullable_to_non_nullable
+as DateTime,
+  ));
+}
+
+
+}
+
+// dart format on
