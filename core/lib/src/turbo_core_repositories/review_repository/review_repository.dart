@@ -17,31 +17,49 @@ class ReviewRepository implements ReviewInterface {
   final ReviewService reviewService;
 
   /// Get reviews
+  @override
   Future<List<Review>> getReviews() async {
     return reviewService.getReviews();
   }
 
   /// Get reviews from a place
+  @override
   Future<List<Review>> getReviewsFromAPlace(String placeId) async {
     return reviewService.getReviewsFromAPlace(placeId);
   }
 
   /// Add review
+  @override
   Future<void> addReview(Review review, String placeId) async {
     return reviewService.addReview(review, placeId);
   }
 
   /// Update review
+  @override
   Future<void> updateReview(Review review) async {
     return reviewService.updateReview(review);
   }
 
   /// Delete review
+  @override
   Future<void> deleteReview(String id) async {
     return reviewService.deleteReview(id);
   }
 
   // ==================== PAGINATED OPERATIONS ====================
+
+  @override
+  Future<PagedResult<Review>> getAllReviews({
+    int page = 1,
+    int limit = 20,
+    ReviewStatus? status,
+  }) async {
+    return reviewService.getAllReviews(
+      page: page,
+      limit: limit,
+      status: status,
+    );
+  }
 
   @override
   Future<PagedResult<Review>> getReviewsPaginated({

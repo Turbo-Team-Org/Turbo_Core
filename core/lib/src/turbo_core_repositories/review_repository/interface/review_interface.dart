@@ -23,6 +23,13 @@ abstract class ReviewInterface {
 
   // ==================== PAGINATED OPERATIONS ====================
 
+  /// Get all reviews with pagination (recommended method)
+  Future<PagedResult<Review>> getAllReviews({
+    int page = 1,
+    int limit = 20,
+    ReviewStatus? status,
+  });
+
   /// Get paginated reviews with optional filtering
   Future<PagedResult<Review>> getReviewsPaginated({
     int page = 1,

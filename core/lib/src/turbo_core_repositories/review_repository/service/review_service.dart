@@ -152,6 +152,89 @@ class ReviewService implements ReviewInterface {
   // ==================== PAGINATED OPERATIONS ====================
 
   @override
+  Future<PagedResult<Review>> getAllReviews({
+    int page = 1,
+    int limit = 20,
+    ReviewStatus? status,
+  }) async {
+    try {
+      Query query = firestore.collectionGroup('reviews');
+
+      // Apply status filter if provided
+      if (status != null) {
+        query = query.where('status', isEqualTo: status.value);
+      }
+
+      // Get total count for pagination metadata
+      final countSnapshot = await query.get();
+      final totalCount = countSnapshot.docs.length;
+
+      // Apply ordering
+      query = query.orderBy('date', descending: true);
+
+      // Apply pagination
+      if (page > 1) {
+        final skipCount = (page - 1) * limit;
+        // Get all documents up to the current page and take only the needed ones
+        final allSnapshot = await query.get();
+        final allDocs = allSnapshot.docs;
+
+        final startIndex = skipCount;
+        final endIndex = (startIndex + limit).clamp(0, allDocs.length);
+
+        final paginatedDocs =
+            startIndex < allDocs.length
+                ? allDocs.sublist(startIndex, endIndex)
+                : <QueryDocumentSnapshot>[];
+
+        final reviews =
+            paginatedDocs.map((doc) {
+              final data = doc.data() as Map<String, dynamic>;
+              data['id'] = doc.id;
+              return Review.fromFirestore(data);
+            }).toList();
+
+        final totalPages = (totalCount / limit).ceil();
+
+        return PagedResult(
+          items: reviews,
+          totalCount: totalCount,
+          currentPage: page,
+          pageSize: limit,
+          totalPages: totalPages,
+          hasNextPage: page < totalPages,
+          hasPreviousPage: page > 1,
+        );
+      } else {
+        // First page - use limit directly
+        query = query.limit(limit);
+        final snapshot = await query.get();
+
+        final reviews =
+            snapshot.docs.map((doc) {
+              final data = doc.data() as Map<String, dynamic>;
+              data['id'] = doc.id;
+              return Review.fromFirestore(data);
+            }).toList();
+
+        final totalPages = (totalCount / limit).ceil();
+
+        return PagedResult(
+          items: reviews,
+          totalCount: totalCount,
+          currentPage: page,
+          pageSize: limit,
+          totalPages: totalPages,
+          hasNextPage: page < totalPages,
+          hasPreviousPage: page > 1,
+        );
+      }
+    } catch (e) {
+      throw Exception('Error al obtener todas las reseñas paginadas: $e');
+    }
+  }
+
+  @override
   Future<PagedResult<Review>> getReviewsPaginated({
     int page = 1,
     int limit = 20,
