@@ -18,6 +18,12 @@ _Review _$ReviewFromJson(Map<String, dynamic> json) => _Review(
   imageUrls:
       (json['imageUrls'] as List<dynamic>?)?.map((e) => e as String).toList() ??
       const [],
+  status:
+      $enumDecodeNullable(_$ReviewStatusEnumMap, json['status']) ??
+      ReviewStatus.pending,
+  moderationNote: json['moderationNote'] as String?,
+  moderatedAt: const TimestampDateTimeConverter().fromJson(json['moderatedAt']),
+  moderatedBy: json['moderatedBy'] as String?,
 );
 
 Map<String, dynamic> _$ReviewToJson(_Review instance) => <String, dynamic>{
@@ -33,6 +39,21 @@ Map<String, dynamic> _$ReviewToJson(_Review instance) => <String, dynamic>{
     const TimestampDateTimeConverter().toJson,
   ),
   'imageUrls': instance.imageUrls,
+  'status': _$ReviewStatusEnumMap[instance.status]!,
+  'moderationNote': instance.moderationNote,
+  'moderatedAt': _$JsonConverterToJson<dynamic, DateTime>(
+    instance.moderatedAt,
+    const TimestampDateTimeConverter().toJson,
+  ),
+  'moderatedBy': instance.moderatedBy,
+};
+
+const _$ReviewStatusEnumMap = {
+  ReviewStatus.pending: 'pending',
+  ReviewStatus.approved: 'approved',
+  ReviewStatus.rejected: 'rejected',
+  ReviewStatus.underReview: 'underReview',
+  ReviewStatus.flagged: 'flagged',
 };
 
 Json? _$JsonConverterToJson<Json, Value>(
