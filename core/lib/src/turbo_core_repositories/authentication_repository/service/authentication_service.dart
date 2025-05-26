@@ -88,6 +88,76 @@ class AuthenticationService implements AuthenticationInterface {
     await GoogleSignIn().signOut();
   }
 
+  /// Changes the password for the current authenticated user.
+  ///
+  /// Requires the user to be authenticated and provide their current password
+  /// for security verification before setting the new password.
+  @override
+  Future<void> changePassword({
+    required String currentPassword,
+    required String newPassword,
+  }) async {
+    final user = _firebaseAuth.currentUser;
+    if (user == null) {
+      throw Exception('No hay usuario autenticado');
+    }
+
+    if (user.email == null) {
+      throw Exception('Usuario no tiene email asociado');
+    }
+
+    try {
+      // Re-authenticate the user with their current password for security
+      final credential = EmailAuthProvider.credential(
+        email: user.email!,
+        password: currentPassword,
+      );
+
+      await user.reauthenticateWithCredential(credential);
+
+      // Update the password
+      await user.updatePassword(newPassword);
+    } on FirebaseAuthException catch (e) {
+      switch (e.code) {
+        case 'wrong-password':
+          throw Exception('La contraseña actual es incorrecta');
+        case 'weak-password':
+          throw Exception('La nueva contraseña es muy débil');
+        case 'requires-recent-login':
+          throw Exception(
+            'Se requiere autenticación reciente. Inicia sesión nuevamente',
+          );
+        default:
+          throw Exception('Error al cambiar contraseña: ${e.message}');
+      }
+    } catch (e) {
+      throw Exception('Error inesperado al cambiar contraseña: $e');
+    }
+  }
+
+  /// Sends a password reset email to the specified email address.
+  ///
+  /// The user will receive an email with instructions to reset their password.
+  @override
+  Future<void> sendPasswordResetEmail({required String email}) async {
+    try {
+      await _firebaseAuth.sendPasswordResetEmail(email: email);
+    } on FirebaseAuthException catch (e) {
+      switch (e.code) {
+        case 'user-not-found':
+          throw Exception('No existe una cuenta con este email');
+        case 'invalid-email':
+          throw Exception('El formato del email es inválido');
+        default:
+          throw Exception(
+            'Error al enviar email de recuperación: ${e.message}',
+          );
+      }
+    } catch (e) {
+      throw Exception('Error inesperado al enviar email: $e');
+    }
+  }
+
   /// Emits authentication state changes as a stream of [AuthUser].
   @override
   Stream<AuthUser?> get authStateChanges =>

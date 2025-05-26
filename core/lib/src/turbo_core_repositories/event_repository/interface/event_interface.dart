@@ -2,6 +2,8 @@ import 'package:core/src/turbo_core_repositories/event_repository/models/event.d
 
 /// Interface for event repository
 abstract class EventInterface {
+  // ==================== READ OPERATIONS ====================
+
   /// Get all events
   Future<List<Event>> getEvents();
 
@@ -19,4 +21,19 @@ abstract class EventInterface {
 
   /// Get highlighted events
   Future<List<Event>> getHighlightedEvents();
+
+  // ==================== CREATE OPERATIONS ====================
+
+  /// Add a new event
+  Future<void> addEvent(Event event);
+
+  // ==================== UPDATE OPERATIONS ====================
+
+  /// Update an existing event
+  Future<void> updateEvent(Event event);
+
+  // ==================== DELETE OPERATIONS ====================
+
+  /// Delete an event by id
+  Future<void> deleteEvent(String id);
 }

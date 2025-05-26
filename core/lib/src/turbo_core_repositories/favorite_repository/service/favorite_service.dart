@@ -111,4 +111,27 @@ class FavoriteService implements FavoriteInterface {
       throw Exception('Error al agregar favorito: $e');
     }
   }
+
+  @override
+  Future<void> removeFavorite(String userId, String placeId) async {
+    try {
+      final querySnapshot =
+          await _firestore
+              .collection('favorites')
+              .where('userId', isEqualTo: userId)
+              .where('placeId', isEqualTo: placeId)
+              .get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        await _firestore
+            .collection('favorites')
+            .doc(querySnapshot.docs.first.id)
+            .delete();
+      } else {
+        throw Exception('Favorito no encontrado');
+      }
+    } catch (e) {
+      throw Exception('Error al eliminar favorito: $e');
+    }
+  }
 }

@@ -2,6 +2,8 @@ import 'package:core/src/turbo_core_repositories/authentication_repository/model
 
 /// Interface for the authentication repository.
 abstract class AuthenticationInterface {
+  // ==================== AUTHENTICATION OPERATIONS ====================
+
   /// Signs in with email.
   Future<AuthUser?> signInWithEmail({
     required String email,
@@ -20,6 +22,19 @@ abstract class AuthenticationInterface {
 
   /// Signs out.
   Future<void> signOut();
+
+  // ==================== PASSWORD OPERATIONS ====================
+
+  /// Changes the password for the current authenticated user.
+  Future<void> changePassword({
+    required String currentPassword,
+    required String newPassword,
+  });
+
+  /// Sends a password reset email to the specified email address.
+  Future<void> sendPasswordResetEmail({required String email});
+
+  // ==================== STATE OPERATIONS ====================
 
   /// Stream of the authentication state.
   Stream<AuthUser?> get authStateChanges;

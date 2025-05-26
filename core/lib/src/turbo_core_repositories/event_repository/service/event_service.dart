@@ -81,4 +81,40 @@ class EventService implements EventInterface {
 
     return snapshot.docs.map(Event.fromFirestore).toList();
   }
+
+  // ==================== CREATE OPERATIONS ====================
+
+  /// Adds a new event to Firestore.
+  @override
+  Future<void> addEvent(Event event) async {
+    try {
+      await firestore.collection('events').doc(event.id).set(event.toJson());
+    } catch (e) {
+      throw Exception('Error adding event: $e');
+    }
+  }
+
+  // ==================== UPDATE OPERATIONS ====================
+
+  /// Updates an existing event in Firestore.
+  @override
+  Future<void> updateEvent(Event event) async {
+    try {
+      await firestore.collection('events').doc(event.id).update(event.toJson());
+    } catch (e) {
+      throw Exception('Error updating event: $e');
+    }
+  }
+
+  // ==================== DELETE OPERATIONS ====================
+
+  /// Deletes an event from Firestore by its [id].
+  @override
+  Future<void> deleteEvent(String id) async {
+    try {
+      await firestore.collection('events').doc(id).delete();
+    } catch (e) {
+      throw Exception('Error deleting event: $e');
+    }
+  }
 }
