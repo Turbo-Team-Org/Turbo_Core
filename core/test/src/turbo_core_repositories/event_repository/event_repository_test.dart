@@ -36,6 +36,10 @@ void main() {
       organizerContact: 'test@example.com',
       endDate: testDate.add(const Duration(hours: 4)),
       link: 'https://example.com/event',
+      createdBy: 'admin_user_001',
+      createdAt: DateTime(2024, 1, 1, 10, 0),
+      lastUpdatedBy: 'admin_user_002',
+      lastUpdatedAt: DateTime(2024, 1, 15, 14, 30),
     );
 
     final testEvents = [testEvent];
@@ -176,10 +180,9 @@ void main() {
         ).thenAnswer((_) async {});
 
         // Act
-        final result = await eventRepository.addEvent(testEvent);
+        await eventRepository.addEvent(testEvent);
 
         // Assert
-        expect(result, isTrue);
         verify(() => mockEventService.addEvent(testEvent)).called(1);
       });
 
@@ -211,10 +214,9 @@ void main() {
         ).thenAnswer((_) async {});
 
         // Act
-        final result = await eventRepository.updateEvent(testEvent);
+        await eventRepository.updateEvent(testEvent);
 
         // Assert
-        expect(result, isTrue);
         verify(() => mockEventService.updateEvent(testEvent)).called(1);
       });
 
@@ -246,10 +248,9 @@ void main() {
         ).thenAnswer((_) async {});
 
         // Act
-        final result = await eventRepository.deleteEvent(testEventId);
+        await eventRepository.deleteEvent(testEventId);
 
         // Assert
-        expect(result, isTrue);
         verify(() => mockEventService.deleteEvent(testEventId)).called(1);
       });
 
@@ -697,6 +698,111 @@ void main() {
           ),
         );
       });
+    });
+  });
+
+  // 🆕 Tests para funcionalidades administrativas
+  group('EventRepository - Administrative Features', () {
+    const testAdminId = 'admin_user_001';
+    const testPlaceId = 'test_place_123';
+    final testDate = DateTime(2024, 12, 25, 20, 0);
+
+    final adminEvent = Event(
+      id: 'admin_event_001',
+      title: 'Admin Event',
+      description: 'Event created by admin',
+      date: testDate,
+      location: 'Admin Location',
+      imageUrl: 'https://example.com/admin-image.jpg',
+      type: EventType.concert,
+      placeId: testPlaceId,
+      price: 50.0,
+      createdBy: testAdminId,
+      createdAt: DateTime(2024, 1, 1, 10, 0),
+      lastUpdatedBy: testAdminId,
+      lastUpdatedAt: DateTime(2024, 1, 15, 14, 30),
+    );
+
+    test('event includes administrative fields', () {
+      // Assert
+      expect(adminEvent.createdBy, equals(testAdminId));
+      expect(adminEvent.createdAt, isNotNull);
+      expect(adminEvent.lastUpdatedBy, equals(testAdminId));
+      expect(adminEvent.lastUpdatedAt, isNotNull);
+    });
+
+    test('event with null administrative fields', () {
+      // Arrange
+      final basicEvent = Event(
+        id: 'basic_event_001',
+        title: 'Basic Event',
+        description: 'Event without admin fields',
+        date: testDate,
+        location: 'Basic Location',
+        imageUrl: 'https://example.com/basic-image.jpg',
+        type: EventType.party,
+        // Admin fields should use defaults
+        createdBy: '', // Default value
+        createdAt: null,
+        lastUpdatedBy: null,
+        lastUpdatedAt: null,
+      );
+
+      // Assert
+      expect(basicEvent.createdBy, equals(''));
+      expect(basicEvent.createdAt, isNull);
+      expect(basicEvent.lastUpdatedBy, isNull);
+      expect(basicEvent.lastUpdatedAt, isNull);
+    });
+
+    test('copyWith preserves administrative fields', () {
+      // Act
+      final updatedEvent = adminEvent.copyWith(
+        title: 'Updated Title',
+        lastUpdatedBy: 'different_admin',
+        lastUpdatedAt: DateTime(2024, 2, 1, 12, 0),
+      );
+
+      // Assert
+      expect(updatedEvent.title, equals('Updated Title'));
+      expect(updatedEvent.createdBy, equals(testAdminId)); // Preserved
+      expect(updatedEvent.createdAt, equals(adminEvent.createdAt)); // Preserved
+      expect(updatedEvent.lastUpdatedBy, equals('different_admin')); // Updated
+      expect(
+        updatedEvent.lastUpdatedAt,
+        isNot(equals(adminEvent.lastUpdatedAt)),
+      ); // Updated
+    });
+
+    test('events can be filtered by creation metadata', () async {
+      // Arrange
+      final systemEvent = adminEvent.copyWith(
+        id: 'system_event',
+        createdBy: 'system',
+      );
+      final userEvent = adminEvent.copyWith(
+        id: 'user_event',
+        createdBy: 'user_123',
+      );
+
+      final allEvents = [adminEvent, systemEvent, userEvent];
+
+      when(
+        () => mockEventService.getEvents(),
+      ).thenAnswer((_) async => allEvents);
+
+      // Act
+      final result = await eventRepository.getEvents();
+      final adminEvents =
+          result.where((e) => e.createdBy == testAdminId).toList();
+      final systemEvents =
+          result.where((e) => e.createdBy == 'system').toList();
+
+      // Assert
+      expect(adminEvents.length, equals(1));
+      expect(systemEvents.length, equals(1));
+      expect(adminEvents.first.id, equals('admin_event_001'));
+      expect(systemEvents.first.id, equals('system_event'));
     });
   });
 }

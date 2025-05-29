@@ -16,7 +16,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$Event {
 
- String get id; String get title; String get description; DateTime get date; String get location; String get imageUrl; EventType get type; String? get placeId; double? get price; bool get isHighlighted; List<String> get tags; String? get organizerName; String? get organizerContact; DateTime? get endDate; String? get link;
+ String get id; String get title; String get description; DateTime get date; String get location; String get imageUrl; EventType get type; String? get placeId; double? get price; bool get isHighlighted; List<String> get tags; String? get organizerName; String? get organizerContact; DateTime? get endDate; String? get link; String get createdBy; DateTime? get createdAt; String? get lastUpdatedBy; DateTime? get lastUpdatedAt;
 /// Create a copy of Event
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -29,16 +29,16 @@ $EventCopyWith<Event> get copyWith => _$EventCopyWithImpl<Event>(this as Event, 
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is Event&&(identical(other.id, id) || other.id == id)&&(identical(other.title, title) || other.title == title)&&(identical(other.description, description) || other.description == description)&&(identical(other.date, date) || other.date == date)&&(identical(other.location, location) || other.location == location)&&(identical(other.imageUrl, imageUrl) || other.imageUrl == imageUrl)&&(identical(other.type, type) || other.type == type)&&(identical(other.placeId, placeId) || other.placeId == placeId)&&(identical(other.price, price) || other.price == price)&&(identical(other.isHighlighted, isHighlighted) || other.isHighlighted == isHighlighted)&&const DeepCollectionEquality().equals(other.tags, tags)&&(identical(other.organizerName, organizerName) || other.organizerName == organizerName)&&(identical(other.organizerContact, organizerContact) || other.organizerContact == organizerContact)&&(identical(other.endDate, endDate) || other.endDate == endDate)&&(identical(other.link, link) || other.link == link));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is Event&&(identical(other.id, id) || other.id == id)&&(identical(other.title, title) || other.title == title)&&(identical(other.description, description) || other.description == description)&&(identical(other.date, date) || other.date == date)&&(identical(other.location, location) || other.location == location)&&(identical(other.imageUrl, imageUrl) || other.imageUrl == imageUrl)&&(identical(other.type, type) || other.type == type)&&(identical(other.placeId, placeId) || other.placeId == placeId)&&(identical(other.price, price) || other.price == price)&&(identical(other.isHighlighted, isHighlighted) || other.isHighlighted == isHighlighted)&&const DeepCollectionEquality().equals(other.tags, tags)&&(identical(other.organizerName, organizerName) || other.organizerName == organizerName)&&(identical(other.organizerContact, organizerContact) || other.organizerContact == organizerContact)&&(identical(other.endDate, endDate) || other.endDate == endDate)&&(identical(other.link, link) || other.link == link)&&(identical(other.createdBy, createdBy) || other.createdBy == createdBy)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.lastUpdatedBy, lastUpdatedBy) || other.lastUpdatedBy == lastUpdatedBy)&&(identical(other.lastUpdatedAt, lastUpdatedAt) || other.lastUpdatedAt == lastUpdatedAt));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,title,description,date,location,imageUrl,type,placeId,price,isHighlighted,const DeepCollectionEquality().hash(tags),organizerName,organizerContact,endDate,link);
+int get hashCode => Object.hashAll([runtimeType,id,title,description,date,location,imageUrl,type,placeId,price,isHighlighted,const DeepCollectionEquality().hash(tags),organizerName,organizerContact,endDate,link,createdBy,createdAt,lastUpdatedBy,lastUpdatedAt]);
 
 @override
 String toString() {
-  return 'Event(id: $id, title: $title, description: $description, date: $date, location: $location, imageUrl: $imageUrl, type: $type, placeId: $placeId, price: $price, isHighlighted: $isHighlighted, tags: $tags, organizerName: $organizerName, organizerContact: $organizerContact, endDate: $endDate, link: $link)';
+  return 'Event(id: $id, title: $title, description: $description, date: $date, location: $location, imageUrl: $imageUrl, type: $type, placeId: $placeId, price: $price, isHighlighted: $isHighlighted, tags: $tags, organizerName: $organizerName, organizerContact: $organizerContact, endDate: $endDate, link: $link, createdBy: $createdBy, createdAt: $createdAt, lastUpdatedBy: $lastUpdatedBy, lastUpdatedAt: $lastUpdatedAt)';
 }
 
 
@@ -49,7 +49,7 @@ abstract mixin class $EventCopyWith<$Res>  {
   factory $EventCopyWith(Event value, $Res Function(Event) _then) = _$EventCopyWithImpl;
 @useResult
 $Res call({
- String id, String title, String description, DateTime date, String location, String imageUrl, EventType type, String? placeId, double? price, bool isHighlighted, List<String> tags, String? organizerName, String? organizerContact, DateTime? endDate, String? link
+ String id, String title, String description, DateTime date, String location, String imageUrl, EventType type, String? placeId, double? price, bool isHighlighted, List<String> tags, String? organizerName, String? organizerContact, DateTime? endDate, String? link, String createdBy, DateTime? createdAt, String? lastUpdatedBy, DateTime? lastUpdatedAt
 });
 
 
@@ -66,7 +66,7 @@ class _$EventCopyWithImpl<$Res>
 
 /// Create a copy of Event
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? title = null,Object? description = null,Object? date = null,Object? location = null,Object? imageUrl = null,Object? type = null,Object? placeId = freezed,Object? price = freezed,Object? isHighlighted = null,Object? tags = null,Object? organizerName = freezed,Object? organizerContact = freezed,Object? endDate = freezed,Object? link = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? title = null,Object? description = null,Object? date = null,Object? location = null,Object? imageUrl = null,Object? type = null,Object? placeId = freezed,Object? price = freezed,Object? isHighlighted = null,Object? tags = null,Object? organizerName = freezed,Object? organizerContact = freezed,Object? endDate = freezed,Object? link = freezed,Object? createdBy = null,Object? createdAt = freezed,Object? lastUpdatedBy = freezed,Object? lastUpdatedAt = freezed,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
@@ -83,7 +83,11 @@ as List<String>,organizerName: freezed == organizerName ? _self.organizerName : 
 as String?,organizerContact: freezed == organizerContact ? _self.organizerContact : organizerContact // ignore: cast_nullable_to_non_nullable
 as String?,endDate: freezed == endDate ? _self.endDate : endDate // ignore: cast_nullable_to_non_nullable
 as DateTime?,link: freezed == link ? _self.link : link // ignore: cast_nullable_to_non_nullable
-as String?,
+as String?,createdBy: null == createdBy ? _self.createdBy : createdBy // ignore: cast_nullable_to_non_nullable
+as String,createdAt: freezed == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
+as DateTime?,lastUpdatedBy: freezed == lastUpdatedBy ? _self.lastUpdatedBy : lastUpdatedBy // ignore: cast_nullable_to_non_nullable
+as String?,lastUpdatedAt: freezed == lastUpdatedAt ? _self.lastUpdatedAt : lastUpdatedAt // ignore: cast_nullable_to_non_nullable
+as DateTime?,
   ));
 }
 
@@ -94,7 +98,7 @@ as String?,
 @JsonSerializable()
 
 class _Event implements Event {
-  const _Event({required this.id, required this.title, required this.description, required this.date, required this.location, required this.imageUrl, required this.type, this.placeId, this.price, this.isHighlighted = false, final  List<String> tags = const [], this.organizerName, this.organizerContact, this.endDate, this.link}): _tags = tags;
+  const _Event({required this.id, required this.title, required this.description, required this.date, required this.location, required this.imageUrl, required this.type, this.placeId, this.price, this.isHighlighted = false, final  List<String> tags = const [], this.organizerName, this.organizerContact, this.endDate, this.link, this.createdBy = '', this.createdAt, this.lastUpdatedBy, this.lastUpdatedAt}): _tags = tags;
   factory _Event.fromJson(Map<String, dynamic> json) => _$EventFromJson(json);
 
 @override final  String id;
@@ -118,6 +122,10 @@ class _Event implements Event {
 @override final  String? organizerContact;
 @override final  DateTime? endDate;
 @override final  String? link;
+@override@JsonKey() final  String createdBy;
+@override final  DateTime? createdAt;
+@override final  String? lastUpdatedBy;
+@override final  DateTime? lastUpdatedAt;
 
 /// Create a copy of Event
 /// with the given fields replaced by the non-null parameter values.
@@ -132,16 +140,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Event&&(identical(other.id, id) || other.id == id)&&(identical(other.title, title) || other.title == title)&&(identical(other.description, description) || other.description == description)&&(identical(other.date, date) || other.date == date)&&(identical(other.location, location) || other.location == location)&&(identical(other.imageUrl, imageUrl) || other.imageUrl == imageUrl)&&(identical(other.type, type) || other.type == type)&&(identical(other.placeId, placeId) || other.placeId == placeId)&&(identical(other.price, price) || other.price == price)&&(identical(other.isHighlighted, isHighlighted) || other.isHighlighted == isHighlighted)&&const DeepCollectionEquality().equals(other._tags, _tags)&&(identical(other.organizerName, organizerName) || other.organizerName == organizerName)&&(identical(other.organizerContact, organizerContact) || other.organizerContact == organizerContact)&&(identical(other.endDate, endDate) || other.endDate == endDate)&&(identical(other.link, link) || other.link == link));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Event&&(identical(other.id, id) || other.id == id)&&(identical(other.title, title) || other.title == title)&&(identical(other.description, description) || other.description == description)&&(identical(other.date, date) || other.date == date)&&(identical(other.location, location) || other.location == location)&&(identical(other.imageUrl, imageUrl) || other.imageUrl == imageUrl)&&(identical(other.type, type) || other.type == type)&&(identical(other.placeId, placeId) || other.placeId == placeId)&&(identical(other.price, price) || other.price == price)&&(identical(other.isHighlighted, isHighlighted) || other.isHighlighted == isHighlighted)&&const DeepCollectionEquality().equals(other._tags, _tags)&&(identical(other.organizerName, organizerName) || other.organizerName == organizerName)&&(identical(other.organizerContact, organizerContact) || other.organizerContact == organizerContact)&&(identical(other.endDate, endDate) || other.endDate == endDate)&&(identical(other.link, link) || other.link == link)&&(identical(other.createdBy, createdBy) || other.createdBy == createdBy)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.lastUpdatedBy, lastUpdatedBy) || other.lastUpdatedBy == lastUpdatedBy)&&(identical(other.lastUpdatedAt, lastUpdatedAt) || other.lastUpdatedAt == lastUpdatedAt));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,title,description,date,location,imageUrl,type,placeId,price,isHighlighted,const DeepCollectionEquality().hash(_tags),organizerName,organizerContact,endDate,link);
+int get hashCode => Object.hashAll([runtimeType,id,title,description,date,location,imageUrl,type,placeId,price,isHighlighted,const DeepCollectionEquality().hash(_tags),organizerName,organizerContact,endDate,link,createdBy,createdAt,lastUpdatedBy,lastUpdatedAt]);
 
 @override
 String toString() {
-  return 'Event(id: $id, title: $title, description: $description, date: $date, location: $location, imageUrl: $imageUrl, type: $type, placeId: $placeId, price: $price, isHighlighted: $isHighlighted, tags: $tags, organizerName: $organizerName, organizerContact: $organizerContact, endDate: $endDate, link: $link)';
+  return 'Event(id: $id, title: $title, description: $description, date: $date, location: $location, imageUrl: $imageUrl, type: $type, placeId: $placeId, price: $price, isHighlighted: $isHighlighted, tags: $tags, organizerName: $organizerName, organizerContact: $organizerContact, endDate: $endDate, link: $link, createdBy: $createdBy, createdAt: $createdAt, lastUpdatedBy: $lastUpdatedBy, lastUpdatedAt: $lastUpdatedAt)';
 }
 
 
@@ -152,7 +160,7 @@ abstract mixin class _$EventCopyWith<$Res> implements $EventCopyWith<$Res> {
   factory _$EventCopyWith(_Event value, $Res Function(_Event) _then) = __$EventCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String title, String description, DateTime date, String location, String imageUrl, EventType type, String? placeId, double? price, bool isHighlighted, List<String> tags, String? organizerName, String? organizerContact, DateTime? endDate, String? link
+ String id, String title, String description, DateTime date, String location, String imageUrl, EventType type, String? placeId, double? price, bool isHighlighted, List<String> tags, String? organizerName, String? organizerContact, DateTime? endDate, String? link, String createdBy, DateTime? createdAt, String? lastUpdatedBy, DateTime? lastUpdatedAt
 });
 
 
@@ -169,7 +177,7 @@ class __$EventCopyWithImpl<$Res>
 
 /// Create a copy of Event
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? title = null,Object? description = null,Object? date = null,Object? location = null,Object? imageUrl = null,Object? type = null,Object? placeId = freezed,Object? price = freezed,Object? isHighlighted = null,Object? tags = null,Object? organizerName = freezed,Object? organizerContact = freezed,Object? endDate = freezed,Object? link = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? title = null,Object? description = null,Object? date = null,Object? location = null,Object? imageUrl = null,Object? type = null,Object? placeId = freezed,Object? price = freezed,Object? isHighlighted = null,Object? tags = null,Object? organizerName = freezed,Object? organizerContact = freezed,Object? endDate = freezed,Object? link = freezed,Object? createdBy = null,Object? createdAt = freezed,Object? lastUpdatedBy = freezed,Object? lastUpdatedAt = freezed,}) {
   return _then(_Event(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
@@ -186,7 +194,11 @@ as List<String>,organizerName: freezed == organizerName ? _self.organizerName : 
 as String?,organizerContact: freezed == organizerContact ? _self.organizerContact : organizerContact // ignore: cast_nullable_to_non_nullable
 as String?,endDate: freezed == endDate ? _self.endDate : endDate // ignore: cast_nullable_to_non_nullable
 as DateTime?,link: freezed == link ? _self.link : link // ignore: cast_nullable_to_non_nullable
-as String?,
+as String?,createdBy: null == createdBy ? _self.createdBy : createdBy // ignore: cast_nullable_to_non_nullable
+as String,createdAt: freezed == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
+as DateTime?,lastUpdatedBy: freezed == lastUpdatedBy ? _self.lastUpdatedBy : lastUpdatedBy // ignore: cast_nullable_to_non_nullable
+as String?,lastUpdatedAt: freezed == lastUpdatedAt ? _self.lastUpdatedAt : lastUpdatedAt // ignore: cast_nullable_to_non_nullable
+as DateTime?,
   ));
 }
 

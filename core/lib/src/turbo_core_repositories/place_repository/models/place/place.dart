@@ -36,6 +36,11 @@ sealed class Place with _$Place {
     @Default('') String website,
     @Default(0) int priceLevel,
     @Default({}) Map<String, dynamic> metadata,
+    //Campos administrativos para ownership y auditoría
+    @Default([]) List<String> ownerIds,
+    @Default('') String createdBy,
+    DateTime? createdAt,
+    DateTime? lastUpdated,
   }) = _Place;
 
   factory Place.fromJson(Map<String, dynamic> json) => _$PlaceFromJson(json);
@@ -112,6 +117,16 @@ sealed class Place with _$Place {
       website: asString(data?['website']),
       priceLevel: asInt(data?['priceLevel']),
       metadata: data?['metadata'] as Map<String, dynamic>? ?? {},
+      ownerIds: asStringList(data?['ownerIds']),
+      createdBy: asString(data?['createdBy']),
+      createdAt:
+          data?['createdAt'] != null
+              ? (data?['createdAt'] as Timestamp).toDate()
+              : null,
+      lastUpdated:
+          data?['lastUpdated'] != null
+              ? (data?['lastUpdated'] as Timestamp).toDate()
+              : null,
     );
   }
 }

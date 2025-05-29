@@ -27,6 +27,16 @@ _Event _$EventFromJson(Map<String, dynamic> json) => _Event(
           ? null
           : DateTime.parse(json['endDate'] as String),
   link: json['link'] as String?,
+  createdBy: json['createdBy'] as String? ?? '',
+  createdAt:
+      json['createdAt'] == null
+          ? null
+          : DateTime.parse(json['createdAt'] as String),
+  lastUpdatedBy: json['lastUpdatedBy'] as String?,
+  lastUpdatedAt:
+      json['lastUpdatedAt'] == null
+          ? null
+          : DateTime.parse(json['lastUpdatedAt'] as String),
 );
 
 Map<String, dynamic> _$EventToJson(_Event instance) => <String, dynamic>{
@@ -45,6 +55,10 @@ Map<String, dynamic> _$EventToJson(_Event instance) => <String, dynamic>{
   'organizerContact': instance.organizerContact,
   'endDate': instance.endDate?.toIso8601String(),
   'link': instance.link,
+  'createdBy': instance.createdBy,
+  'createdAt': instance.createdAt?.toIso8601String(),
+  'lastUpdatedBy': instance.lastUpdatedBy,
+  'lastUpdatedAt': instance.lastUpdatedAt?.toIso8601String(),
 };
 
 const _$EventTypeEnumMap = {

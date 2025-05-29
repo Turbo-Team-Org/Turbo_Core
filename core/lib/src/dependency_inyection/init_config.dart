@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:core/src/turbo_core_repositories/turbo_core_repositories.dart';
+import 'package:core/src/turbo_core_repositories/admin_auth_repository/admin_auth_repository.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:get_it/get_it.dart';
@@ -21,7 +22,10 @@ Future<void> initCoreDependencies({
       () => EventService(firestore: sl<FirebaseFirestore>()),
     )
     ..registerLazySingleton<PlaceService>(
-      () => PlaceService(firestore: sl<FirebaseFirestore>()),
+      () => PlaceService(
+        firestore: sl<FirebaseFirestore>(),
+        analyticsService: sl<AnalyticsService>(),
+      ),
     )
     ..registerLazySingleton<ReviewService>(
       () => ReviewService(firestore: sl<FirebaseFirestore>()),
@@ -35,6 +39,12 @@ Future<void> initCoreDependencies({
         firebaseAuth: sl<FirebaseAuth>(),
       ),
     )
+    ..registerLazySingleton<AdminAuthService>(
+      () => AdminAuthService(
+        firestore: sl<FirebaseFirestore>(),
+        firebaseAuth: sl<FirebaseAuth>(),
+      ),
+    )
     ..registerLazySingleton<CategoryService>(
       () => CategoryService(firestore: sl<FirebaseFirestore>()),
     )
@@ -42,6 +52,9 @@ Future<void> initCoreDependencies({
       () => PlaceCategoryService(firestore: sl<FirebaseFirestore>()),
     )
     ..registerLazySingleton<LocationService>(LocationService.new)
+    ..registerLazySingleton<AnalyticsService>(
+      () => AnalyticsService(firestore: sl<FirebaseFirestore>()),
+    )
     // Register repositories
     ..registerLazySingleton<CategoryRepository>(
       () => CategoryRepository(
@@ -66,6 +79,12 @@ Future<void> initCoreDependencies({
     )
     ..registerLazySingleton<AuthenticationRepository>(
       () => AuthenticationRepository(authService: sl<AuthenticationService>()),
+    )
+    ..registerLazySingleton<AdminAuthRepository>(
+      () => AdminAuthRepositoryImpl(adminAuthService: sl<AdminAuthService>()),
+    )
+    ..registerLazySingleton<AnalyticsRepository>(
+      () => AnalyticsRepository(analyticsService: sl<AnalyticsService>()),
     );
 
   // Repeat for each service/repository

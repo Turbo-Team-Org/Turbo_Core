@@ -1,10 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:core/src/turbo_core_repositories/place_repository/models/place/place.dart';
 import 'package:core/src/turbo_core_repositories/place_repository/service/place_service.dart';
+import 'package:core/src/turbo_core_repositories/analytics_repository/service/analytics_service.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
 class MockFirebaseFirestore extends Mock implements FirebaseFirestore {}
+
+class MockAnalyticsService extends Mock implements AnalyticsService {}
 
 class MockCollectionReference extends Mock
     implements CollectionReference<Map<String, dynamic>> {}
@@ -23,6 +26,7 @@ class MockQuery extends Mock implements Query<Map<String, dynamic>> {}
 void main() {
   late PlaceService placeService;
   late MockFirebaseFirestore mockFirestore;
+  late MockAnalyticsService mockAnalyticsService;
   late MockCollectionReference mockPlacesCollection;
   late MockCollectionReference mockReviewsCollection;
   late MockDocumentReference mockPlaceDoc;
@@ -35,6 +39,7 @@ void main() {
 
   setUp(() {
     mockFirestore = MockFirebaseFirestore();
+    mockAnalyticsService = MockAnalyticsService();
     mockPlacesCollection = MockCollectionReference();
     mockReviewsCollection = MockCollectionReference();
     mockPlaceDoc = MockDocumentReference();
@@ -45,7 +50,10 @@ void main() {
     mockPlaceQuery = MockQuery();
     mockReviewQuery = MockQuery();
 
-    placeService = PlaceService(firestore: mockFirestore);
+    placeService = PlaceService(
+      firestore: mockFirestore,
+      analyticsService: mockAnalyticsService,
+    );
 
     // Solo configurar los mocks básicos
     when(
@@ -56,6 +64,14 @@ void main() {
     ).thenReturn(mockReviewsCollection);
     when(() => mockPlacesCollection.doc(any())).thenReturn(mockPlaceDoc);
     when(() => mockPlaceSnapshot.id).thenReturn('test-place-id');
+
+    // Configurar mocks para AnalyticsService
+    when(
+      () => mockAnalyticsService.initializeAnalyticsStructure(any()),
+    ).thenAnswer((_) async => Future<void>.value());
+    when(
+      () => mockAnalyticsService.cleanupAnalyticsStructure(any()),
+    ).thenAnswer((_) async => Future<void>.value());
   });
 
   group('PlaceService', () {
@@ -201,6 +217,10 @@ void main() {
       print('Lugar añadido exitosamente: $place'); // Log de la operación
 
       verify(() => mockPlaceDoc.set(any())).called(1);
+
+      verify(
+        () => mockAnalyticsService.initializeAnalyticsStructure(place.id),
+      ).called(1);
     });
 
     test('updatePlace success', () async {
@@ -227,7 +247,61 @@ void main() {
         'Lugar eliminado exitosamente: $testPlaceId',
       ); // Log de la operación
 
+      verify(
+        () => mockAnalyticsService.cleanupAnalyticsStructure(testPlaceId),
+      ).called(1);
+
       verify(() => mockPlaceDoc.delete()).called(1);
+    });
+
+    test('addPlace failure - analytics initialization fails', () async {
+      final place = Place.fromJson(testPlace);
+
+      // Mock successful place creation
+      when(
+        () => mockPlaceDoc.set(any()),
+      ).thenAnswer((_) async => Future<void>.value());
+
+      // Mock analytics initialization failure
+      when(
+        () => mockAnalyticsService.initializeAnalyticsStructure(any()),
+      ).thenThrow(Exception('Analytics initialization failed'));
+
+      // Mock place deletion for cleanup
+      when(
+        () => mockPlaceDoc.delete(),
+      ).thenAnswer((_) async => Future<void>.value());
+
+      // Should throw exception due to analytics failure
+      expect(
+        () => placeService.addPlace(place),
+        throwsA(
+          isA<Exception>().having(
+            (e) => e.toString(),
+            'message',
+            contains('Error adding place with analytics'),
+          ),
+        ),
+      );
+    });
+
+    test('deletePlace failure - analytics cleanup fails', () async {
+      // Mock analytics cleanup failure
+      when(
+        () => mockAnalyticsService.cleanupAnalyticsStructure(any()),
+      ).thenThrow(Exception('Analytics cleanup failed'));
+
+      // Should throw exception due to analytics cleanup failure
+      expect(
+        () => placeService.deletePlace(testPlaceId),
+        throwsA(
+          isA<Exception>().having(
+            (e) => e.toString(),
+            'message',
+            contains('Error deleting place with analytics'),
+          ),
+        ),
+      );
     });
   });
 }

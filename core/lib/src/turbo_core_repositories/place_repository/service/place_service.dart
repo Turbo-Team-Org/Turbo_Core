@@ -1,15 +1,20 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:core/src/turbo_core_repositories/place_repository/interface/place_interface.dart';
 import 'package:core/src/turbo_core_repositories/place_repository/models/place/place.dart';
+import 'package:core/src/turbo_core_repositories/place_repository/place_repository.dart';
 import 'package:core/src/turbo_core_repositories/review_repository/models/review.dart';
+import 'package:core/src/turbo_core_repositories/analytics_repository/service/analytics_service.dart';
 
 /// Place service
 class PlaceService implements PlaceInterface {
   /// Constructor
-  const PlaceService({required this.firestore});
+  const PlaceService({required this.firestore, required this.analyticsService});
 
   /// Firestore instance
   final FirebaseFirestore firestore;
+
+  /// Analytics service para inicializar estructura automáticamente
+  final AnalyticsService analyticsService;
 
   @override
   Future<List<Place>> getPlaces() async {
@@ -138,12 +143,221 @@ class PlaceService implements PlaceInterface {
     }
   }
 
+  // ==================== ADMIN OPERATIONS ====================
+
+  /// 🏢 Gets places owned by a specific admin user
+  Future<List<Place>> getPlacesByOwnerId(String ownerId) async {
+    try {
+      final querySnapshot =
+          await firestore
+              .collection('places')
+              .where('ownerIds', arrayContains: ownerId)
+              .get();
+
+      final places = <Place>[];
+
+      for (final doc in querySnapshot.docs) {
+        final place = Place.fromFirestore(doc);
+        final reviewsSnapshot =
+            await firestore
+                .collection('reviews')
+                .where('placeId', isEqualTo: place.id)
+                .orderBy('date', descending: true)
+                .limit(20)
+                .get();
+
+        final reviews =
+            reviewsSnapshot.docs
+                .map((doc) => Review.fromFirestore(doc.data()))
+                .toList();
+
+        places.add(place.copyWith(reviews: reviews));
+      }
+
+      return places;
+    } catch (e) {
+      throw Exception('Error getting places by owner: $e');
+    }
+  }
+
+  /// 🏢 Gets places owned by multiple admin users
+  Future<List<Place>> getPlacesByOwnerIds(List<String> ownerIds) async {
+    try {
+      final places = <Place>[];
+
+      // Firebase 'in' queries are limited to 10 items, so we batch them
+      const int batchSize = 10;
+      for (int i = 0; i < ownerIds.length; i += batchSize) {
+        final batch = ownerIds.skip(i).take(batchSize).toList();
+
+        final querySnapshot =
+            await firestore
+                .collection('places')
+                .where('ownerIds', arrayContainsAny: batch)
+                .get();
+
+        for (final doc in querySnapshot.docs) {
+          final place = Place.fromFirestore(doc);
+
+          // Avoid duplicates
+          if (!places.any((p) => p.id == place.id)) {
+            final reviewsSnapshot =
+                await firestore
+                    .collection('reviews')
+                    .where('placeId', isEqualTo: place.id)
+                    .orderBy('date', descending: true)
+                    .limit(20)
+                    .get();
+
+            final reviews =
+                reviewsSnapshot.docs
+                    .map((doc) => Review.fromFirestore(doc.data()))
+                    .toList();
+
+            places.add(place.copyWith(reviews: reviews));
+          }
+        }
+      }
+
+      return places;
+    } catch (e) {
+      throw Exception('Error getting places by owners: $e');
+    }
+  }
+
+  /// 👑 Updates the ownership of a place (super admin only)
+  Future<Place> updatePlaceOwnership(
+    String placeId,
+    List<String> ownerIds,
+  ) async {
+    try {
+      // Update the place document with new owners
+      await firestore.collection('places').doc(placeId).update({
+        'ownerIds': ownerIds,
+        'lastUpdated': FieldValue.serverTimestamp(),
+      });
+
+      // Return the updated place
+      return await getPlaceById(placeId);
+    } catch (e) {
+      throw Exception('Error updating place ownership: $e');
+    }
+  }
+
+  /// 📊 Gets analytics summary for places owned by an admin
+  Future<PlaceOwnerAnalytics> getPlaceAnalyticsByOwnerId(String ownerId) async {
+    try {
+      // Get all places owned by this admin
+      final ownerPlaces = await getPlacesByOwnerId(ownerId);
+
+      // Calculate aggregated metrics
+      int totalViews = 0;
+      int totalReviews = 0;
+      double totalRating = 0.0;
+      int totalFavorites = 0;
+      int placesWithHighRating = 0;
+      int placesNeedingAttention = 0;
+
+      for (final place in ownerPlaces) {
+        totalReviews += place.reviews.length;
+        totalRating += place.rating;
+        totalFavorites += place.favoriteCount;
+
+        if (place.rating >= 4.0) {
+          placesWithHighRating++;
+        }
+        if (place.rating < 3.0 || place.reviews.isEmpty) {
+          placesNeedingAttention++;
+        }
+      }
+
+      // Get aggregated analytics from analytics collections if available
+      try {
+        final analyticsSnapshot =
+            await firestore
+                .collection('analytics_places')
+                .where(
+                  'placeId',
+                  whereIn: ownerPlaces.map((p) => p.id).toList(),
+                )
+                .get();
+
+        for (final doc in analyticsSnapshot.docs) {
+          final data = doc.data();
+          totalViews += (data['viewsThisMonth'] as int? ?? 0);
+        }
+      } catch (e) {
+        // Si no hay analytics disponibles, usar valores calculados
+        print('Analytics not available, using calculated values: $e');
+      }
+
+      return PlaceOwnerAnalytics(
+        ownerId: ownerId,
+        totalPlaces: ownerPlaces.length,
+        totalViews: totalViews,
+        totalReviews: totalReviews,
+        averageRating:
+            ownerPlaces.isNotEmpty ? totalRating / ownerPlaces.length : 0.0,
+        totalFavorites: totalFavorites,
+        placesWithHighRating: placesWithHighRating,
+        placesNeedingAttention: placesNeedingAttention,
+        monthlyMetrics: {
+          'currentMonth': DateTime.now().month,
+          'placesAdded': 0, // This would require historical tracking
+          'avgViewsPerPlace':
+              ownerPlaces.isNotEmpty ? totalViews / ownerPlaces.length : 0,
+        },
+      );
+    } catch (e) {
+      throw Exception('Error getting analytics by owner: $e');
+    }
+  }
+
   @override
   Future<void> addPlace(Place place) async {
     try {
+      // 1. Crear el documento del lugar
       await firestore.collection('places').doc(place.id).set(place.toJson());
+
+      // 2. Inicializar automáticamente la estructura de analytics
+      await analyticsService.initializeAnalyticsStructure(place.id);
+
+      print('✅ Lugar creado con analytics inicializados: ${place.name}');
     } catch (e) {
-      throw Exception('Error adding place: $e');
+      // Si falla la creación de analytics, intentamos limpiar el lugar creado
+      try {
+        await firestore.collection('places').doc(place.id).delete();
+      } catch (_) {
+        // Ignorar errores de limpieza
+      }
+      throw Exception('Error adding place with analytics: $e');
+    }
+  }
+
+  /// 🏢 Adds a new place with admin ownership
+  Future<void> addPlaceWithOwner(Place place, String ownerId) async {
+    try {
+      // Create place data with owner information
+      final placeData = place.toJson();
+      placeData['ownerIds'] = [ownerId];
+      placeData['createdBy'] = ownerId;
+      placeData['createdAt'] = FieldValue.serverTimestamp();
+
+      // 1. Create the place document
+      await firestore.collection('places').doc(place.id).set(placeData);
+
+      // 2. Initialize analytics structure automatically
+      await analyticsService.initializeAnalyticsStructure(place.id);
+
+      print('✅ Lugar creado con propietario y analytics: ${place.name}');
+    } catch (e) {
+      // If analytics creation fails, try to clean up the created place
+      try {
+        await firestore.collection('places').doc(place.id).delete();
+      } catch (_) {
+        // Ignore cleanup errors
+      }
+      throw Exception('Error adding place with owner and analytics: $e');
     }
   }
 
@@ -159,9 +373,15 @@ class PlaceService implements PlaceInterface {
   @override
   Future<void> deletePlace(String id) async {
     try {
+      // 1. Limpiar estructura de analytics primero
+      await analyticsService.cleanupAnalyticsStructure(id);
+
+      // 2. Eliminar el documento del lugar
       await firestore.collection('places').doc(id).delete();
+
+      print('🗑️ Lugar eliminado con analytics limpiados: $id');
     } catch (e) {
-      throw Exception('Error deleting place: $e');
+      throw Exception('Error deleting place with analytics: $e');
     }
   }
 }

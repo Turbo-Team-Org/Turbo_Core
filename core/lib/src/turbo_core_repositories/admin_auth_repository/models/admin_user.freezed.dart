@@ -1,0 +1,199 @@
+// dart format width=80
+// coverage:ignore-file
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint
+// ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
+
+part of 'admin_user.dart';
+
+// **************************************************************************
+// FreezedGenerator
+// **************************************************************************
+
+// dart format off
+T _$identity<T>(T value) => value;
+
+/// @nodoc
+mixin _$AdminUser {
+
+ String get uid; String get email; String? get displayName; AdminRole get role; List<String> get ownedPlaceIds; Map<String, List<Permission>> get permissions; DateTime get createdAt; DateTime? get lastLogin; bool get isActive; String? get photoUrl; String? get phoneNumber; Map<String, dynamic> get metadata;
+/// Create a copy of AdminUser
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$AdminUserCopyWith<AdminUser> get copyWith => _$AdminUserCopyWithImpl<AdminUser>(this as AdminUser, _$identity);
+
+  /// Serializes this AdminUser to a JSON map.
+  Map<String, dynamic> toJson();
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is AdminUser&&(identical(other.uid, uid) || other.uid == uid)&&(identical(other.email, email) || other.email == email)&&(identical(other.displayName, displayName) || other.displayName == displayName)&&(identical(other.role, role) || other.role == role)&&const DeepCollectionEquality().equals(other.ownedPlaceIds, ownedPlaceIds)&&const DeepCollectionEquality().equals(other.permissions, permissions)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.lastLogin, lastLogin) || other.lastLogin == lastLogin)&&(identical(other.isActive, isActive) || other.isActive == isActive)&&(identical(other.photoUrl, photoUrl) || other.photoUrl == photoUrl)&&(identical(other.phoneNumber, phoneNumber) || other.phoneNumber == phoneNumber)&&const DeepCollectionEquality().equals(other.metadata, metadata));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,uid,email,displayName,role,const DeepCollectionEquality().hash(ownedPlaceIds),const DeepCollectionEquality().hash(permissions),createdAt,lastLogin,isActive,photoUrl,phoneNumber,const DeepCollectionEquality().hash(metadata));
+
+@override
+String toString() {
+  return 'AdminUser(uid: $uid, email: $email, displayName: $displayName, role: $role, ownedPlaceIds: $ownedPlaceIds, permissions: $permissions, createdAt: $createdAt, lastLogin: $lastLogin, isActive: $isActive, photoUrl: $photoUrl, phoneNumber: $phoneNumber, metadata: $metadata)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $AdminUserCopyWith<$Res>  {
+  factory $AdminUserCopyWith(AdminUser value, $Res Function(AdminUser) _then) = _$AdminUserCopyWithImpl;
+@useResult
+$Res call({
+ String uid, String email, String? displayName, AdminRole role, List<String> ownedPlaceIds, Map<String, List<Permission>> permissions, DateTime createdAt, DateTime? lastLogin, bool isActive, String? photoUrl, String? phoneNumber, Map<String, dynamic> metadata
+});
+
+
+
+
+}
+/// @nodoc
+class _$AdminUserCopyWithImpl<$Res>
+    implements $AdminUserCopyWith<$Res> {
+  _$AdminUserCopyWithImpl(this._self, this._then);
+
+  final AdminUser _self;
+  final $Res Function(AdminUser) _then;
+
+/// Create a copy of AdminUser
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? uid = null,Object? email = null,Object? displayName = freezed,Object? role = null,Object? ownedPlaceIds = null,Object? permissions = null,Object? createdAt = null,Object? lastLogin = freezed,Object? isActive = null,Object? photoUrl = freezed,Object? phoneNumber = freezed,Object? metadata = null,}) {
+  return _then(_self.copyWith(
+uid: null == uid ? _self.uid : uid // ignore: cast_nullable_to_non_nullable
+as String,email: null == email ? _self.email : email // ignore: cast_nullable_to_non_nullable
+as String,displayName: freezed == displayName ? _self.displayName : displayName // ignore: cast_nullable_to_non_nullable
+as String?,role: null == role ? _self.role : role // ignore: cast_nullable_to_non_nullable
+as AdminRole,ownedPlaceIds: null == ownedPlaceIds ? _self.ownedPlaceIds : ownedPlaceIds // ignore: cast_nullable_to_non_nullable
+as List<String>,permissions: null == permissions ? _self.permissions : permissions // ignore: cast_nullable_to_non_nullable
+as Map<String, List<Permission>>,createdAt: null == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
+as DateTime,lastLogin: freezed == lastLogin ? _self.lastLogin : lastLogin // ignore: cast_nullable_to_non_nullable
+as DateTime?,isActive: null == isActive ? _self.isActive : isActive // ignore: cast_nullable_to_non_nullable
+as bool,photoUrl: freezed == photoUrl ? _self.photoUrl : photoUrl // ignore: cast_nullable_to_non_nullable
+as String?,phoneNumber: freezed == phoneNumber ? _self.phoneNumber : phoneNumber // ignore: cast_nullable_to_non_nullable
+as String?,metadata: null == metadata ? _self.metadata : metadata // ignore: cast_nullable_to_non_nullable
+as Map<String, dynamic>,
+  ));
+}
+
+}
+
+
+/// @nodoc
+@JsonSerializable()
+
+class _AdminUser extends AdminUser {
+  const _AdminUser({required this.uid, required this.email, this.displayName, this.role = AdminRole.placeOwner, final  List<String> ownedPlaceIds = const [], final  Map<String, List<Permission>> permissions = const {}, required this.createdAt, this.lastLogin, this.isActive = true, this.photoUrl, this.phoneNumber, final  Map<String, dynamic> metadata = const {}}): _ownedPlaceIds = ownedPlaceIds,_permissions = permissions,_metadata = metadata,super._();
+  factory _AdminUser.fromJson(Map<String, dynamic> json) => _$AdminUserFromJson(json);
+
+@override final  String uid;
+@override final  String email;
+@override final  String? displayName;
+@override@JsonKey() final  AdminRole role;
+ final  List<String> _ownedPlaceIds;
+@override@JsonKey() List<String> get ownedPlaceIds {
+  if (_ownedPlaceIds is EqualUnmodifiableListView) return _ownedPlaceIds;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_ownedPlaceIds);
+}
+
+ final  Map<String, List<Permission>> _permissions;
+@override@JsonKey() Map<String, List<Permission>> get permissions {
+  if (_permissions is EqualUnmodifiableMapView) return _permissions;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableMapView(_permissions);
+}
+
+@override final  DateTime createdAt;
+@override final  DateTime? lastLogin;
+@override@JsonKey() final  bool isActive;
+@override final  String? photoUrl;
+@override final  String? phoneNumber;
+ final  Map<String, dynamic> _metadata;
+@override@JsonKey() Map<String, dynamic> get metadata {
+  if (_metadata is EqualUnmodifiableMapView) return _metadata;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableMapView(_metadata);
+}
+
+
+/// Create a copy of AdminUser
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$AdminUserCopyWith<_AdminUser> get copyWith => __$AdminUserCopyWithImpl<_AdminUser>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$AdminUserToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _AdminUser&&(identical(other.uid, uid) || other.uid == uid)&&(identical(other.email, email) || other.email == email)&&(identical(other.displayName, displayName) || other.displayName == displayName)&&(identical(other.role, role) || other.role == role)&&const DeepCollectionEquality().equals(other._ownedPlaceIds, _ownedPlaceIds)&&const DeepCollectionEquality().equals(other._permissions, _permissions)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.lastLogin, lastLogin) || other.lastLogin == lastLogin)&&(identical(other.isActive, isActive) || other.isActive == isActive)&&(identical(other.photoUrl, photoUrl) || other.photoUrl == photoUrl)&&(identical(other.phoneNumber, phoneNumber) || other.phoneNumber == phoneNumber)&&const DeepCollectionEquality().equals(other._metadata, _metadata));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,uid,email,displayName,role,const DeepCollectionEquality().hash(_ownedPlaceIds),const DeepCollectionEquality().hash(_permissions),createdAt,lastLogin,isActive,photoUrl,phoneNumber,const DeepCollectionEquality().hash(_metadata));
+
+@override
+String toString() {
+  return 'AdminUser(uid: $uid, email: $email, displayName: $displayName, role: $role, ownedPlaceIds: $ownedPlaceIds, permissions: $permissions, createdAt: $createdAt, lastLogin: $lastLogin, isActive: $isActive, photoUrl: $photoUrl, phoneNumber: $phoneNumber, metadata: $metadata)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$AdminUserCopyWith<$Res> implements $AdminUserCopyWith<$Res> {
+  factory _$AdminUserCopyWith(_AdminUser value, $Res Function(_AdminUser) _then) = __$AdminUserCopyWithImpl;
+@override @useResult
+$Res call({
+ String uid, String email, String? displayName, AdminRole role, List<String> ownedPlaceIds, Map<String, List<Permission>> permissions, DateTime createdAt, DateTime? lastLogin, bool isActive, String? photoUrl, String? phoneNumber, Map<String, dynamic> metadata
+});
+
+
+
+
+}
+/// @nodoc
+class __$AdminUserCopyWithImpl<$Res>
+    implements _$AdminUserCopyWith<$Res> {
+  __$AdminUserCopyWithImpl(this._self, this._then);
+
+  final _AdminUser _self;
+  final $Res Function(_AdminUser) _then;
+
+/// Create a copy of AdminUser
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? uid = null,Object? email = null,Object? displayName = freezed,Object? role = null,Object? ownedPlaceIds = null,Object? permissions = null,Object? createdAt = null,Object? lastLogin = freezed,Object? isActive = null,Object? photoUrl = freezed,Object? phoneNumber = freezed,Object? metadata = null,}) {
+  return _then(_AdminUser(
+uid: null == uid ? _self.uid : uid // ignore: cast_nullable_to_non_nullable
+as String,email: null == email ? _self.email : email // ignore: cast_nullable_to_non_nullable
+as String,displayName: freezed == displayName ? _self.displayName : displayName // ignore: cast_nullable_to_non_nullable
+as String?,role: null == role ? _self.role : role // ignore: cast_nullable_to_non_nullable
+as AdminRole,ownedPlaceIds: null == ownedPlaceIds ? _self._ownedPlaceIds : ownedPlaceIds // ignore: cast_nullable_to_non_nullable
+as List<String>,permissions: null == permissions ? _self._permissions : permissions // ignore: cast_nullable_to_non_nullable
+as Map<String, List<Permission>>,createdAt: null == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
+as DateTime,lastLogin: freezed == lastLogin ? _self.lastLogin : lastLogin // ignore: cast_nullable_to_non_nullable
+as DateTime?,isActive: null == isActive ? _self.isActive : isActive // ignore: cast_nullable_to_non_nullable
+as bool,photoUrl: freezed == photoUrl ? _self.photoUrl : photoUrl // ignore: cast_nullable_to_non_nullable
+as String?,phoneNumber: freezed == phoneNumber ? _self.phoneNumber : phoneNumber // ignore: cast_nullable_to_non_nullable
+as String?,metadata: null == metadata ? _self._metadata : metadata // ignore: cast_nullable_to_non_nullable
+as Map<String, dynamic>,
+  ));
+}
+
+
+}
+
+// dart format on

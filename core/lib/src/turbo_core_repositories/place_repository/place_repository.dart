@@ -71,6 +71,69 @@ class PlaceRepository {
     }
   }
 
+  // ==================== ADMIN OPERATIONS ====================
+
+  /// 🏢 Gets places owned by a specific admin user.
+  ///
+  /// [ownerId] The unique identifier of the admin user.
+  ///
+  /// Returns a list of places owned by the specified admin user.
+  /// This method is used by the Admin Panel to show only the places
+  /// that a specific admin user can manage.
+  Future<List<Place>> getPlacesByOwnerId(String ownerId) async {
+    try {
+      return await placeService.getPlacesByOwnerId(ownerId);
+    } catch (e) {
+      throw Exception('Error al obtener lugares por propietario: $e');
+    }
+  }
+
+  /// 🏢 Gets places owned by multiple admin users.
+  ///
+  /// [ownerIds] List of admin user IDs.
+  ///
+  /// Returns a list of places owned by any of the specified admin users.
+  /// Useful for super admins who want to see places from specific owners.
+  Future<List<Place>> getPlacesByOwnerIds(List<String> ownerIds) async {
+    try {
+      return await placeService.getPlacesByOwnerIds(ownerIds);
+    } catch (e) {
+      throw Exception('Error al obtener lugares por propietarios: $e');
+    }
+  }
+
+  /// 👑 Updates the ownership of a place (super admin only).
+  ///
+  /// [placeId] The unique identifier of the place.
+  /// [ownerIds] List of admin user IDs who will own this place.
+  ///
+  /// Returns the updated place with new ownership information.
+  /// This operation is restricted to super administrators.
+  Future<Place> updatePlaceOwnership(
+    String placeId,
+    List<String> ownerIds,
+  ) async {
+    try {
+      return await placeService.updatePlaceOwnership(placeId, ownerIds);
+    } catch (e) {
+      throw Exception('Error al actualizar propietarios del lugar: $e');
+    }
+  }
+
+  /// 📊 Gets analytics summary for places owned by an admin.
+  ///
+  /// [ownerId] The unique identifier of the admin user.
+  ///
+  /// Returns aggregated analytics data for all places owned by the admin.
+  /// Includes metrics like total views, reviews, ratings, etc.
+  Future<PlaceOwnerAnalytics> getPlaceAnalyticsByOwnerId(String ownerId) async {
+    try {
+      return await placeService.getPlaceAnalyticsByOwnerId(ownerId);
+    } catch (e) {
+      throw Exception('Error al obtener analytics por propietario: $e');
+    }
+  }
+
   // ==================== CREATE OPERATIONS ====================
 
   /// Adds a new place to the data source.
@@ -85,6 +148,22 @@ class PlaceRepository {
       return true;
     } catch (e) {
       throw Exception('Error al agregar lugar: $e');
+    }
+  }
+
+  /// 🏢 Adds a new place with admin ownership.
+  ///
+  /// [place] The place object to be added.
+  /// [ownerId] The admin user ID who will own this place.
+  ///
+  /// Returns true if the place was successfully added with ownership.
+  /// This method ensures the place is automatically assigned to an admin.
+  Future<bool> addPlaceWithOwner(Place place, String ownerId) async {
+    try {
+      await placeService.addPlaceWithOwner(place, ownerId);
+      return true;
+    } catch (e) {
+      throw Exception('Error al agregar lugar con propietario: $e');
     }
   }
 
@@ -142,6 +221,27 @@ class PlaceRepository {
       }).toList();
     } catch (e) {
       throw Exception('Error al buscar lugares: $e');
+    }
+  }
+
+  /// 🏢 Searches for places owned by a specific admin.
+  ///
+  /// [query] The search term to look for.
+  /// [ownerId] The admin user ID to filter by.
+  ///
+  /// Returns places owned by the admin that match the search criteria.
+  Future<List<Place>> searchPlacesByOwner(String query, String ownerId) async {
+    try {
+      final ownerPlaces = await placeService.getPlacesByOwnerId(ownerId);
+      final lowercaseQuery = query.toLowerCase();
+
+      return ownerPlaces.where((place) {
+        return place.name.toLowerCase().contains(lowercaseQuery) ||
+            place.description.toLowerCase().contains(lowercaseQuery) ||
+            place.tags.any((tag) => tag.toLowerCase().contains(lowercaseQuery));
+      }).toList();
+    } catch (e) {
+      throw Exception('Error al buscar lugares por propietario: $e');
     }
   }
 
@@ -252,13 +352,87 @@ class PlaceRepository {
             sin(dLon / 2) *
             sin(dLon / 2);
 
-    final double c = 2 * asin(sqrt(a));
-
+    final double c = 2 * atan2(sqrt(a), sqrt(1 - a));
     return earthRadius * c;
   }
 
   /// Converts degrees to radians.
   double _degreesToRadians(double degrees) {
     return degrees * (pi / 180);
+  }
+}
+
+/// 📊 Analytics data for places owned by an admin user
+class PlaceOwnerAnalytics {
+  const PlaceOwnerAnalytics({
+    required this.ownerId,
+    required this.totalPlaces,
+    required this.totalViews,
+    required this.totalReviews,
+    required this.averageRating,
+    required this.totalFavorites,
+    required this.placesWithHighRating,
+    required this.placesNeedingAttention,
+    required this.monthlyMetrics,
+  });
+
+  /// ID del propietario admin
+  final String ownerId;
+
+  /// Número total de lugares que posee
+  final int totalPlaces;
+
+  /// Total de visualizaciones en todos sus lugares
+  final int totalViews;
+
+  /// Total de reseñas en todos sus lugares
+  final int totalReviews;
+
+  /// Calificación promedio de todos sus lugares
+  final double averageRating;
+
+  /// Total de favoritos en todos sus lugares
+  final int totalFavorites;
+
+  /// Lugares con calificación alta (>= 4.0)
+  final int placesWithHighRating;
+
+  /// Lugares que necesitan atención (< 3.0 rating o sin reviews)
+  final int placesNeedingAttention;
+
+  /// Métricas mensuales de rendimiento
+  final Map<String, dynamic> monthlyMetrics;
+
+  /// Factory para crear desde datos de Firebase
+  factory PlaceOwnerAnalytics.fromAnalyticsData(
+    String ownerId,
+    Map<String, dynamic> data,
+  ) {
+    return PlaceOwnerAnalytics(
+      ownerId: ownerId,
+      totalPlaces: data['totalPlaces'] as int? ?? 0,
+      totalViews: data['totalViews'] as int? ?? 0,
+      totalReviews: data['totalReviews'] as int? ?? 0,
+      averageRating: (data['averageRating'] as num?)?.toDouble() ?? 0.0,
+      totalFavorites: data['totalFavorites'] as int? ?? 0,
+      placesWithHighRating: data['placesWithHighRating'] as int? ?? 0,
+      placesNeedingAttention: data['placesNeedingAttention'] as int? ?? 0,
+      monthlyMetrics: data['monthlyMetrics'] as Map<String, dynamic>? ?? {},
+    );
+  }
+
+  /// Convierte a JSON para storage
+  Map<String, dynamic> toJson() {
+    return {
+      'ownerId': ownerId,
+      'totalPlaces': totalPlaces,
+      'totalViews': totalViews,
+      'totalReviews': totalReviews,
+      'averageRating': averageRating,
+      'totalFavorites': totalFavorites,
+      'placesWithHighRating': placesWithHighRating,
+      'placesNeedingAttention': placesNeedingAttention,
+      'monthlyMetrics': monthlyMetrics,
+    };
   }
 }

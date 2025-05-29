@@ -41,6 +41,10 @@ sealed class Event with _$Event {
     String? organizerContact,
     DateTime? endDate,
     String? link,
+    @Default('') String createdBy,
+    DateTime? createdAt,
+    String? lastUpdatedBy,
+    DateTime? lastUpdatedAt,
   }) = _Event;
 
   factory Event.fromJson(Map<String, dynamic> json) => _$EventFromJson(json);
@@ -84,6 +88,19 @@ sealed class Event with _$Event {
               ? (data?['endDate'] as Timestamp).toDate()
               : null,
       link: data?['link'] != null ? asString(data?['link']) : null,
+      createdBy: asString(data?['createdBy']),
+      createdAt:
+          data?['createdAt'] != null
+              ? (data?['createdAt'] as Timestamp).toDate()
+              : null,
+      lastUpdatedBy:
+          data?['lastUpdatedBy'] != null
+              ? asString(data?['lastUpdatedBy'])
+              : null,
+      lastUpdatedAt:
+          data?['lastUpdatedAt'] != null
+              ? (data?['lastUpdatedAt'] as Timestamp).toDate()
+              : null,
     );
   }
 }

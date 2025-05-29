@@ -50,6 +50,18 @@ _Place _$PlaceFromJson(Map<String, dynamic> json) => _Place(
   website: json['website'] as String? ?? '',
   priceLevel: (json['priceLevel'] as num?)?.toInt() ?? 0,
   metadata: json['metadata'] as Map<String, dynamic>? ?? const {},
+  ownerIds:
+      (json['ownerIds'] as List<dynamic>?)?.map((e) => e as String).toList() ??
+      const [],
+  createdBy: json['createdBy'] as String? ?? '',
+  createdAt:
+      json['createdAt'] == null
+          ? null
+          : DateTime.parse(json['createdAt'] as String),
+  lastUpdated:
+      json['lastUpdated'] == null
+          ? null
+          : DateTime.parse(json['lastUpdated'] as String),
 );
 
 Map<String, dynamic> _$PlaceToJson(_Place instance) => <String, dynamic>{
@@ -78,4 +90,8 @@ Map<String, dynamic> _$PlaceToJson(_Place instance) => <String, dynamic>{
   'website': instance.website,
   'priceLevel': instance.priceLevel,
   'metadata': instance.metadata,
+  'ownerIds': instance.ownerIds,
+  'createdBy': instance.createdBy,
+  'createdAt': instance.createdAt?.toIso8601String(),
+  'lastUpdated': instance.lastUpdated?.toIso8601String(),
 };
