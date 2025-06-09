@@ -5,4 +5,5 @@
 
 export 'admin_auth_repository.dart';
 export 'models/admin_user.dart';
+export 'models/business_owner_request.dart';
 export 'service/admin_auth_service.dart';

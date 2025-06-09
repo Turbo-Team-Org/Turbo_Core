@@ -1,0 +1,250 @@
+// 🛡️ Reglas de Seguridad Firestore - Business Owner Auto-Registration
+// 
+// Reglas actualizadas para soportar el sistema de auto-registro
+// de business owners en Turbo Platform
+
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // ================== FUNCIONES HELPER ==================
+    
+    // Verificar si el usuario está autenticado
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    // Verificar si es el dueño del recurso
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    // Verificar si es super administrador
+    function isSuperAdmin() {
+      return isAuthenticated() && 
+        exists(/databases/$(database)/documents/admin_users/$(request.auth.uid)) &&
+        get(/databases/$(database)/documents/admin_users/$(request.auth.uid)).data.role == 'superAdmin';
+    }
+    
+    // Verificar si es cualquier tipo de admin
+    function isAdmin() {
+      return isAuthenticated() && 
+        exists(/databases/$(database)/documents/admin_users/$(request.auth.uid));
+    }
+    
+    // Verificar si puede gestionar un lugar específico
+    function canManagePlace(placeId) {
+      return isSuperAdmin() || 
+        (isAdmin() && 
+         placeId in get(/databases/$(database)/documents/admin_users/$(request.auth.uid)).data.ownedPlaceIds);
+    }
+
+    // ================== USUARIOS REGULARES ==================
+    
+    match /users/{userId} {
+      // Usuarios pueden leer/escribir su propio documento
+      allow read, write: if isOwner(userId);
+      
+      // Admins pueden leer usuarios (para verificaciones)
+      allow read: if isAdmin();
+      
+      // Solo el usuario puede marcar que es business owner
+      // (esto se actualiza automáticamente al aprobar solicitud)
+      allow update: if isOwner(userId) && 
+        (!('isBusinessOwner' in request.resource.data) || 
+         request.resource.data.isBusinessOwner == resource.data.isBusinessOwner);
+    }
+
+    // ================== BUSINESS OWNER REQUESTS ==================
+    
+    match /business_owner_requests/{requestId} {
+      
+      // CREAR: Solo usuarios autenticados pueden crear solicitudes
+      allow create: if isAuthenticated() && 
+        // Debe ser el dueño de la solicitud
+        request.auth.uid == request.resource.data.userId &&
+        // Email debe coincidir con el del usuario autenticado
+        request.auth.token.email == request.resource.data.email &&
+        // Estado inicial debe ser 'pending'
+        request.resource.data.status == 'pending' &&
+        // CreatedAt debe ser timestamp actual (aproximadamente)
+        request.resource.data.createdAt is timestamp &&
+        // Los campos de revisión deben estar vacíos
+        !('reviewedBy' in request.resource.data) &&
+        !('reviewedAt' in request.resource.data) &&
+        // Campos requeridos deben estar presentes
+        request.resource.data.keys().hasAll([
+          'id', 'userId', 'email', 'displayName', 
+          'businessName', 'businessDescription', 'businessAddress'
+        ]);
+      
+      // LEER: El usuario puede leer sus propias solicitudes
+      allow read: if isAuthenticated() && 
+        (request.auth.uid == resource.data.userId || isSuperAdmin());
+      
+      // ACTUALIZAR: Solo super admins pueden actualizar solicitudes
+      allow update: if isSuperAdmin() && 
+        // No se puede cambiar la información básica del negocio
+        request.resource.data.userId == resource.data.userId &&
+        request.resource.data.email == resource.data.email &&
+        request.resource.data.businessName == resource.data.businessName &&
+        // Solo se pueden actualizar campos específicos
+        request.resource.data.diff(resource.data).affectedKeys()
+          .hasOnly(['status', 'reviewedAt', 'reviewedBy', 'rejectionReason', 'approvalNotes']);
+      
+      // ELIMINAR: Solo super admins pueden eliminar (raro, mejor mantener histórico)
+      allow delete: if isSuperAdmin();
+    }
+
+    // ================== ADMIN USERS ==================
+    
+    match /admin_users/{adminUserId} {
+      // Leer: El propio admin o super admins
+      allow read: if isOwner(adminUserId) || isSuperAdmin();
+      
+      // Crear: Solo super admins pueden crear nuevos admins
+      allow create: if isSuperAdmin();
+      
+      // Actualizar: Solo super admins pueden actualizar otros admins
+      // El admin puede actualizar ciertos campos de su propio perfil
+      allow update: if isSuperAdmin() || 
+        (isOwner(adminUserId) && 
+         request.resource.data.diff(resource.data).affectedKeys()
+           .hasOnly(['displayName', 'phoneNumber', 'photoUrl', 'lastLogin']));
+      
+      // Eliminar: Solo super admins
+      allow delete: if isSuperAdmin();
+    }
+
+    // ================== NOTIFICATIONS ==================
+    
+    match /notifications/{notificationId} {
+      // Leer: Super admins pueden leer todas las notificaciones
+      // Usuarios pueden leer notificaciones dirigidas a ellos
+      allow read: if isSuperAdmin() || 
+        (isAuthenticated() && 
+         (('targetRole' in resource.data && resource.data.targetRole == 'user') ||
+          ('targetEmail' in resource.data && request.auth.token.email == resource.data.targetEmail)));
+      
+      // Crear: Solo el sistema (vía Cloud Functions o Admin SDK)
+      // En reglas de cliente, solo permitimos a super admins crear notificaciones manuales
+      allow create: if isSuperAdmin();
+      
+      // Actualizar: Solo para marcar como leída
+      allow update: if (isSuperAdmin() || 
+        (isAuthenticated() && 
+         ('targetEmail' in resource.data && request.auth.token.email == resource.data.targetEmail))) &&
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['isRead']) &&
+        request.resource.data.isRead == true;
+      
+      // Eliminar: Solo super admins
+      allow delete: if isSuperAdmin();
+    }
+
+    // ================== PLACES (ACTUALIZADO) ==================
+    
+    match /places/{placeId} {
+      // Leer: Todos pueden leer lugares públicos
+      allow read: if true;
+      
+      // Crear: Solo admins autenticados
+      allow create: if isAdmin();
+      
+      // Actualizar: Solo quien puede gestionar el lugar
+      allow update: if canManagePlace(placeId);
+      
+      // Eliminar: Solo super admins
+      allow delete: if isSuperAdmin();
+      
+      // Sub-colecciones de places
+      match /reviews/{reviewId} {
+        allow read: if true;
+        allow create: if isAuthenticated();
+        allow update: if isOwner(resource.data.userId) || canManagePlace(placeId);
+        allow delete: if canManagePlace(placeId) || isSuperAdmin();
+      }
+      
+      match /offers/{offerId} {
+        allow read: if true;
+        allow create, update, delete: if canManagePlace(placeId);
+      }
+      
+      match /events/{eventId} {
+        allow read: if true;
+        allow create, update, delete: if canManagePlace(placeId);
+      }
+    }
+
+    // ================== EVENTOS GLOBALES ==================
+    
+    match /events/{eventId} {
+      allow read: if true;
+      allow create: if isAdmin();
+      allow update: if isAdmin() && 
+        (isSuperAdmin() || 
+         resource.data.createdBy == request.auth.uid ||
+         ('placeId' in resource.data && canManagePlace(resource.data.placeId)));
+      allow delete: if isSuperAdmin();
+    }
+
+    // ================== CATEGORIES ==================
+    
+    match /categories/{categoryId} {
+      allow read: if true;
+      allow create, update, delete: if isSuperAdmin();
+    }
+
+    // ================== FAVORITES ==================
+    
+    match /users/{userId}/favorites/{favoriteId} {
+      allow read, write: if isOwner(userId);
+    }
+
+    // ================== ANALYTICS (si aplica) ==================
+    
+    match /analytics/{doc=**} {
+      // Solo admins pueden leer analytics
+      allow read: if isAdmin();
+      // Solo el sistema puede escribir analytics
+      allow write: if false;
+    }
+
+    // ================== CONFIGURACIONES GENERALES ==================
+    
+    // Documentos de configuración (_config) - solo lectura para todos
+    match /{path=**}/_config {
+      allow read: if true;
+      allow write: if isSuperAdmin();
+    }
+  }
+}
+
+// ================== NOTAS IMPORTANTES ==================
+//
+// 1. 🔒 SEGURIDAD:
+//    - Los usuarios solo pueden crear solicitudes para sí mismos
+//    - Solo super admins pueden aprobar/rechazar solicitudes
+//    - Se valida que el email coincida con el usuario autenticado
+//
+// 2. 📝 VALIDACIONES:
+//    - Estado inicial debe ser 'pending'
+//    - Campos requeridos deben estar presentes
+//    - No se pueden modificar datos básicos una vez creada la solicitud
+//
+// 3. 🔔 NOTIFICACIONES:
+//    - Super admins pueden ver todas las notificaciones
+//    - Usuarios ven solo las dirigidas a ellos
+//    - Solo se permite marcar como leída
+//
+// 4. 🏢 BUSINESS LOGIC:
+//    - Al aprobar solicitud, se crea admin_user automáticamente
+//    - Se actualiza el usuario regular para marcar isBusinessOwner
+//    - Se mantiene trazabilidad completa del proceso
+//
+// 5. ⚠️ CONSIDERACIONES:
+//    - Estas reglas asumen autenticación por email/password
+//    - Para production, considera rate limiting
+//    - Implementa Cloud Functions para lógica compleja
+//    - Configura alertas para solicitudes urgentes
+//
+// ================== FIN DE REGLAS ================== 

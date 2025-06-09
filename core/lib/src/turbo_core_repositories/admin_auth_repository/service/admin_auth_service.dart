@@ -2,7 +2,9 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:core/src/turbo_core_repositories/admin_auth_repository/models/admin_user.dart';
+import 'package:core/src/turbo_core_repositories/admin_auth_repository/models/business_owner_request.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:uuid/uuid.dart';
 
 /// 🔐 Servicio de Autenticación Administrativa
 ///
@@ -21,6 +23,13 @@ class AdminAuthService {
   /// 📚 Referencia a la colección de usuarios administrativos
   CollectionReference<Map<String, dynamic>> get _adminUsersRef =>
       _firestore.collection('admin_users');
+
+  /// 📝 Referencia a la colección de solicitudes de business owners
+  CollectionReference<Map<String, dynamic>> get _businessOwnerRequestsRef =>
+      _firestore.collection('business_owner_requests');
+
+  /// 🆔 Generador de IDs únicos
+  static const _uuid = Uuid();
 
   /// 🔄 Stream del estado de autenticación
   Stream<AdminUser?> get authStateChanges {
@@ -324,6 +333,338 @@ class AdminAuthService {
     }
   }
 
+  // ==================== AUTO-REGISTRO DE BUSINESS OWNERS ====================
+
+  /// 🆕 Solicitar registro como business owner (usuario ya registrado)
+  Future<BusinessOwnerRequest> submitBusinessOwnerRequest({
+    required String userId, // UID del usuario ya registrado
+    required String displayName,
+    required String businessName,
+    required String businessDescription,
+    required String businessAddress,
+    String? phoneNumber,
+    String? website,
+    Map<String, dynamic>? businessMetadata,
+    Map<String, dynamic>? contactInfo,
+  }) async {
+    try {
+      // 1. Verificar que el usuario existe y está autenticado
+      final currentUser = _firebaseAuth.currentUser;
+      if (currentUser == null || currentUser.uid != userId) {
+        throw AdminAuthException('Usuario no autenticado o ID no coincide');
+      }
+
+      // 2. Verificar que no es ya un usuario administrativo
+      final existingAdmin = await getAdminUserByUid(userId);
+      if (existingAdmin != null) {
+        throw AdminAuthException('El usuario ya es un administrador');
+      }
+
+      // 3. Verificar que no hay solicitud pendiente para este usuario
+      final existingRequestQuery =
+          await _businessOwnerRequestsRef
+              .where('userId', isEqualTo: userId)
+              .where(
+                'status',
+                whereIn: [
+                  BusinessOwnerRequestStatus.pending.name,
+                  BusinessOwnerRequestStatus.reviewing.name,
+                  BusinessOwnerRequestStatus.needsMoreInfo.name,
+                ],
+              )
+              .get();
+
+      if (existingRequestQuery.docs.isNotEmpty) {
+        throw AdminAuthException(
+          'Ya tienes una solicitud pendiente para convertirte en propietario',
+        );
+      }
+
+      // 4. Crear la solicitud de registro
+      final requestId = _uuid.v4();
+      final request = BusinessOwnerRequest(
+        id: requestId,
+        userId: userId, // Nuevo campo para el UID del usuario
+        email: currentUser.email ?? '',
+        displayName: displayName,
+        businessName: businessName,
+        businessDescription: businessDescription,
+        businessAddress: businessAddress,
+        phoneNumber: phoneNumber,
+        website: website,
+        status: BusinessOwnerRequestStatus.pending,
+        createdAt: DateTime.now(),
+        businessMetadata: businessMetadata ?? {},
+        contactInfo: contactInfo ?? {},
+      );
+
+      // 5. Guardar en Firestore
+      await _businessOwnerRequestsRef.doc(requestId).set(request.toFirestore());
+
+      // 6. Notificar a super administradores
+      // await _notifySuperAdminsNewRequest(request);
+
+      return request;
+    } catch (e) {
+      throw AdminAuthException('Error enviando solicitud: $e');
+    }
+  }
+
+  /// ✅ Aprobar solicitud de business owner
+  Future<AdminUser> approveBusinessOwnerRequest({
+    required String requestId,
+    required String approvedByUid,
+    List<String>? initialPlaceIds,
+    String? approvalNotes,
+  }) async {
+    try {
+      // 1. Verificar permisos del aprobador
+      final approver = await getAdminUserByUid(approvedByUid);
+      if (approver?.role != AdminRole.superAdmin) {
+        throw AdminAuthException(
+          'Solo super administradores pueden aprobar solicitudes',
+        );
+      }
+
+      // 2. Obtener la solicitud
+      final requestDoc = await _businessOwnerRequestsRef.doc(requestId).get();
+      if (!requestDoc.exists) {
+        throw AdminAuthException('Solicitud no encontrada');
+      }
+
+      final request = BusinessOwnerRequest.fromFirestore(requestDoc.data()!);
+
+      // 3. Verificar que está pendiente
+      if (!request.isPending &&
+          request.status != BusinessOwnerRequestStatus.reviewing) {
+        throw AdminAuthException(
+          'La solicitud no está pendiente de aprobación',
+        );
+      }
+
+      // 4. Verificar que el usuario original aún existe
+      final userDoc =
+          await _firestore.collection('users').doc(request.userId).get();
+      if (!userDoc.exists) {
+        throw AdminAuthException('El usuario original ya no existe');
+      }
+
+      // 5. Crear usuario administrativo (convertir usuario regular en admin)
+      final adminUser = AdminUser(
+        uid: request.userId, // Usar el UID del usuario existente
+        email: request.email,
+        displayName: request.displayName,
+        role: AdminRole.placeOwner,
+        ownedPlaceIds: initialPlaceIds ?? [],
+        permissions: _generateDefaultPermissions(
+          initialPlaceIds ?? [],
+          AdminRole.placeOwner,
+        ),
+        createdAt: DateTime.now(),
+        isActive: true,
+        phoneNumber: request.phoneNumber,
+        metadata: {
+          'approvedBy': approvedByUid,
+          'approvedAt': DateTime.now().toIso8601String(),
+          'originalRequestId': requestId,
+          'businessName': request.businessName,
+          'businessMetadata': request.businessMetadata,
+          'convertedFromUserId': request.userId,
+        },
+      );
+
+      // 6. Guardar usuario administrativo
+      await _adminUsersRef.doc(request.userId).set(adminUser.toFirestore());
+
+      // 7. Actualizar estado de solicitud
+      await _businessOwnerRequestsRef.doc(requestId).update({
+        'status': BusinessOwnerRequestStatus.approved.name,
+        'reviewedAt': Timestamp.fromDate(DateTime.now()),
+        'reviewedBy': approvedByUid,
+        'approvalNotes': approvalNotes,
+      });
+
+      // 8. Opcional: Marcar en el usuario regular que ahora es admin
+      await _firestore.collection('users').doc(request.userId).update({
+        'isBusinessOwner': true,
+        'businessOwnerSince': Timestamp.fromDate(DateTime.now()),
+        'adminUserId': request.userId,
+      });
+
+      // 9. Notificar al business owner sobre la aprobación
+      await _notifyBusinessOwnerApproval(request);
+
+      return adminUser;
+    } catch (e) {
+      throw AdminAuthException('Error aprobando solicitud: $e');
+    }
+  }
+
+  /// ❌ Rechazar solicitud de business owner
+  Future<void> rejectBusinessOwnerRequest({
+    required String requestId,
+    required String rejectedByUid,
+    required String rejectionReason,
+  }) async {
+    try {
+      // 1. Verificar permisos del rechazador
+      final rejector = await getAdminUserByUid(rejectedByUid);
+      if (rejector?.role != AdminRole.superAdmin) {
+        throw AdminAuthException(
+          'Solo super administradores pueden rechazar solicitudes',
+        );
+      }
+
+      // 2. Obtener la solicitud
+      final requestDoc = await _businessOwnerRequestsRef.doc(requestId).get();
+      if (!requestDoc.exists) {
+        throw AdminAuthException('Solicitud no encontrada');
+      }
+
+      final request = BusinessOwnerRequest.fromFirestore(requestDoc.data()!);
+
+      // 3. Verificar que puede ser rechazada
+      if (request.isApproved || request.isRejected) {
+        throw AdminAuthException('La solicitud ya fue procesada');
+      }
+
+      // 4. Actualizar estado de solicitud
+      await _businessOwnerRequestsRef.doc(requestId).update({
+        'status': BusinessOwnerRequestStatus.rejected.name,
+        'reviewedAt': Timestamp.fromDate(DateTime.now()),
+        'reviewedBy': rejectedByUid,
+        'rejectionReason': rejectionReason,
+      });
+
+      // 5. Notificar al business owner sobre el rechazo
+      await _notifyBusinessOwnerRejection(request, rejectionReason);
+    } catch (e) {
+      throw AdminAuthException('Error rechazando solicitud: $e');
+    }
+  }
+
+  /// 🔄 Cambiar estado de solicitud (a reviewing o needsMoreInfo)
+  Future<void> updateRequestStatus({
+    required String requestId,
+    required String updatedByUid,
+    required BusinessOwnerRequestStatus newStatus,
+    String? notes,
+  }) async {
+    try {
+      // 1. Verificar permisos
+      final updater = await getAdminUserByUid(updatedByUid);
+      if (updater?.role != AdminRole.superAdmin) {
+        throw AdminAuthException(
+          'Solo super administradores pueden actualizar solicitudes',
+        );
+      }
+
+      // 2. Verificar que el estado es válido para actualización
+      if (newStatus == BusinessOwnerRequestStatus.approved ||
+          newStatus == BusinessOwnerRequestStatus.rejected) {
+        throw AdminAuthException(
+          'Use métodos específicos para aprobar/rechazar',
+        );
+      }
+
+      // 3. Actualizar estado
+      await _businessOwnerRequestsRef.doc(requestId).update({
+        'status': newStatus.name,
+        'reviewedAt': Timestamp.fromDate(DateTime.now()),
+        'reviewedBy': updatedByUid,
+        'approvalNotes': notes,
+      });
+    } catch (e) {
+      throw AdminAuthException('Error actualizando estado: $e');
+    }
+  }
+
+  /// 📋 Obtener todas las solicitudes de business owners
+  Future<List<BusinessOwnerRequest>> getAllBusinessOwnerRequests({
+    String? requestedByUid,
+    BusinessOwnerRequestStatus? filterByStatus,
+  }) async {
+    try {
+      // Verificar permisos
+      if (requestedByUid != null) {
+        final requester = await getAdminUserByUid(requestedByUid);
+        if (requester?.role != AdminRole.superAdmin) {
+          throw AdminAuthException(
+            'Solo super administradores pueden ver solicitudes',
+          );
+        }
+      }
+
+      Query<Map<String, dynamic>> query = _businessOwnerRequestsRef.orderBy(
+        'createdAt',
+        descending: true,
+      );
+
+      // Aplicar filtro por estado si se especifica
+      if (filterByStatus != null) {
+        query = query.where('status', isEqualTo: filterByStatus.name);
+      }
+
+      final snapshot = await query.get();
+
+      return snapshot.docs
+          .map((doc) => BusinessOwnerRequest.fromFirestore(doc.data()))
+          .toList();
+    } catch (e) {
+      throw AdminAuthException('Error obteniendo solicitudes: $e');
+    }
+  }
+
+  /// 📊 Obtener estadísticas de solicitudes
+  Future<BusinessOwnerRequestStats> getBusinessOwnerRequestStats({
+    String? requestedByUid,
+  }) async {
+    try {
+      // Verificar permisos
+      if (requestedByUid != null) {
+        final requester = await getAdminUserByUid(requestedByUid);
+        if (requester?.role != AdminRole.superAdmin) {
+          throw AdminAuthException(
+            'Solo super administradores pueden ver estadísticas',
+          );
+        }
+      }
+
+      final requests = await getAllBusinessOwnerRequests(
+        requestedByUid: requestedByUid,
+      );
+
+      return BusinessOwnerRequestStats.fromRequests(requests);
+    } catch (e) {
+      throw AdminAuthException('Error obteniendo estadísticas: $e');
+    }
+  }
+
+  /// 🔍 Obtener solicitud por ID
+  Future<BusinessOwnerRequest?> getBusinessOwnerRequestById(
+    String requestId, {
+    String? requestedByUid,
+  }) async {
+    try {
+      // Verificar permisos
+      if (requestedByUid != null) {
+        final requester = await getAdminUserByUid(requestedByUid);
+        if (requester?.role != AdminRole.superAdmin) {
+          throw AdminAuthException(
+            'Solo super administradores pueden ver solicitudes',
+          );
+        }
+      }
+
+      final doc = await _businessOwnerRequestsRef.doc(requestId).get();
+      if (!doc.exists) return null;
+
+      return BusinessOwnerRequest.fromFirestore(doc.data()!);
+    } catch (e) {
+      throw AdminAuthException('Error obteniendo solicitud: $e');
+    }
+  }
+
   // ================== MÉTODOS PRIVADOS ==================
 
   /// 🕐 Actualiza la fecha de último login
@@ -364,6 +705,119 @@ class AdminAuthService {
         return 'Demasiados intentos, intenta más tarde';
       default:
         return 'Error de autenticación: $code';
+    }
+  }
+
+  // ================== MÉTODOS DE NOTIFICACIÓN ==================
+
+  /// 📧 Notificar a super administradores sobre nueva solicitud
+  Future<void> _notifySuperAdminsNewRequest(
+    BusinessOwnerRequest request,
+  ) async {
+    try {
+      // TODO: Implementar notificación real (email, push notification, etc.)
+      // Por ahora, solo logging
+      print('🔔 Nueva solicitud de business owner:');
+      print('   📧 Email: ${request.email}');
+      print('   🏢 Negocio: ${request.businessName}');
+      print('   📅 Fecha: ${request.createdAt}');
+
+      // Aquí podrías integrar:
+      // - Envío de emails usando algún servicio
+      // - Push notifications
+      // - Webhooks
+      // - Slack/Discord notifications
+
+      // Opcional: Crear documento de notificación en Firestore
+      await _firestore.collection('notifications').add({
+        'type': 'business_owner_request',
+        'requestId': request.id,
+        'title': 'Nueva solicitud de Business Owner',
+        'message':
+            '${request.displayName} (${request.businessName}) ha solicitado registro',
+        'createdAt': FieldValue.serverTimestamp(),
+        'targetRole': 'superAdmin',
+        'isRead': false,
+        'metadata': {
+          'email': request.email,
+          'businessName': request.businessName,
+        },
+      });
+    } catch (e) {
+      // No fallar el proceso principal por errores de notificación
+      print('⚠️ Error enviando notificación: $e');
+    }
+  }
+
+  /// ✅ Notificar aprobación al business owner
+  Future<void> _notifyBusinessOwnerApproval(
+    BusinessOwnerRequest request,
+  ) async {
+    try {
+      // TODO: Implementar notificación real
+      print('✅ Solicitud aprobada para: ${request.email}');
+      print('   🏢 Negocio: ${request.businessName}');
+
+      // Aquí implementarías:
+      // - Envío de email con credenciales
+      // - Instrucciones de acceso al Admin Panel
+      // - Enlaces de primeros pasos
+
+      // Opcional: Crear notificación en Firestore
+      await _firestore.collection('notifications').add({
+        'type': 'business_owner_approved',
+        'requestId': request.id,
+        'title': '¡Solicitud Aprobada!',
+        'message': 'Tu solicitud para ${request.businessName} ha sido aprobada',
+        'createdAt': FieldValue.serverTimestamp(),
+        'targetEmail': request.email,
+        'isRead': false,
+        'metadata': {
+          'businessName': request.businessName,
+          'nextSteps': [
+            'Inicia sesión en el Admin Panel',
+            'Configura tu primer lugar',
+          ],
+        },
+      });
+    } catch (e) {
+      print('⚠️ Error enviando notificación de aprobación: $e');
+    }
+  }
+
+  /// ❌ Notificar rechazo al business owner
+  Future<void> _notifyBusinessOwnerRejection(
+    BusinessOwnerRequest request,
+    String rejectionReason,
+  ) async {
+    try {
+      // TODO: Implementar notificación real
+      print('❌ Solicitud rechazada para: ${request.email}');
+      print('   🏢 Negocio: ${request.businessName}');
+      print('   📝 Razón: $rejectionReason');
+
+      // Aquí implementarías:
+      // - Envío de email con razón del rechazo
+      // - Posibilidad de nueva solicitud
+      // - Recursos de ayuda
+
+      // Opcional: Crear notificación en Firestore
+      await _firestore.collection('notifications').add({
+        'type': 'business_owner_rejected',
+        'requestId': request.id,
+        'title': 'Solicitud No Aprobada',
+        'message': 'Tu solicitud para ${request.businessName} no fue aprobada',
+        'createdAt': FieldValue.serverTimestamp(),
+        'targetEmail': request.email,
+        'isRead': false,
+        'metadata': {
+          'businessName': request.businessName,
+          'rejectionReason': rejectionReason,
+          'canReapply': true,
+        },
+      });
+    } catch (e) {
+      print('⚠️ Error enviando notificación de rechazo: $e');
     }
   }
 }

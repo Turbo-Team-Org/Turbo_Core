@@ -4,9 +4,11 @@
 // con separación clara entre usuarios regulares y administrativos
 
 export 'models/admin_user.dart';
+export 'models/business_owner_request.dart';
 export 'service/admin_auth_service.dart';
 
 import 'package:core/src/turbo_core_repositories/admin_auth_repository/models/admin_user.dart';
+import 'package:core/src/turbo_core_repositories/admin_auth_repository/models/business_owner_request.dart';
 import 'package:core/src/turbo_core_repositories/admin_auth_repository/service/admin_auth_service.dart';
 import 'package:dartz/dartz.dart';
 
@@ -93,6 +95,60 @@ abstract class AdminAuthRepository {
     bool? isActive,
     String? requestedByUid,
   });
+
+  // ==================== AUTO-REGISTRO DE BUSINESS OWNERS ====================
+
+  /// 🆕 Enviar solicitud de registro como business owner
+  Future<Either<AdminAuthFailure, BusinessOwnerRequest>>
+  submitBusinessOwnerRequest({
+    required String userId,
+    required String displayName,
+    required String businessName,
+    required String businessDescription,
+    required String businessAddress,
+    String? phoneNumber,
+    String? website,
+    Map<String, dynamic>? businessMetadata,
+    Map<String, dynamic>? contactInfo,
+  });
+
+  /// ✅ Aprobar solicitud de business owner
+  Future<Either<AdminAuthFailure, AdminUser>> approveBusinessOwnerRequest({
+    required String requestId,
+    required String approvedByUid,
+    List<String>? initialPlaceIds,
+    String? approvalNotes,
+  });
+
+  /// ❌ Rechazar solicitud de business owner
+  Future<Either<AdminAuthFailure, Unit>> rejectBusinessOwnerRequest({
+    required String requestId,
+    required String rejectedByUid,
+    required String rejectionReason,
+  });
+
+  /// 🔄 Actualizar estado de solicitud
+  Future<Either<AdminAuthFailure, Unit>> updateRequestStatus({
+    required String requestId,
+    required String updatedByUid,
+    required BusinessOwnerRequestStatus newStatus,
+    String? notes,
+  });
+
+  /// 📋 Obtener todas las solicitudes de business owners
+  Future<Either<AdminAuthFailure, List<BusinessOwnerRequest>>>
+  getAllBusinessOwnerRequests({
+    String? requestedByUid,
+    BusinessOwnerRequestStatus? filterByStatus,
+  });
+
+  /// 📊 Obtener estadísticas de solicitudes
+  Future<Either<AdminAuthFailure, BusinessOwnerRequestStats>>
+  getBusinessOwnerRequestStats({String? requestedByUid});
+
+  /// 🔍 Obtener solicitud por ID
+  Future<Either<AdminAuthFailure, BusinessOwnerRequest?>>
+  getBusinessOwnerRequestById(String requestId, {String? requestedByUid});
 }
 
 /// 🛠️ Implementación concreta del repositorio
@@ -317,6 +373,142 @@ class AdminAuthRepositoryImpl implements AdminAuthRepository {
           }).toList();
 
       return Right(filteredAdmins);
+    } catch (e) {
+      return Left(_mapExceptionToFailure(e));
+    }
+  }
+
+  @override
+  Future<Either<AdminAuthFailure, BusinessOwnerRequest>>
+  submitBusinessOwnerRequest({
+    required String userId,
+    required String displayName,
+    required String businessName,
+    required String businessDescription,
+    required String businessAddress,
+    String? phoneNumber,
+    String? website,
+    Map<String, dynamic>? businessMetadata,
+    Map<String, dynamic>? contactInfo,
+  }) async {
+    try {
+      final request = await _adminAuthService.submitBusinessOwnerRequest(
+        userId: userId,
+        displayName: displayName,
+        businessName: businessName,
+        businessDescription: businessDescription,
+        businessAddress: businessAddress,
+        phoneNumber: phoneNumber,
+        website: website,
+        businessMetadata: businessMetadata,
+        contactInfo: contactInfo,
+      );
+      return Right(request);
+    } catch (e) {
+      return Left(_mapExceptionToFailure(e));
+    }
+  }
+
+  @override
+  Future<Either<AdminAuthFailure, AdminUser>> approveBusinessOwnerRequest({
+    required String requestId,
+    required String approvedByUid,
+    List<String>? initialPlaceIds,
+    String? approvalNotes,
+  }) async {
+    try {
+      final user = await _adminAuthService.approveBusinessOwnerRequest(
+        requestId: requestId,
+        approvedByUid: approvedByUid,
+        initialPlaceIds: initialPlaceIds,
+        approvalNotes: approvalNotes,
+      );
+      return Right(user);
+    } catch (e) {
+      return Left(_mapExceptionToFailure(e));
+    }
+  }
+
+  @override
+  Future<Either<AdminAuthFailure, Unit>> rejectBusinessOwnerRequest({
+    required String requestId,
+    required String rejectedByUid,
+    required String rejectionReason,
+  }) async {
+    try {
+      await _adminAuthService.rejectBusinessOwnerRequest(
+        requestId: requestId,
+        rejectedByUid: rejectedByUid,
+        rejectionReason: rejectionReason,
+      );
+      return const Right(unit);
+    } catch (e) {
+      return Left(_mapExceptionToFailure(e));
+    }
+  }
+
+  @override
+  Future<Either<AdminAuthFailure, Unit>> updateRequestStatus({
+    required String requestId,
+    required String updatedByUid,
+    required BusinessOwnerRequestStatus newStatus,
+    String? notes,
+  }) async {
+    try {
+      await _adminAuthService.updateRequestStatus(
+        requestId: requestId,
+        updatedByUid: updatedByUid,
+        newStatus: newStatus,
+        notes: notes,
+      );
+      return const Right(unit);
+    } catch (e) {
+      return Left(_mapExceptionToFailure(e));
+    }
+  }
+
+  @override
+  Future<Either<AdminAuthFailure, List<BusinessOwnerRequest>>>
+  getAllBusinessOwnerRequests({
+    String? requestedByUid,
+    BusinessOwnerRequestStatus? filterByStatus,
+  }) async {
+    try {
+      final requests = await _adminAuthService.getAllBusinessOwnerRequests(
+        requestedByUid: requestedByUid,
+        filterByStatus: filterByStatus,
+      );
+      return Right(requests);
+    } catch (e) {
+      return Left(_mapExceptionToFailure(e));
+    }
+  }
+
+  @override
+  Future<Either<AdminAuthFailure, BusinessOwnerRequestStats>>
+  getBusinessOwnerRequestStats({String? requestedByUid}) async {
+    try {
+      final stats = await _adminAuthService.getBusinessOwnerRequestStats(
+        requestedByUid: requestedByUid,
+      );
+      return Right(stats);
+    } catch (e) {
+      return Left(_mapExceptionToFailure(e));
+    }
+  }
+
+  @override
+  Future<Either<AdminAuthFailure, BusinessOwnerRequest?>>
+  getBusinessOwnerRequestById(
+    String requestId, {
+    String? requestedByUid,
+  }) async {
+    try {
+      final request = await _adminAuthService.getBusinessOwnerRequestById(
+        requestId,
+        requestedByUid: requestedByUid,
+      );
+      return Right(request);
     } catch (e) {
       return Left(_mapExceptionToFailure(e));
     }
