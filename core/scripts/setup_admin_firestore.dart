@@ -1,5 +1,12 @@
 // Script mejorado para configurar Firestore con sistema administrativo
-// Ejecutar con: dart run scripts/setup_admin_firestore.dart
+//
+// EJECUTAR CON FLUTTER (no dart puro):
+// flutter run core/scripts/setup_admin_firestore.dart
+//
+// O como parte de una aplicación Flutter de testing:
+// 1. Crea un proyecto Flutter temporal
+// 2. Agrega este archivo como main.dart
+// 3. Ejecuta con: flutter run
 
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -11,7 +18,7 @@ void main() async {
   );
 
   try {
-    // Inicializar Firebase con configuración básica
+    // Inicializar Firebase (requiere flutter_options.dart o configuración manual)
     await initializeFirebase();
     final firestore = FirebaseFirestore.instance;
 
@@ -34,6 +41,9 @@ void main() async {
 
     print('\n✅ ¡Configuración completada exitosamente!');
     printNextSteps();
+
+    // Terminar el proceso para evitar que Flutter quede ejecutándose
+    exit(0);
   } catch (e) {
     print('❌ Error durante la configuración: $e');
     printTroubleshootingSteps();
@@ -46,14 +56,36 @@ Future<void> initializeFirebase() async {
   print('🔧 Inicializando Firebase...');
 
   try {
-    // Intentar inicializar con configuración por defecto
-    await Firebase.initializeApp();
-    print('   ✅ Firebase inicializado correctamente');
+    // Opción 1: Usar firebase_options.dart (generado por FlutterFire CLI)
+    try {
+      await Firebase.initializeApp();
+      print('   ✅ Firebase inicializado con firebase_options.dart');
+      return;
+    } catch (e) {
+      print(
+        '   ⚠️ firebase_options.dart no encontrado, intentando configuración manual...',
+      );
+    }
+
+    // Opción 2: Configuración manual para desarrollo/testing
+    // NOTA: Reemplaza estos valores con los de tu proyecto Firebase
+    await Firebase.initializeApp(
+      options: const FirebaseOptions(
+        apiKey: 'TU_API_KEY_AQUI',
+        appId: 'TU_APP_ID_AQUI',
+        messagingSenderId: 'TU_SENDER_ID_AQUI',
+        projectId: 'TU_PROJECT_ID_AQUI',
+        // Para web también necesitas:
+        // authDomain: 'tu-proyecto.firebaseapp.com',
+        // storageBucket: 'tu-proyecto.appspot.com',
+      ),
+    );
+
+    print('   ✅ Firebase inicializado con configuración manual');
   } catch (e) {
-    print('   ⚠️ Error de inicialización: $e');
-    print('   💡 Verifica que tengas firebase_options.dart configurado');
+    print('   ❌ Error de inicialización: $e');
     throw Exception(
-      'No se pudo inicializar Firebase. Verifica tu configuración.',
+      'No se pudo inicializar Firebase. Consulta las instrucciones de solución de problemas.',
     );
   }
 }
@@ -264,20 +296,42 @@ void printTroubleshootingSteps() {
 🛠️ Solución de problemas:
 
 1. ❌ Error de inicialización Firebase:
-   - Verifica que firebase_options.dart exista
-   - Ejecuta: flutter packages pub run firebase_core:config
-   - Asegúrate de tener las credenciales correctas
+   OPCIÓN A - Usar FlutterFire CLI (Recomendado):
+   - Instala: dart pub global activate flutterfire_cli
+   - Configura: flutterfire configure
+   - Esto genera firebase_options.dart automáticamente
+
+   OPCIÓN B - Configuración manual:
+   - Edita las FirebaseOptions en initializeFirebase()
+   - Obtén los valores desde Firebase Console > Project Settings
+
+   OPCIÓN C - Variables de entorno:
+   - export FIREBASE_PROJECT_ID="tu-proyecto-id"
+   - export FIREBASE_API_KEY="tu-api-key"
 
 2. ❌ Error de permisos Firestore:
    - Verifica las reglas de seguridad en Firebase Console
-   - Asegúrate de tener permisos de escritura en las collections
+   - Para testing temporal, usa: allow read, write: if true;
 
-3. ❌ Error de dependencias:
-   - Ejecuta: flutter pub get
-   - Verifica que firebase_core y cloud_firestore estén en pubspec.yaml
+3. ❌ Ejecutar el script:
+   - NO uses: dart run scripts/setup_admin_firestore.dart
+   - SÍ usa: flutter run scripts/setup_admin_firestore.dart
+   - O crea un proyecto Flutter temporal con este archivo como main.dart
 
-4. 💡 Configuración manual alternativa:
-   - Usa Firebase Console para crear collections manualmente
-   - Consulta: documentation/FIRESTORE_ADMIN_SETUP_GUIDE.md
+4. 🔧 Para uso en servidor/CLI real:
+   - Usa Firebase Admin SDK con credenciales de servicio
+   - Considera usar firebase-admin (Node.js) o gcloud CLI
+   - Para scripts Dart puros, usa el REST API de Firestore
+
+📚 Recursos adicionales:
+   - FlutterFire: https://firebase.flutter.dev/docs/overview
+   - Firebase Console: https://console.firebase.google.com
+   - Firestore REST API: https://firebase.google.com/docs/firestore/use-rest-api
+
+🎯 Alternativa con Firebase CLI:
+   Si prefieres no usar Flutter, puedes usar Firebase CLI:
+   - npm install -g firebase-tools
+   - firebase login
+   - firebase firestore:indexes:set firestore.indexes.json
 ''');
 }

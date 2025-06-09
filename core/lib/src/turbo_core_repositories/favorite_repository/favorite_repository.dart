@@ -56,6 +56,7 @@ class FavoriteRepository implements FavoriteInterface {
   ///
   /// Returns true if the favorite was successfully added.
   /// Throws an exception if the operation fails or if already exists.
+  @override
   Future<bool> addFavorite(String userId, String placeId) async {
     try {
       // Check if already exists to avoid duplicates

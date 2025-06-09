@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:core/src/monorepo_utils/common/models/paged_result.dart';
 import 'package:core/src/turbo_core_repositories/review_repository/interface/review_interface.dart';
+import 'package:core/src/turbo_core_repositories/review_repository/models/paginated_reviews.dart';
 import 'package:core/src/turbo_core_repositories/review_repository/models/review.dart';
 import 'package:core/src/turbo_core_repositories/review_repository/models/review_status.dart';
 
@@ -46,7 +47,7 @@ class ReviewService implements ReviewInterface {
   }
 
   @override
-  Future<void> addReview(Review review, String placeId) async {
+  Future<String> addReview(Review review, String placeId) async {
     try {
       final placeRef = firestore.collection('places').doc(placeId);
       final reviewRef = placeRef.collection('reviews').doc(review.id);
@@ -73,6 +74,9 @@ class ReviewService implements ReviewInterface {
           'rating': newRating,
         });
       });
+
+      // Return the ID of the newly created review
+      return review.id;
     } catch (e) {
       throw Exception('Error al añadir la reseña: $e');
     }
@@ -165,47 +169,10 @@ class ReviewService implements ReviewInterface {
         query = query.where('status', isEqualTo: status.value);
       }
 
-      // Get total count for pagination metadata
-      final countSnapshot = await query.get();
-      final totalCount = countSnapshot.docs.length;
-
       // Apply ordering
       query = query.orderBy('date', descending: true);
 
-      // Apply pagination
-      if (page > 1) {
-        final skipCount = (page - 1) * limit;
-        // Get all documents up to the current page and take only the needed ones
-        final allSnapshot = await query.get();
-        final allDocs = allSnapshot.docs;
-
-        final startIndex = skipCount;
-        final endIndex = (startIndex + limit).clamp(0, allDocs.length);
-
-        final paginatedDocs =
-            startIndex < allDocs.length
-                ? allDocs.sublist(startIndex, endIndex)
-                : <QueryDocumentSnapshot>[];
-
-        final reviews =
-            paginatedDocs.map((doc) {
-              final data = doc.data() as Map<String, dynamic>;
-              data['id'] = doc.id;
-              return Review.fromFirestore(data);
-            }).toList();
-
-        final totalPages = (totalCount / limit).ceil();
-
-        return PagedResult(
-          items: reviews,
-          totalCount: totalCount,
-          currentPage: page,
-          pageSize: limit,
-          totalPages: totalPages,
-          hasNextPage: page < totalPages,
-          hasPreviousPage: page > 1,
-        );
-      } else {
+      if (page == 1) {
         // First page - use limit directly
         query = query.limit(limit);
         final snapshot = await query.get();
@@ -217,21 +184,193 @@ class ReviewService implements ReviewInterface {
               return Review.fromFirestore(data);
             }).toList();
 
-        final totalPages = (totalCount / limit).ceil();
+        // For first page, we don't know total count unless we do a separate query
+        // This is a trade-off for performance
+        return PagedResult(
+          items: reviews,
+          totalCount: -1, // Unknown for efficiency
+          currentPage: page,
+          pageSize: limit,
+          totalPages: -1, // Unknown for efficiency
+          hasNextPage:
+              reviews.length ==
+              limit, // Assume there's more if we got a full page
+          hasPreviousPage: false,
+        );
+      } else {
+        // For subsequent pages, we need to use offset which is less efficient
+        // Consider using the new cursor-based method instead
+        final skipCount = (page - 1) * limit;
+        final allSnapshot = await query.limit(skipCount + limit).get();
+
+        final startIndex = skipCount;
+        final endIndex = (startIndex + limit).clamp(0, allSnapshot.docs.length);
+
+        final paginatedDocs =
+            startIndex < allSnapshot.docs.length
+                ? allSnapshot.docs.sublist(startIndex, endIndex)
+                : <QueryDocumentSnapshot>[];
+
+        final reviews =
+            paginatedDocs.map((doc) {
+              final data = doc.data() as Map<String, dynamic>;
+              data['id'] = doc.id;
+              return Review.fromFirestore(data);
+            }).toList();
 
         return PagedResult(
           items: reviews,
-          totalCount: totalCount,
+          totalCount: allSnapshot.docs.length,
           currentPage: page,
           pageSize: limit,
-          totalPages: totalPages,
-          hasNextPage: page < totalPages,
+          totalPages: (allSnapshot.docs.length / limit).ceil(),
+          hasNextPage: endIndex < allSnapshot.docs.length,
           hasPreviousPage: page > 1,
         );
       }
     } catch (e) {
       throw Exception('Error al obtener todas las reseñas paginadas: $e');
     }
+  }
+
+  /// 🚀 OPTIMIZED: Get reviews using cursor-based pagination
+  /// This method provides O(1) performance regardless of dataset size
+  @override
+  Future<PaginatedReviews> getReviewsCursor({
+    int limit = 20,
+    ReviewStatus? status,
+    String? placeId,
+    String? userId,
+    String? pageToken,
+    bool includeTotalCount = false,
+  }) async {
+    try {
+      Query query = firestore.collectionGroup('reviews');
+
+      // Apply filters first (most selective)
+      if (placeId != null) {
+        // For place-specific reviews, use the specific collection for better performance
+        query = firestore
+            .collection('places')
+            .doc(placeId)
+            .collection('reviews');
+      }
+
+      if (status != null) {
+        query = query.where('status', isEqualTo: status.value);
+      }
+
+      if (userId != null) {
+        query = query.where('userId', isEqualTo: userId);
+      }
+
+      // Apply ordering (required for cursor pagination)
+      query = query.orderBy('date', descending: true);
+
+      // Apply cursor pagination
+      if (pageToken != null) {
+        // Decode cursor and get the starting point
+        final cursorDoc = await _getCursorDocument(pageToken, query);
+        if (cursorDoc != null) {
+          query = query.startAfterDocument(cursorDoc);
+        }
+      }
+
+      // Limit the results
+      query = query.limit(limit);
+
+      // Execute the query - this only reads the documents we need!
+      final snapshot = await query.get();
+
+      // Calculate total count only if requested (expensive operation)
+      int? totalCount;
+      if (includeTotalCount) {
+        totalCount = await _getTotalCount(
+          placeId: placeId,
+          status: status,
+          userId: userId,
+        );
+      }
+
+      // Create query metadata for debugging
+      final queryMeta = {
+        'hasFilters': status != null || placeId != null || userId != null,
+        'usedCursor': pageToken != null,
+        'docsRead': snapshot.docs.length,
+        'limit': limit,
+      };
+
+      return PaginatedReviews.fromSnapshot(
+        snapshot: snapshot,
+        requestedPageSize: limit,
+        nextPageToken: pageToken,
+        totalCount: totalCount,
+        queryMeta: queryMeta,
+      );
+    } catch (e) {
+      throw Exception('Error al obtener reseñas con cursor: $e');
+    }
+  }
+
+  /// Helper method to get cursor document for pagination
+  Future<DocumentSnapshot?> _getCursorDocument(
+    String pageToken,
+    Query query,
+  ) async {
+    try {
+      // For a production app, you'd decode the token to get document reference
+      // This is a simplified implementation
+      final decoded = Uri.decodeComponent(pageToken);
+
+      // Extract document ID from cursor (simplified)
+      final match = RegExp(r'docId: ([^,}]+)').firstMatch(decoded);
+      if (match != null) {
+        final docId = match.group(1);
+
+        // Try to get the document from the collection
+        // Note: This is simplified - in production you'd store more metadata
+        final docSnapshot =
+            await firestore
+                .collectionGroup('reviews')
+                .where(FieldPath.documentId, isEqualTo: docId)
+                .limit(1)
+                .get();
+
+        return docSnapshot.docs.isNotEmpty ? docSnapshot.docs.first : null;
+      }
+
+      return null;
+    } catch (e) {
+      // If cursor is invalid, start from beginning
+      return null;
+    }
+  }
+
+  /// Helper method to get total count (expensive operation)
+  Future<int> _getTotalCount({
+    String? placeId,
+    ReviewStatus? status,
+    String? userId,
+  }) async {
+    Query countQuery = firestore.collectionGroup('reviews');
+
+    if (placeId != null) {
+      countQuery = firestore
+          .collection('places')
+          .doc(placeId)
+          .collection('reviews');
+    }
+
+    if (status != null) {
+      countQuery = countQuery.where('status', isEqualTo: status.value);
+    }
+
+    if (userId != null) {
+      countQuery = countQuery.where('userId', isEqualTo: userId);
+    }
+
+    final countSnapshot = await countQuery.get();
+    return countSnapshot.docs.length;
   }
 
   @override
@@ -263,49 +402,11 @@ class ReviewService implements ReviewInterface {
         query = query.where('userId', isEqualTo: userId);
       }
 
-      // Get total count
-      final countSnapshot = await query.get();
-      final totalCount = countSnapshot.docs.length;
-
-      // Apply pagination and ordering
+      // Apply ordering
       query = query.orderBy('date', descending: true);
 
-      // For pagination, we'll use a simpler approach for now
-      // In production, you'd want to use cursor-based pagination with startAfter
-      if (page > 1) {
-        final skipCount = (page - 1) * limit;
-        // Get all documents up to the current page and take only the needed ones
-        final allSnapshot = await query.get();
-        final allDocs = allSnapshot.docs;
-
-        final startIndex = skipCount;
-        final endIndex = (startIndex + limit).clamp(0, allDocs.length);
-
-        final paginatedDocs =
-            startIndex < allDocs.length
-                ? allDocs.sublist(startIndex, endIndex)
-                : <QueryDocumentSnapshot>[];
-
-        final reviews =
-            paginatedDocs.map((doc) {
-              final data = doc.data() as Map<String, dynamic>;
-              data['id'] = doc.id;
-              return Review.fromFirestore(data);
-            }).toList();
-
-        final totalPages = (totalCount / limit).ceil();
-
-        return PagedResult(
-          items: reviews,
-          totalCount: totalCount,
-          currentPage: page,
-          pageSize: limit,
-          totalPages: totalPages,
-          hasNextPage: page < totalPages,
-          hasPreviousPage: page > 1,
-        );
-      } else {
-        // First page - use limit directly
+      if (page == 1) {
+        // First page - optimized path
         query = query.limit(limit);
         final snapshot = await query.get();
 
@@ -316,15 +417,42 @@ class ReviewService implements ReviewInterface {
               return Review.fromFirestore(data);
             }).toList();
 
-        final totalPages = (totalCount / limit).ceil();
+        return PagedResult(
+          items: reviews,
+          totalCount: -1, // Unknown for efficiency
+          currentPage: page,
+          pageSize: limit,
+          totalPages: -1, // Unknown for efficiency
+          hasNextPage: reviews.length == limit,
+          hasPreviousPage: false,
+        );
+      } else {
+        // Subsequent pages - less efficient but necessary for PagedResult compatibility
+        final skipCount = (page - 1) * limit;
+        final allSnapshot = await query.limit(skipCount + limit).get();
+
+        final startIndex = skipCount;
+        final endIndex = (startIndex + limit).clamp(0, allSnapshot.docs.length);
+
+        final paginatedDocs =
+            startIndex < allSnapshot.docs.length
+                ? allSnapshot.docs.sublist(startIndex, endIndex)
+                : <QueryDocumentSnapshot>[];
+
+        final reviews =
+            paginatedDocs.map((doc) {
+              final data = doc.data() as Map<String, dynamic>;
+              data['id'] = doc.id;
+              return Review.fromFirestore(data);
+            }).toList();
 
         return PagedResult(
           items: reviews,
-          totalCount: totalCount,
+          totalCount: allSnapshot.docs.length,
           currentPage: page,
           pageSize: limit,
-          totalPages: totalPages,
-          hasNextPage: page < totalPages,
+          totalPages: (allSnapshot.docs.length / limit).ceil(),
+          hasNextPage: endIndex < allSnapshot.docs.length,
           hasPreviousPage: page > 1,
         );
       }

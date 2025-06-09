@@ -1,9 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-
+import 'package:core/src/turbo_core_repositories/event_repository/event_repository.dart';
 import 'package:core/src/turbo_core_repositories/event_repository/interface/event_interface.dart';
 import 'package:core/src/turbo_core_repositories/event_repository/models/event.dart';
-import 'package:core/src/turbo_core_repositories/event_repository/event_repository.dart';
-import 'package:core/src/turbo_core_repositories/admin_auth_repository/service/admin_auth_service.dart';
 
 /// Service responsible for managing events from Firestore.
 class EventService implements EventInterface {
@@ -267,13 +265,21 @@ class EventService implements EventInterface {
 
       var filteredEvents =
           adminEvents.where((event) {
-            // Text search
-            final matchesQuery =
-                event.title.toLowerCase().contains(lowercaseQuery) ||
-                event.description.toLowerCase().contains(lowercaseQuery) ||
+            // Text search with safe checking for empty values
+            final titleMatches = event.title.toLowerCase().contains(
+              lowercaseQuery,
+            );
+            final descriptionMatches =
+                event.description.isNotEmpty &&
+                event.description.toLowerCase().contains(lowercaseQuery);
+            final tagsMatch =
+                event.tags.isNotEmpty &&
                 event.tags.any(
                   (tag) => tag.toLowerCase().contains(lowercaseQuery),
                 );
+
+            final matchesQuery =
+                titleMatches || descriptionMatches || tagsMatch;
 
             // Type filter
             final matchesType = eventType == null || event.type == eventType;

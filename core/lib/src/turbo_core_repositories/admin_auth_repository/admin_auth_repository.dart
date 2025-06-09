@@ -3,14 +3,16 @@
 // Maneja usuarios administrativos para el Admin Panel de Turbo Platform
 // con separación clara entre usuarios regulares y administrativos
 
-export 'models/admin_user.dart';
-export 'models/business_owner_request.dart';
-export 'service/admin_auth_service.dart';
+import 'dart:async';
 
 import 'package:core/src/turbo_core_repositories/admin_auth_repository/models/admin_user.dart';
 import 'package:core/src/turbo_core_repositories/admin_auth_repository/models/business_owner_request.dart';
 import 'package:core/src/turbo_core_repositories/admin_auth_repository/service/admin_auth_service.dart';
 import 'package:dartz/dartz.dart';
+
+export 'models/admin_user.dart';
+export 'models/business_owner_request.dart';
+export 'service/admin_auth_service.dart';
 
 /// 🏛️ Repositorio de Autenticación Administrativa - Domain Layer
 ///
@@ -162,11 +164,26 @@ class AdminAuthRepositoryImpl implements AdminAuthRepository {
   Stream<Either<AdminAuthFailure, AdminUser?>> get authStateChanges {
     return _adminAuthService.authStateChanges
         .map<Either<AdminAuthFailure, AdminUser?>>((user) => Right(user))
-        .handleError((error, stackTrace) {
-          return Stream<Either<AdminAuthFailure, AdminUser?>>.value(
-            Left(_mapExceptionToFailure(error)),
-          );
-        });
+        .transform(_errorToLeftTransformer<AdminAuthFailure, AdminUser?>());
+  }
+
+  /// StreamTransformer que convierte errores en eventos Left en lugar de errores
+  StreamTransformer<Either<F, T>, Either<F, T>>
+  _errorToLeftTransformer<F, T>() {
+    return StreamTransformer<Either<F, T>, Either<F, T>>.fromHandlers(
+      handleData: (Either<F, T> data, EventSink<Either<F, T>> sink) {
+        sink.add(data);
+      },
+      handleError: (
+        Object error,
+        StackTrace stackTrace,
+        EventSink<Either<F, T>> sink,
+      ) {
+        // Convierte el error en un evento Left y lo emite como dato
+        final failure = _mapExceptionToFailure(error) as F;
+        sink.add(Left<F, T>(failure));
+      },
+    );
   }
 
   @override

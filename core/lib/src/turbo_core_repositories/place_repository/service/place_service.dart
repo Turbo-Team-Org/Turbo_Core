@@ -273,18 +273,32 @@ class PlaceService implements PlaceInterface {
 
       // Get aggregated analytics from analytics collections if available
       try {
-        final analyticsSnapshot =
-            await firestore
-                .collection('analytics_places')
-                .where(
-                  'placeId',
-                  whereIn: ownerPlaces.map((p) => p.id).toList(),
-                )
-                .get();
+        final placeIds = ownerPlaces.map((p) => p.id).toList();
 
-        for (final doc in analyticsSnapshot.docs) {
-          final data = doc.data();
-          totalViews += (data['viewsThisMonth'] as int? ?? 0);
+        // Split place IDs into batches of 10 (Firestore whereIn limit)
+        const int batchSize = 10;
+        final List<QuerySnapshot> allSnapshots = [];
+
+        for (int i = 0; i < placeIds.length; i += batchSize) {
+          final batchIds = placeIds.skip(i).take(batchSize).toList();
+
+          final batchSnapshot =
+              await firestore
+                  .collection('analytics_places')
+                  .where('placeId', whereIn: batchIds)
+                  .get();
+
+          allSnapshots.add(batchSnapshot);
+        }
+
+        // Aggregate results from all batches
+        for (final snapshot in allSnapshots) {
+          for (final doc in snapshot.docs) {
+            final data = doc.data() as Map<String, dynamic>?;
+            if (data != null) {
+              totalViews += (data['viewsThisMonth'] as int? ?? 0);
+            }
+          }
         }
       } catch (e) {
         // Si no hay analytics disponibles, usar valores calculados

@@ -311,6 +311,55 @@ void main() {
         expect(result, equals(testEvents));
       });
 
+      test('searchEvents with empty description should not crash', () async {
+        // Arrange
+        final eventWithEmptyDescription = testEvent.copyWith(description: '');
+        when(
+          () => mockEventService.getEvents(),
+        ).thenAnswer((_) async => [eventWithEmptyDescription]);
+
+        // Act
+        final result = await eventRepository.searchEvents('description');
+
+        // Assert
+        expect(result, isEmpty); // Empty description should not match
+      });
+
+      test('searchEvents with empty tags should not crash', () async {
+        // Arrange
+        final eventWithEmptyTags = testEvent.copyWith(tags: []);
+        when(
+          () => mockEventService.getEvents(),
+        ).thenAnswer((_) async => [eventWithEmptyTags]);
+
+        // Act
+        final result = await eventRepository.searchEvents('party');
+
+        // Assert
+        expect(result, isEmpty); // Empty tags should not match
+      });
+
+      test(
+        'searchEvents should find event by title when description and tags are empty',
+        () async {
+          // Arrange
+          final eventWithEmptyFields = testEvent.copyWith(
+            title: 'Amazing Event',
+            description: '',
+            tags: [],
+          );
+          when(
+            () => mockEventService.getEvents(),
+          ).thenAnswer((_) async => [eventWithEmptyFields]);
+
+          // Act
+          final result = await eventRepository.searchEvents('amazing');
+
+          // Assert
+          expect(result, equals([eventWithEmptyFields]));
+        },
+      );
+
       test('searchEvents no results', () async {
         // Arrange
         when(

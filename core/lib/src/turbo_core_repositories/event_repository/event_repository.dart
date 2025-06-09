@@ -294,9 +294,20 @@ class EventRepository implements EventInterface {
       final lowercaseQuery = query.toLowerCase();
 
       return allEvents.where((event) {
-        return event.title.toLowerCase().contains(lowercaseQuery) ||
-            event.description.toLowerCase().contains(lowercaseQuery) ||
+        // Safe null-aware checking for title
+        final titleMatches = event.title.toLowerCase().contains(lowercaseQuery);
+
+        // Safe checking for description (may be empty string from Firestore)
+        final descriptionMatches =
+            event.description.isNotEmpty &&
+            event.description.toLowerCase().contains(lowercaseQuery);
+
+        // Safe checking for tags (may be empty list from Firestore)
+        final tagsMatch =
+            event.tags.isNotEmpty &&
             event.tags.any((tag) => tag.toLowerCase().contains(lowercaseQuery));
+
+        return titleMatches || descriptionMatches || tagsMatch;
       }).toList();
     } catch (e) {
       throw Exception('Error al buscar eventos: $e');

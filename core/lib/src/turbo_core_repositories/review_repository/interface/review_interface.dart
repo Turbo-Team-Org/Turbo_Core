@@ -1,4 +1,5 @@
 import 'package:core/src/monorepo_utils/common/models/paged_result.dart';
+import 'package:core/src/turbo_core_repositories/review_repository/models/paginated_reviews.dart';
 import 'package:core/src/turbo_core_repositories/review_repository/models/review.dart';
 import 'package:core/src/turbo_core_repositories/review_repository/models/review_status.dart';
 
@@ -10,7 +11,8 @@ abstract class ReviewInterface {
   Future<List<Review>> getReviews();
 
   /// Add a new review to a place
-  Future<void> addReview(Review review, String placeId);
+  /// Returns the ID of the newly created review
+  Future<String> addReview(Review review, String placeId);
 
   /// Update an existing review
   Future<void> updateReview(Review review);
@@ -28,6 +30,18 @@ abstract class ReviewInterface {
     int page = 1,
     int limit = 20,
     ReviewStatus? status,
+  });
+
+  /// 🚀 OPTIMIZED: Get reviews using cursor-based pagination
+  /// This method provides O(1) performance regardless of dataset size
+  /// Use this method for better performance in production apps
+  Future<PaginatedReviews> getReviewsCursor({
+    int limit = 20,
+    ReviewStatus? status,
+    String? placeId,
+    String? userId,
+    String? pageToken,
+    bool includeTotalCount = false,
   });
 
   /// Get paginated reviews with optional filtering

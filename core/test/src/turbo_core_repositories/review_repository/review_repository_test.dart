@@ -172,16 +172,17 @@ void main() {
       verify(() => mockReviewService.getReviews()).called(1);
     });
 
-    test('addReview delegates to service', () async {
+    test('addReview delegates to service and returns review ID', () async {
       // Arrange
       when(
         () => mockReviewService.addReview(any(), any()),
-      ).thenAnswer((_) async {});
+      ).thenAnswer((_) async => testReviewId);
 
       // Act
-      await reviewRepository.addReview(testReview, testPlaceId);
+      final result = await reviewRepository.addReview(testReview, testPlaceId);
 
       // Assert
+      expect(result, equals(testReviewId));
       verify(
         () => mockReviewService.addReview(testReview, testPlaceId),
       ).called(1);

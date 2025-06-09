@@ -1,5 +1,6 @@
 import 'package:core/src/monorepo_utils/common/models/paged_result.dart';
 import 'package:core/src/turbo_core_repositories/review_repository/interface/review_interface.dart';
+import 'package:core/src/turbo_core_repositories/review_repository/models/paginated_reviews.dart';
 import 'package:core/src/turbo_core_repositories/review_repository/models/review.dart';
 import 'package:core/src/turbo_core_repositories/review_repository/models/review_status.dart';
 import 'package:core/src/turbo_core_repositories/review_repository/service/review_service.dart';
@@ -30,7 +31,7 @@ class ReviewRepository implements ReviewInterface {
 
   /// Add review
   @override
-  Future<void> addReview(Review review, String placeId) async {
+  Future<String> addReview(Review review, String placeId) async {
     return reviewService.addReview(review, placeId);
   }
 
@@ -54,10 +55,35 @@ class ReviewRepository implements ReviewInterface {
     int limit = 20,
     ReviewStatus? status,
   }) async {
+    // Validate pagination parameters
+    _validatePaginationParams(page: page, limit: limit);
+
     return reviewService.getAllReviews(
       page: page,
       limit: limit,
       status: status,
+    );
+  }
+
+  @override
+  Future<PaginatedReviews> getReviewsCursor({
+    int limit = 20,
+    ReviewStatus? status,
+    String? placeId,
+    String? userId,
+    String? pageToken,
+    bool includeTotalCount = false,
+  }) async {
+    // Validate cursor pagination parameters
+    _validateCursorParams(limit: limit);
+
+    return reviewService.getReviewsCursor(
+      limit: limit,
+      status: status,
+      placeId: placeId,
+      userId: userId,
+      pageToken: pageToken,
+      includeTotalCount: includeTotalCount,
     );
   }
 
@@ -69,6 +95,9 @@ class ReviewRepository implements ReviewInterface {
     String? placeId,
     String? userId,
   }) async {
+    // Validate pagination parameters
+    _validatePaginationParams(page: page, limit: limit);
+
     return reviewService.getReviewsPaginated(
       page: page,
       limit: limit,
@@ -85,6 +114,11 @@ class ReviewRepository implements ReviewInterface {
     int limit = 20,
     ReviewStatus? status,
   }) async {
+    // Validate pagination parameters
+    _validatePaginationParams(page: page, limit: limit);
+    // Validate placeId parameter
+    _validateNonEmptyString(placeId, 'placeId');
+
     return reviewService.getReviewsByPlaceId(
       placeId,
       page: page,
@@ -100,6 +134,11 @@ class ReviewRepository implements ReviewInterface {
     int limit = 20,
     ReviewStatus? status,
   }) async {
+    // Validate pagination parameters
+    _validatePaginationParams(page: page, limit: limit);
+    // Validate userId parameter
+    _validateNonEmptyString(userId, 'userId');
+
     return reviewService.getReviewsByUserId(
       userId,
       page: page,
@@ -114,6 +153,9 @@ class ReviewRepository implements ReviewInterface {
     int page = 1,
     int limit = 20,
   }) async {
+    // Validate pagination parameters
+    _validatePaginationParams(page: page, limit: limit);
+
     return reviewService.getReviewsByStatus(status, page: page, limit: limit);
   }
 
@@ -125,6 +167,9 @@ class ReviewRepository implements ReviewInterface {
     String? moderatorId,
     String? moderationNote,
   }) async {
+    // Validate reviewId parameter
+    _validateNonEmptyString(reviewId, 'reviewId');
+
     return reviewService.approveReview(
       reviewId,
       moderatorId: moderatorId,
@@ -138,6 +183,9 @@ class ReviewRepository implements ReviewInterface {
     String? moderatorId,
     String? moderationNote,
   }) async {
+    // Validate reviewId parameter
+    _validateNonEmptyString(reviewId, 'reviewId');
+
     return reviewService.rejectReview(
       reviewId,
       moderatorId: moderatorId,
@@ -151,6 +199,9 @@ class ReviewRepository implements ReviewInterface {
     String? moderatorId,
     String? moderationNote,
   }) async {
+    // Validate reviewId parameter
+    _validateNonEmptyString(reviewId, 'reviewId');
+
     return reviewService.flagReview(
       reviewId,
       moderatorId: moderatorId,
@@ -165,6 +216,9 @@ class ReviewRepository implements ReviewInterface {
     String? moderatorId,
     String? moderationNote,
   }) async {
+    // Validate reviewId parameter
+    _validateNonEmptyString(reviewId, 'reviewId');
+
     return reviewService.updateReviewStatus(
       reviewId,
       status,
@@ -177,6 +231,9 @@ class ReviewRepository implements ReviewInterface {
 
   @override
   Future<Map<String, dynamic>> getReviewStats(String placeId) async {
+    // Validate placeId parameter
+    _validateNonEmptyString(placeId, 'placeId');
+
     return reviewService.getReviewStats(placeId);
   }
 
@@ -188,5 +245,65 @@ class ReviewRepository implements ReviewInterface {
   @override
   Future<int> getFlaggedReviewsCount() async {
     return reviewService.getFlaggedReviewsCount();
+  }
+
+  // ==================== PRIVATE VALIDATION METHODS ====================
+
+  /// Validates pagination parameters for page-based pagination
+  ///
+  /// Throws [ArgumentError] if parameters are invalid:
+  /// - page must be >= 1
+  /// - limit must be > 0 and <= 1000 (to prevent excessive resource usage)
+  void _validatePaginationParams({required int page, required int limit}) {
+    if (page < 1) {
+      throw ArgumentError.value(
+        page,
+        'page',
+        'Page number must be greater than or equal to 1',
+      );
+    }
+
+    if (limit <= 0) {
+      throw ArgumentError.value(limit, 'limit', 'Limit must be greater than 0');
+    }
+
+    if (limit > 1000) {
+      throw ArgumentError.value(
+        limit,
+        'limit',
+        'Limit must not exceed 1000 to prevent excessive resource usage',
+      );
+    }
+  }
+
+  /// Validates parameters for cursor-based pagination
+  ///
+  /// Throws [ArgumentError] if parameters are invalid:
+  /// - limit must be > 0 and <= 1000
+  void _validateCursorParams({required int limit}) {
+    if (limit <= 0) {
+      throw ArgumentError.value(limit, 'limit', 'Limit must be greater than 0');
+    }
+
+    if (limit > 1000) {
+      throw ArgumentError.value(
+        limit,
+        'limit',
+        'Limit must not exceed 1000 to prevent excessive resource usage',
+      );
+    }
+  }
+
+  /// Validates that a string parameter is not null or empty
+  ///
+  /// Throws [ArgumentError] if the string is null, empty, or only whitespace
+  void _validateNonEmptyString(String value, String parameterName) {
+    if (value.trim().isEmpty) {
+      throw ArgumentError.value(
+        value,
+        parameterName,
+        '$parameterName cannot be null, empty, or only whitespace',
+      );
+    }
   }
 }
