@@ -2,7 +2,9 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:core/src/turbo_core_repositories/admin_auth_repository/models/admin_user.dart';
+import 'package:core/src/turbo_core_repositories/admin_auth_repository/models/business_owner_registration_result.dart';
 import 'package:core/src/turbo_core_repositories/admin_auth_repository/models/business_owner_request.dart';
+import 'package:core/src/turbo_core_repositories/authentication_repository/service/authentication_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:uuid/uuid.dart';
 
@@ -662,6 +664,62 @@ class AdminAuthService {
       return BusinessOwnerRequest.fromFirestore(doc.data()!);
     } catch (e) {
       throw AdminAuthException('Error obteniendo solicitud: $e');
+    }
+  }
+
+  /// 🚀 Registra usuario y solicita business owner en un solo flujo
+  Future<BusinessOwnerRegistrationResult> registerAndRequestBusinessOwner({
+    required String email,
+    required String password,
+    required String displayName,
+    required String businessName,
+    required String businessDescription,
+    required String businessAddress,
+    String? phoneNumber,
+    String? website,
+    Map<String, dynamic>? businessMetadata,
+    Map<String, dynamic>? contactInfo,
+  }) async {
+    try {
+      // 1. Crear instancia de AuthenticationService
+      final authService = AuthenticationService(
+        firebaseAuth: _firebaseAuth,
+        firestore: _firestore,
+      );
+
+      // 2. Registrar usuario normal
+      final newUser = await authService.signUpWithEmail(
+        email: email,
+        password: password,
+        displayName: displayName,
+      );
+
+      if (newUser == null) {
+        throw AdminAuthException('Error registrando usuario');
+      }
+
+      // 3. Crear solicitud de business owner
+      final request = await submitBusinessOwnerRequest(
+        userId: newUser.uid,
+        displayName: displayName,
+        businessName: businessName,
+        businessDescription: businessDescription,
+        businessAddress: businessAddress,
+        phoneNumber: phoneNumber,
+        website: website,
+        businessMetadata: businessMetadata,
+        contactInfo: contactInfo,
+      );
+
+      // 4. Retornar resultado
+      return BusinessOwnerRegistrationResult(
+        user: newUser,
+        request: request,
+        success: true,
+        message: 'Usuario registrado y solicitud enviada exitosamente',
+      );
+    } catch (e) {
+      throw AdminAuthException('Error en registro completo: $e');
     }
   }
 

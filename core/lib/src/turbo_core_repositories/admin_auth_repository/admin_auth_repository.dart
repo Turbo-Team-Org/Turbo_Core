@@ -6,11 +6,13 @@
 import 'dart:async';
 
 import 'package:core/src/turbo_core_repositories/admin_auth_repository/models/admin_user.dart';
+import 'package:core/src/turbo_core_repositories/admin_auth_repository/models/business_owner_registration_result.dart';
 import 'package:core/src/turbo_core_repositories/admin_auth_repository/models/business_owner_request.dart';
 import 'package:core/src/turbo_core_repositories/admin_auth_repository/service/admin_auth_service.dart';
 import 'package:dartz/dartz.dart';
 
 export 'models/admin_user.dart';
+export 'models/business_owner_registration_result.dart';
 export 'models/business_owner_request.dart';
 export 'service/admin_auth_service.dart';
 
@@ -151,6 +153,30 @@ abstract class AdminAuthRepository {
   /// 🔍 Obtener solicitud por ID
   Future<Either<AdminAuthFailure, BusinessOwnerRequest?>>
   getBusinessOwnerRequestById(String requestId, {String? requestedByUid});
+
+  // ==================== FLUJO COMPLETO BUSINESS OWNER ====================
+
+  /// 🚀 Registra usuario nuevo y envía solicitud de business owner en un solo flujo
+  ///
+  /// Maneja todo el proceso para usuarios sin cuenta:
+  /// 1. Registra usuario en authentication
+  /// 2. Inmediatamente envía solicitud de business owner
+  /// 3. Retorna resultado unificado
+  Future<Either<AdminAuthFailure, BusinessOwnerRegistrationResult>>
+  registerAndRequestBusinessOwner({
+    // Datos de usuario
+    required String email,
+    required String password,
+    required String displayName,
+    // Datos de negocio
+    required String businessName,
+    required String businessDescription,
+    required String businessAddress,
+    String? phoneNumber,
+    String? website,
+    Map<String, dynamic>? businessMetadata,
+    Map<String, dynamic>? contactInfo,
+  });
 }
 
 /// 🛠️ Implementación concreta del repositorio
@@ -526,6 +552,41 @@ class AdminAuthRepositoryImpl implements AdminAuthRepository {
         requestedByUid: requestedByUid,
       );
       return Right(request);
+    } catch (e) {
+      return Left(_mapExceptionToFailure(e));
+    }
+  }
+
+  @override
+  Future<Either<AdminAuthFailure, BusinessOwnerRegistrationResult>>
+  registerAndRequestBusinessOwner({
+    // Datos de usuario
+    required String email,
+    required String password,
+    required String displayName,
+    // Datos de negocio
+    required String businessName,
+    required String businessDescription,
+    required String businessAddress,
+    String? phoneNumber,
+    String? website,
+    Map<String, dynamic>? businessMetadata,
+    Map<String, dynamic>? contactInfo,
+  }) async {
+    try {
+      final result = await _adminAuthService.registerAndRequestBusinessOwner(
+        email: email,
+        password: password,
+        displayName: displayName,
+        businessName: businessName,
+        businessDescription: businessDescription,
+        businessAddress: businessAddress,
+        phoneNumber: phoneNumber,
+        website: website,
+        businessMetadata: businessMetadata,
+        contactInfo: contactInfo,
+      );
+      return Right(result);
     } catch (e) {
       return Left(_mapExceptionToFailure(e));
     }
