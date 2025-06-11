@@ -441,17 +441,22 @@ class AdminAuthService {
     }
   }
 
-  /// 🔍 Obtener solicitud por ID
-  Future<BusinessOwnerRequest?> getBusinessOwnerById(String requestId) async {
+  /// 🔍 Obtener solicitud por userId (uid del usuario)
+  Future<BusinessOwnerRequest?> getBusinessOwnerById(String userId) async {
     try {
-      final doc = await _businessOwnerRequestsRef.doc(requestId).get();
+      // Buscar en la colección por la propiedad userId
+      final query =
+          await _businessOwnerRequestsRef
+              .where('userId', isEqualTo: userId)
+              .limit(1)
+              .get();
 
-      if (!doc.exists) return null;
+      if (query.docs.isEmpty) return null;
 
-      final data = doc.data()!;
+      final data = query.docs.first.data();
       return BusinessOwnerRequest.fromFirestore(data);
     } catch (e) {
-      throw AdminAuthException('Error obteniendo solicitud: $e');
+      throw AdminAuthException('Error obteniendo solicitud por userId: $e');
     }
   }
 
