@@ -25,6 +25,7 @@ sealed class BusinessOwnerRequest with _$BusinessOwnerRequest {
     @Default(BusinessOwnerRequestStatus.pending)
     BusinessOwnerRequestStatus status,
     required DateTime createdAt,
+    DateTime? lastLogin,
     DateTime? reviewedAt,
     String? reviewedBy,
     String? rejectionReason,

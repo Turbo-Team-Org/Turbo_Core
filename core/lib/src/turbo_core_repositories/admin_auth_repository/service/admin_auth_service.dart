@@ -88,14 +88,8 @@ class AdminAuthService {
         throw AdminAuthException('Usuario no autorizado para admin panel');
       }
 
-      // 3. Verificar que está activo
-      if (!adminUser.isActive) {
-        await _firebaseAuth.signOut();
-        throw AdminAuthException('Cuenta desactivada');
-      }
-
       // 4. Actualizar último login
-      await _updateLastLogin(adminUser.uid);
+      await _updateLastLogin(_adminUsersRef, adminUser.uid);
 
       return adminUser.copyWith(lastLogin: DateTime.now());
     } on FirebaseAuthException catch (e) {
@@ -336,6 +330,41 @@ class AdminAuthService {
   }
 
   // ==================== AUTO-REGISTRO DE BUSINESS OWNERS ====================
+  /// 🔐 Inicia sesión con email y contraseña para business owners
+  Future<BusinessOwnerRequest> signInWithEmailAndPasswordBusinessOwner({
+    required String email,
+    required String password,
+  }) async {
+    try {
+      // 1. Autenticar con Firebase Auth
+      final userCredential = await _firebaseAuth.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+
+      final firebaseUser = userCredential.user;
+      if (firebaseUser == null) {
+        throw AdminAuthException('Error en autenticación');
+      }
+
+      // 2. Verificar que existe en business_owner_requests
+      final businessOwnerRequest = await getBusinessOwnerById(firebaseUser.uid);
+      if (businessOwnerRequest == null) {
+        // Cerrar sesión si no es usuario administrativo
+        await _firebaseAuth.signOut();
+        throw AdminAuthException('Usuario no autorizado para business owner');
+      }
+
+      // 4. Actualizar último login
+      await _updateLastLogin(_businessOwnerRequestsRef, firebaseUser.uid);
+
+      return businessOwnerRequest.copyWith(lastLogin: DateTime.now());
+    } on FirebaseAuthException catch (e) {
+      throw AdminAuthException(_getAuthErrorMessage(e.code));
+    } catch (e) {
+      throw AdminAuthException('Error de autenticación: $e');
+    }
+  }
 
   /// 🆕 Solicitar registro como business owner (usuario ya registrado)
   Future<BusinessOwnerRequest> submitBusinessOwnerRequest({
@@ -409,6 +438,20 @@ class AdminAuthService {
       return request;
     } catch (e) {
       throw AdminAuthException('Error enviando solicitud: $e');
+    }
+  }
+
+  /// 🔍 Obtener solicitud por ID
+  Future<BusinessOwnerRequest?> getBusinessOwnerById(String requestId) async {
+    try {
+      final doc = await _businessOwnerRequestsRef.doc(requestId).get();
+
+      if (!doc.exists) return null;
+
+      final data = doc.data()!;
+      return BusinessOwnerRequest.fromFirestore(data);
+    } catch (e) {
+      throw AdminAuthException('Error obteniendo solicitud: $e');
     }
   }
 
@@ -726,8 +769,11 @@ class AdminAuthService {
   // ================== MÉTODOS PRIVADOS ==================
 
   /// 🕐 Actualiza la fecha de último login
-  Future<void> _updateLastLogin(String uid) async {
-    await _adminUsersRef.doc(uid).update({
+  Future<void> _updateLastLogin(
+    CollectionReference<Map<String, dynamic>> collection,
+    String uid,
+  ) async {
+    await collection.doc(uid).update({
       'lastLogin': Timestamp.fromDate(DateTime.now()),
     });
   }

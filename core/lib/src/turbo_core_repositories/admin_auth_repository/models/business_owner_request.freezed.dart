@@ -16,7 +16,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$BusinessOwnerRequest {
 
- String get id; String get userId; String get email; String get displayName; String get businessName; String get businessDescription; String get businessAddress; String? get phoneNumber; String? get website; BusinessOwnerRequestStatus get status; DateTime get createdAt; DateTime? get reviewedAt; String? get reviewedBy; String? get rejectionReason; String? get approvalNotes; Map<String, dynamic> get businessMetadata; Map<String, dynamic> get contactInfo;
+ String get id; String get userId; String get email; String get displayName; String get businessName; String get businessDescription; String get businessAddress; String? get phoneNumber; String? get website; BusinessOwnerRequestStatus get status; DateTime get createdAt; DateTime? get lastLogin; DateTime? get reviewedAt; String? get reviewedBy; String? get rejectionReason; String? get approvalNotes; Map<String, dynamic> get businessMetadata; Map<String, dynamic> get contactInfo;
 /// Create a copy of BusinessOwnerRequest
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -29,16 +29,16 @@ $BusinessOwnerRequestCopyWith<BusinessOwnerRequest> get copyWith => _$BusinessOw
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is BusinessOwnerRequest&&(identical(other.id, id) || other.id == id)&&(identical(other.userId, userId) || other.userId == userId)&&(identical(other.email, email) || other.email == email)&&(identical(other.displayName, displayName) || other.displayName == displayName)&&(identical(other.businessName, businessName) || other.businessName == businessName)&&(identical(other.businessDescription, businessDescription) || other.businessDescription == businessDescription)&&(identical(other.businessAddress, businessAddress) || other.businessAddress == businessAddress)&&(identical(other.phoneNumber, phoneNumber) || other.phoneNumber == phoneNumber)&&(identical(other.website, website) || other.website == website)&&(identical(other.status, status) || other.status == status)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.reviewedAt, reviewedAt) || other.reviewedAt == reviewedAt)&&(identical(other.reviewedBy, reviewedBy) || other.reviewedBy == reviewedBy)&&(identical(other.rejectionReason, rejectionReason) || other.rejectionReason == rejectionReason)&&(identical(other.approvalNotes, approvalNotes) || other.approvalNotes == approvalNotes)&&const DeepCollectionEquality().equals(other.businessMetadata, businessMetadata)&&const DeepCollectionEquality().equals(other.contactInfo, contactInfo));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is BusinessOwnerRequest&&(identical(other.id, id) || other.id == id)&&(identical(other.userId, userId) || other.userId == userId)&&(identical(other.email, email) || other.email == email)&&(identical(other.displayName, displayName) || other.displayName == displayName)&&(identical(other.businessName, businessName) || other.businessName == businessName)&&(identical(other.businessDescription, businessDescription) || other.businessDescription == businessDescription)&&(identical(other.businessAddress, businessAddress) || other.businessAddress == businessAddress)&&(identical(other.phoneNumber, phoneNumber) || other.phoneNumber == phoneNumber)&&(identical(other.website, website) || other.website == website)&&(identical(other.status, status) || other.status == status)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.lastLogin, lastLogin) || other.lastLogin == lastLogin)&&(identical(other.reviewedAt, reviewedAt) || other.reviewedAt == reviewedAt)&&(identical(other.reviewedBy, reviewedBy) || other.reviewedBy == reviewedBy)&&(identical(other.rejectionReason, rejectionReason) || other.rejectionReason == rejectionReason)&&(identical(other.approvalNotes, approvalNotes) || other.approvalNotes == approvalNotes)&&const DeepCollectionEquality().equals(other.businessMetadata, businessMetadata)&&const DeepCollectionEquality().equals(other.contactInfo, contactInfo));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,userId,email,displayName,businessName,businessDescription,businessAddress,phoneNumber,website,status,createdAt,reviewedAt,reviewedBy,rejectionReason,approvalNotes,const DeepCollectionEquality().hash(businessMetadata),const DeepCollectionEquality().hash(contactInfo));
+int get hashCode => Object.hash(runtimeType,id,userId,email,displayName,businessName,businessDescription,businessAddress,phoneNumber,website,status,createdAt,lastLogin,reviewedAt,reviewedBy,rejectionReason,approvalNotes,const DeepCollectionEquality().hash(businessMetadata),const DeepCollectionEquality().hash(contactInfo));
 
 @override
 String toString() {
-  return 'BusinessOwnerRequest(id: $id, userId: $userId, email: $email, displayName: $displayName, businessName: $businessName, businessDescription: $businessDescription, businessAddress: $businessAddress, phoneNumber: $phoneNumber, website: $website, status: $status, createdAt: $createdAt, reviewedAt: $reviewedAt, reviewedBy: $reviewedBy, rejectionReason: $rejectionReason, approvalNotes: $approvalNotes, businessMetadata: $businessMetadata, contactInfo: $contactInfo)';
+  return 'BusinessOwnerRequest(id: $id, userId: $userId, email: $email, displayName: $displayName, businessName: $businessName, businessDescription: $businessDescription, businessAddress: $businessAddress, phoneNumber: $phoneNumber, website: $website, status: $status, createdAt: $createdAt, lastLogin: $lastLogin, reviewedAt: $reviewedAt, reviewedBy: $reviewedBy, rejectionReason: $rejectionReason, approvalNotes: $approvalNotes, businessMetadata: $businessMetadata, contactInfo: $contactInfo)';
 }
 
 
@@ -49,7 +49,7 @@ abstract mixin class $BusinessOwnerRequestCopyWith<$Res>  {
   factory $BusinessOwnerRequestCopyWith(BusinessOwnerRequest value, $Res Function(BusinessOwnerRequest) _then) = _$BusinessOwnerRequestCopyWithImpl;
 @useResult
 $Res call({
- String id, String userId, String email, String displayName, String businessName, String businessDescription, String businessAddress, String? phoneNumber, String? website, BusinessOwnerRequestStatus status, DateTime createdAt, DateTime? reviewedAt, String? reviewedBy, String? rejectionReason, String? approvalNotes, Map<String, dynamic> businessMetadata, Map<String, dynamic> contactInfo
+ String id, String userId, String email, String displayName, String businessName, String businessDescription, String businessAddress, String? phoneNumber, String? website, BusinessOwnerRequestStatus status, DateTime createdAt, DateTime? lastLogin, DateTime? reviewedAt, String? reviewedBy, String? rejectionReason, String? approvalNotes, Map<String, dynamic> businessMetadata, Map<String, dynamic> contactInfo
 });
 
 
@@ -66,7 +66,7 @@ class _$BusinessOwnerRequestCopyWithImpl<$Res>
 
 /// Create a copy of BusinessOwnerRequest
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? userId = null,Object? email = null,Object? displayName = null,Object? businessName = null,Object? businessDescription = null,Object? businessAddress = null,Object? phoneNumber = freezed,Object? website = freezed,Object? status = null,Object? createdAt = null,Object? reviewedAt = freezed,Object? reviewedBy = freezed,Object? rejectionReason = freezed,Object? approvalNotes = freezed,Object? businessMetadata = null,Object? contactInfo = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? userId = null,Object? email = null,Object? displayName = null,Object? businessName = null,Object? businessDescription = null,Object? businessAddress = null,Object? phoneNumber = freezed,Object? website = freezed,Object? status = null,Object? createdAt = null,Object? lastLogin = freezed,Object? reviewedAt = freezed,Object? reviewedBy = freezed,Object? rejectionReason = freezed,Object? approvalNotes = freezed,Object? businessMetadata = null,Object? contactInfo = null,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,userId: null == userId ? _self.userId : userId // ignore: cast_nullable_to_non_nullable
@@ -79,7 +79,8 @@ as String,phoneNumber: freezed == phoneNumber ? _self.phoneNumber : phoneNumber 
 as String?,website: freezed == website ? _self.website : website // ignore: cast_nullable_to_non_nullable
 as String?,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
 as BusinessOwnerRequestStatus,createdAt: null == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
-as DateTime,reviewedAt: freezed == reviewedAt ? _self.reviewedAt : reviewedAt // ignore: cast_nullable_to_non_nullable
+as DateTime,lastLogin: freezed == lastLogin ? _self.lastLogin : lastLogin // ignore: cast_nullable_to_non_nullable
+as DateTime?,reviewedAt: freezed == reviewedAt ? _self.reviewedAt : reviewedAt // ignore: cast_nullable_to_non_nullable
 as DateTime?,reviewedBy: freezed == reviewedBy ? _self.reviewedBy : reviewedBy // ignore: cast_nullable_to_non_nullable
 as String?,rejectionReason: freezed == rejectionReason ? _self.rejectionReason : rejectionReason // ignore: cast_nullable_to_non_nullable
 as String?,approvalNotes: freezed == approvalNotes ? _self.approvalNotes : approvalNotes // ignore: cast_nullable_to_non_nullable
@@ -96,7 +97,7 @@ as Map<String, dynamic>,
 @JsonSerializable()
 
 class _BusinessOwnerRequest extends BusinessOwnerRequest {
-  const _BusinessOwnerRequest({required this.id, required this.userId, required this.email, required this.displayName, required this.businessName, required this.businessDescription, required this.businessAddress, this.phoneNumber, this.website, this.status = BusinessOwnerRequestStatus.pending, required this.createdAt, this.reviewedAt, this.reviewedBy, this.rejectionReason, this.approvalNotes, final  Map<String, dynamic> businessMetadata = const {}, final  Map<String, dynamic> contactInfo = const {}}): _businessMetadata = businessMetadata,_contactInfo = contactInfo,super._();
+  const _BusinessOwnerRequest({required this.id, required this.userId, required this.email, required this.displayName, required this.businessName, required this.businessDescription, required this.businessAddress, this.phoneNumber, this.website, this.status = BusinessOwnerRequestStatus.pending, required this.createdAt, this.lastLogin, this.reviewedAt, this.reviewedBy, this.rejectionReason, this.approvalNotes, final  Map<String, dynamic> businessMetadata = const {}, final  Map<String, dynamic> contactInfo = const {}}): _businessMetadata = businessMetadata,_contactInfo = contactInfo,super._();
   factory _BusinessOwnerRequest.fromJson(Map<String, dynamic> json) => _$BusinessOwnerRequestFromJson(json);
 
 @override final  String id;
@@ -110,6 +111,7 @@ class _BusinessOwnerRequest extends BusinessOwnerRequest {
 @override final  String? website;
 @override@JsonKey() final  BusinessOwnerRequestStatus status;
 @override final  DateTime createdAt;
+@override final  DateTime? lastLogin;
 @override final  DateTime? reviewedAt;
 @override final  String? reviewedBy;
 @override final  String? rejectionReason;
@@ -142,16 +144,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _BusinessOwnerRequest&&(identical(other.id, id) || other.id == id)&&(identical(other.userId, userId) || other.userId == userId)&&(identical(other.email, email) || other.email == email)&&(identical(other.displayName, displayName) || other.displayName == displayName)&&(identical(other.businessName, businessName) || other.businessName == businessName)&&(identical(other.businessDescription, businessDescription) || other.businessDescription == businessDescription)&&(identical(other.businessAddress, businessAddress) || other.businessAddress == businessAddress)&&(identical(other.phoneNumber, phoneNumber) || other.phoneNumber == phoneNumber)&&(identical(other.website, website) || other.website == website)&&(identical(other.status, status) || other.status == status)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.reviewedAt, reviewedAt) || other.reviewedAt == reviewedAt)&&(identical(other.reviewedBy, reviewedBy) || other.reviewedBy == reviewedBy)&&(identical(other.rejectionReason, rejectionReason) || other.rejectionReason == rejectionReason)&&(identical(other.approvalNotes, approvalNotes) || other.approvalNotes == approvalNotes)&&const DeepCollectionEquality().equals(other._businessMetadata, _businessMetadata)&&const DeepCollectionEquality().equals(other._contactInfo, _contactInfo));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _BusinessOwnerRequest&&(identical(other.id, id) || other.id == id)&&(identical(other.userId, userId) || other.userId == userId)&&(identical(other.email, email) || other.email == email)&&(identical(other.displayName, displayName) || other.displayName == displayName)&&(identical(other.businessName, businessName) || other.businessName == businessName)&&(identical(other.businessDescription, businessDescription) || other.businessDescription == businessDescription)&&(identical(other.businessAddress, businessAddress) || other.businessAddress == businessAddress)&&(identical(other.phoneNumber, phoneNumber) || other.phoneNumber == phoneNumber)&&(identical(other.website, website) || other.website == website)&&(identical(other.status, status) || other.status == status)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.lastLogin, lastLogin) || other.lastLogin == lastLogin)&&(identical(other.reviewedAt, reviewedAt) || other.reviewedAt == reviewedAt)&&(identical(other.reviewedBy, reviewedBy) || other.reviewedBy == reviewedBy)&&(identical(other.rejectionReason, rejectionReason) || other.rejectionReason == rejectionReason)&&(identical(other.approvalNotes, approvalNotes) || other.approvalNotes == approvalNotes)&&const DeepCollectionEquality().equals(other._businessMetadata, _businessMetadata)&&const DeepCollectionEquality().equals(other._contactInfo, _contactInfo));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,userId,email,displayName,businessName,businessDescription,businessAddress,phoneNumber,website,status,createdAt,reviewedAt,reviewedBy,rejectionReason,approvalNotes,const DeepCollectionEquality().hash(_businessMetadata),const DeepCollectionEquality().hash(_contactInfo));
+int get hashCode => Object.hash(runtimeType,id,userId,email,displayName,businessName,businessDescription,businessAddress,phoneNumber,website,status,createdAt,lastLogin,reviewedAt,reviewedBy,rejectionReason,approvalNotes,const DeepCollectionEquality().hash(_businessMetadata),const DeepCollectionEquality().hash(_contactInfo));
 
 @override
 String toString() {
-  return 'BusinessOwnerRequest(id: $id, userId: $userId, email: $email, displayName: $displayName, businessName: $businessName, businessDescription: $businessDescription, businessAddress: $businessAddress, phoneNumber: $phoneNumber, website: $website, status: $status, createdAt: $createdAt, reviewedAt: $reviewedAt, reviewedBy: $reviewedBy, rejectionReason: $rejectionReason, approvalNotes: $approvalNotes, businessMetadata: $businessMetadata, contactInfo: $contactInfo)';
+  return 'BusinessOwnerRequest(id: $id, userId: $userId, email: $email, displayName: $displayName, businessName: $businessName, businessDescription: $businessDescription, businessAddress: $businessAddress, phoneNumber: $phoneNumber, website: $website, status: $status, createdAt: $createdAt, lastLogin: $lastLogin, reviewedAt: $reviewedAt, reviewedBy: $reviewedBy, rejectionReason: $rejectionReason, approvalNotes: $approvalNotes, businessMetadata: $businessMetadata, contactInfo: $contactInfo)';
 }
 
 
@@ -162,7 +164,7 @@ abstract mixin class _$BusinessOwnerRequestCopyWith<$Res> implements $BusinessOw
   factory _$BusinessOwnerRequestCopyWith(_BusinessOwnerRequest value, $Res Function(_BusinessOwnerRequest) _then) = __$BusinessOwnerRequestCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String userId, String email, String displayName, String businessName, String businessDescription, String businessAddress, String? phoneNumber, String? website, BusinessOwnerRequestStatus status, DateTime createdAt, DateTime? reviewedAt, String? reviewedBy, String? rejectionReason, String? approvalNotes, Map<String, dynamic> businessMetadata, Map<String, dynamic> contactInfo
+ String id, String userId, String email, String displayName, String businessName, String businessDescription, String businessAddress, String? phoneNumber, String? website, BusinessOwnerRequestStatus status, DateTime createdAt, DateTime? lastLogin, DateTime? reviewedAt, String? reviewedBy, String? rejectionReason, String? approvalNotes, Map<String, dynamic> businessMetadata, Map<String, dynamic> contactInfo
 });
 
 
@@ -179,7 +181,7 @@ class __$BusinessOwnerRequestCopyWithImpl<$Res>
 
 /// Create a copy of BusinessOwnerRequest
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? userId = null,Object? email = null,Object? displayName = null,Object? businessName = null,Object? businessDescription = null,Object? businessAddress = null,Object? phoneNumber = freezed,Object? website = freezed,Object? status = null,Object? createdAt = null,Object? reviewedAt = freezed,Object? reviewedBy = freezed,Object? rejectionReason = freezed,Object? approvalNotes = freezed,Object? businessMetadata = null,Object? contactInfo = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? userId = null,Object? email = null,Object? displayName = null,Object? businessName = null,Object? businessDescription = null,Object? businessAddress = null,Object? phoneNumber = freezed,Object? website = freezed,Object? status = null,Object? createdAt = null,Object? lastLogin = freezed,Object? reviewedAt = freezed,Object? reviewedBy = freezed,Object? rejectionReason = freezed,Object? approvalNotes = freezed,Object? businessMetadata = null,Object? contactInfo = null,}) {
   return _then(_BusinessOwnerRequest(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,userId: null == userId ? _self.userId : userId // ignore: cast_nullable_to_non_nullable
@@ -192,7 +194,8 @@ as String,phoneNumber: freezed == phoneNumber ? _self.phoneNumber : phoneNumber 
 as String?,website: freezed == website ? _self.website : website // ignore: cast_nullable_to_non_nullable
 as String?,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
 as BusinessOwnerRequestStatus,createdAt: null == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
-as DateTime,reviewedAt: freezed == reviewedAt ? _self.reviewedAt : reviewedAt // ignore: cast_nullable_to_non_nullable
+as DateTime,lastLogin: freezed == lastLogin ? _self.lastLogin : lastLogin // ignore: cast_nullable_to_non_nullable
+as DateTime?,reviewedAt: freezed == reviewedAt ? _self.reviewedAt : reviewedAt // ignore: cast_nullable_to_non_nullable
 as DateTime?,reviewedBy: freezed == reviewedBy ? _self.reviewedBy : reviewedBy // ignore: cast_nullable_to_non_nullable
 as String?,rejectionReason: freezed == rejectionReason ? _self.rejectionReason : rejectionReason // ignore: cast_nullable_to_non_nullable
 as String?,approvalNotes: freezed == approvalNotes ? _self.approvalNotes : approvalNotes // ignore: cast_nullable_to_non_nullable

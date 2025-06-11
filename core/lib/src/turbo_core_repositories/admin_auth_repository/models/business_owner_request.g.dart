@@ -25,6 +25,10 @@ _BusinessOwnerRequest _$BusinessOwnerRequestFromJson(
       ) ??
       BusinessOwnerRequestStatus.pending,
   createdAt: DateTime.parse(json['createdAt'] as String),
+  lastLogin:
+      json['lastLogin'] == null
+          ? null
+          : DateTime.parse(json['lastLogin'] as String),
   reviewedAt:
       json['reviewedAt'] == null
           ? null
@@ -51,6 +55,7 @@ Map<String, dynamic> _$BusinessOwnerRequestToJson(
   'website': instance.website,
   'status': _$BusinessOwnerRequestStatusEnumMap[instance.status]!,
   'createdAt': instance.createdAt.toIso8601String(),
+  'lastLogin': instance.lastLogin?.toIso8601String(),
   'reviewedAt': instance.reviewedAt?.toIso8601String(),
   'reviewedBy': instance.reviewedBy,
   'rejectionReason': instance.rejectionReason,
