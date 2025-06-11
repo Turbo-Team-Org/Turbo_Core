@@ -1,0 +1,269 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // ================== FUNCIONES HELPER ==================
+    
+    // Verificar si el usuario está autenticado
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    // Verificar si es el dueño del recurso
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    // Verificar si es super administrador
+    function isSuperAdmin() {
+      return isAuthenticated() && 
+        exists(/databases/$(database)/documents/admin_users/$(request.auth.uid)) &&
+        get(/databases/$(database)/documents/admin_users/$(request.auth.uid)).data.role == 'superAdmin';
+    }
+    
+    // Verificar si es cualquier tipo de admin
+    function isAdmin() {
+      return isAuthenticated() && 
+        exists(/databases/$(database)/documents/admin_users/$(request.auth.uid));
+    }
+    
+    // Verificar si puede gestionar un lugar específico
+    function canManagePlace(placeId) {
+      return isSuperAdmin() || 
+        (isAdmin() && 
+         placeId in get(/databases/$(database)/documents/admin_users/$(request.auth.uid)).data.ownedPlaceIds);
+    }
+
+    // ================== USUARIOS REGULARES ==================
+    
+    match /users/{userId} {
+      // Usuarios pueden leer/escribir su propio documento
+      allow read, write: if isOwner(userId);
+      
+      // Admins pueden leer usuarios (para verificaciones)
+      allow read: if isAdmin();
+      
+      // Crear documento cuando se registra
+      allow create: if isAuthenticated() && request.auth.uid == userId;
+    }
+
+    // ================== BUSINESS OWNER REQUESTS ==================
+    
+    match /business_owner_requests/{requestId} {
+      
+      // CREAR: Solo usuarios autenticados pueden crear solicitudes para sí mismos
+      allow create: if isAuthenticated() && 
+        // Debe ser el dueño de la solicitud
+        request.auth.uid == request.resource.data.userId &&
+        // Estado inicial debe ser 'pending'
+        request.resource.data.status == 'pending' &&
+        // CreatedAt debe ser timestamp actual
+        request.resource.data.createdAt is timestamp &&
+        // Los campos de revisión deben estar vacíos inicialmente
+        !('reviewedBy' in request.resource.data) &&
+        !('reviewedAt' in request.resource.data) &&
+        // Campos requeridos deben estar presentes
+        request.resource.data.keys().hasAll([
+          'id', 'userId', 'email', 'displayName', 
+          'businessName', 'businessDescription', 'businessAddress'
+        ]);
+      
+      // LEER: El usuario puede leer sus propias solicitudes o super admin todas
+      allow read: if isAuthenticated() && 
+        (request.auth.uid == resource.data.userId || isSuperAdmin());
+      
+      // ACTUALIZAR: Solo super admins pueden actualizar solicitudes
+      allow update: if isSuperAdmin() && 
+        // No se puede cambiar la información básica del usuario/negocio
+        request.resource.data.userId == resource.data.userId &&
+        request.resource.data.email == resource.data.email &&
+        request.resource.data.businessName == resource.data.businessName &&
+        // Solo se pueden actualizar campos específicos de revisión
+        request.resource.data.diff(resource.data).affectedKeys()
+          .hasOnly(['status', 'reviewedAt', 'reviewedBy', 'rejectionReason', 'approvalNotes']);
+      
+      // ELIMINAR: Solo super admins (raro, mejor mantener histórico)
+      allow delete: if isSuperAdmin();
+    }
+
+    // ================== ADMIN USERS ==================
+    
+    match /admin_users/{adminUserId} {
+      // Leer: El propio admin o super admins
+      allow read: if isOwner(adminUserId) || isSuperAdmin();
+      
+      // Crear: Usuarios autenticados pueden crear su propio documento admin
+      // (se valida en el backend que sea apropiado)
+      allow create: if isAuthenticated() && (
+        // Puede crear su propio documento
+        adminUserId == request.auth.uid ||
+        // O si es super admin creando otro admin
+        isSuperAdmin()
+      );
+      
+      // Actualizar: Solo super admins pueden actualizar otros admins
+      // El admin puede actualizar ciertos campos de su propio perfil
+      allow update: if isSuperAdmin() || 
+        (isOwner(adminUserId) && 
+         request.resource.data.diff(resource.data).affectedKeys()
+           .hasOnly(['displayName', 'phoneNumber', 'photoUrl', 'lastLogin']));
+      
+      // Eliminar: Solo super admins
+      allow delete: if isSuperAdmin();
+    }
+
+    // ================== NOTIFICATIONS ==================
+    
+    match /notifications/{notificationId} {
+      // Leer: Super admins pueden leer todas las notificaciones
+      // Usuarios pueden leer notificaciones dirigidas a ellos
+      allow read: if isSuperAdmin() || 
+        (isAuthenticated() && 
+         (('targetRole' in resource.data && resource.data.targetRole == 'user') ||
+          ('targetEmail' in resource.data && request.auth.token.email == resource.data.targetEmail)));
+      
+      // Crear: Solo super admins o el sistema
+      allow create: if isSuperAdmin();
+      
+      // Actualizar: Solo para marcar como leída
+      allow update: if (isSuperAdmin() || 
+        (isAuthenticated() && 
+         ('targetEmail' in resource.data && request.auth.token.email == resource.data.targetEmail))) &&
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['isRead']) &&
+        request.resource.data.isRead == true;
+      
+      // Eliminar: Solo super admins
+      allow delete: if isSuperAdmin();
+    }
+
+    // ================== PLACES ==================
+    
+    match /places/{placeId} {
+      // Leer: Todos pueden leer lugares públicos
+      allow read: if true;
+      
+      // Crear: Usuarios autenticados pueden crear lugares (para business owners)
+      allow create: if isAuthenticated();
+      
+      // Actualizar: Solo quien puede gestionar el lugar
+      allow update: if canManagePlace(placeId) || 
+        (isAuthenticated() && request.auth.uid == resource.data.createdBy);
+      
+      // Eliminar: Solo super admins
+      allow delete: if isSuperAdmin();
+      
+      // Sub-colecciones de places
+      match /reviews/{reviewId} {
+        allow read: if true;
+        allow create: if isAuthenticated();
+        allow update: if isOwner(resource.data.userId) || canManagePlace(placeId);
+        allow delete: if canManagePlace(placeId) || isSuperAdmin();
+      }
+      
+      match /offers/{offerId} {
+        allow read: if true;
+        allow create, update, delete: if canManagePlace(placeId) || 
+          (isAuthenticated() && request.auth.uid == resource.data.createdBy);
+      }
+      
+      match /events/{eventId} {
+        allow read: if true;
+        allow create, update, delete: if canManagePlace(placeId) || 
+          (isAuthenticated() && request.auth.uid == resource.data.createdBy);
+      }
+    }
+
+    // ================== EVENTOS GLOBALES ==================
+    
+    match /events/{eventId} {
+      allow read: if true;
+      allow create: if isAuthenticated();
+      allow update: if isAuthenticated() && 
+        (isSuperAdmin() || 
+         resource.data.createdBy == request.auth.uid ||
+         ('placeId' in resource.data && canManagePlace(resource.data.placeId)));
+      allow delete: if isSuperAdmin();
+    }
+
+    // ================== OFFERS GLOBALES ==================
+    
+    match /offers/{offerId} {
+      allow read: if true;
+      allow create: if isAuthenticated();
+      allow update: if isAuthenticated() && 
+        (isSuperAdmin() || 
+         resource.data.createdBy == request.auth.uid ||
+         ('placeId' in resource.data && canManagePlace(resource.data.placeId)));
+      allow delete: if isSuperAdmin();
+    }
+
+    // ================== CATEGORIES ==================
+    
+    match /categories/{categoryId} {
+      allow read: if true;
+      allow create, update, delete: if isSuperAdmin();
+    }
+    
+    match /place_categories/{categoryId} {
+      allow read: if true;
+      allow create, update, delete: if isSuperAdmin();
+    }
+
+    // ================== FAVORITES ==================
+    
+    match /users/{userId}/favorites/{favoriteId} {
+      allow read, write: if isOwner(userId);
+    }
+    
+    match /favorites/{userId} {
+      allow read, write: if isOwner(userId);
+    }
+
+    // ================== REVIEWS GLOBALES ==================
+    
+    match /reviews/{reviewId} {
+      allow read: if true;
+      allow create: if isAuthenticated();
+      allow update: if isAuthenticated() && 
+        (request.auth.uid == resource.data.userId || 
+         isSuperAdmin() || 
+         isAdmin());
+      allow delete: if isSuperAdmin() || 
+        (isAuthenticated() && request.auth.uid == resource.data.userId);
+    }
+
+    // ================== ANALYTICS ==================
+    
+    match /analytics/{doc=**} {
+      // Solo admins pueden leer analytics
+      allow read: if isAdmin();
+      // Escritura para admins y sistema
+      allow write: if isAdmin();
+    }
+    
+    match /analytics_places/{doc=**} {
+      allow read, write: if isAdmin();
+    }
+    
+    match /analytics_traffic/{doc=**} {
+      allow read, write: if isAdmin();
+    }
+
+    match /analytics_realtime/{doc=**} {
+      allow read, write: if isAdmin();
+    }
+
+    match /analytics_reviews/{doc=**} {
+      allow read, write: if isAdmin();
+    }
+
+    // ================== CONFIGURACIONES GENERALES ==================
+    
+    // Documentos de configuración - solo lectura para todos
+    match /{path=**}/_config {
+      allow read: if true;
+      allow write: if isSuperAdmin();
+    }
+  }
+} 

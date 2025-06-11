@@ -773,9 +773,23 @@ class AdminAuthService {
     CollectionReference<Map<String, dynamic>> collection,
     String uid,
   ) async {
-    await collection.doc(uid).update({
-      'lastLogin': Timestamp.fromDate(DateTime.now()),
-    });
+    try {
+      // Usar set con merge: true para crear la propiedad si no existe
+      await collection.doc(uid).set({
+        'lastLogin': Timestamp.fromDate(DateTime.now()),
+      }, SetOptions(merge: true));
+    } catch (e) {
+      // Si falla con set, intentar con update como respaldo
+      try {
+        await collection.doc(uid).update({
+          'lastLogin': Timestamp.fromDate(DateTime.now()),
+        });
+      } catch (updateError) {
+        throw AdminAuthException(
+          'Error actualizando último login: $updateError',
+        );
+      }
+    }
   }
 
   /// 🔑 Genera permisos por defecto según rol y lugares

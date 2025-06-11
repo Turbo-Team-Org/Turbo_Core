@@ -102,6 +102,13 @@ abstract class AdminAuthRepository {
 
   // ==================== AUTO-REGISTRO DE BUSINESS OWNERS ====================
 
+  /// 🔐 Inicia sesión con email y contraseña para business owners
+  Future<Either<AdminAuthFailure, BusinessOwnerRequest>>
+  signInWithEmailAndPasswordBusinessOwner({
+    required String email,
+    required String password,
+  });
+
   /// 🆕 Enviar solicitud de registro como business owner
   Future<Either<AdminAuthFailure, BusinessOwnerRequest>>
   submitBusinessOwnerRequest({
@@ -416,6 +423,24 @@ class AdminAuthRepositoryImpl implements AdminAuthRepository {
           }).toList();
 
       return Right(filteredAdmins);
+    } catch (e) {
+      return Left(_mapExceptionToFailure(e));
+    }
+  }
+
+  @override
+  Future<Either<AdminAuthFailure, BusinessOwnerRequest>>
+  signInWithEmailAndPasswordBusinessOwner({
+    required String email,
+    required String password,
+  }) async {
+    try {
+      final businessOwnerRequest = await _adminAuthService
+          .signInWithEmailAndPasswordBusinessOwner(
+            email: email,
+            password: password,
+          );
+      return Right(businessOwnerRequest);
     } catch (e) {
       return Left(_mapExceptionToFailure(e));
     }
