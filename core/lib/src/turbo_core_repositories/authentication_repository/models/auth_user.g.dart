@@ -19,6 +19,8 @@ _AuthUser _$AuthUserFromJson(Map<String, dynamic> json) => _AuthUser(
           ?.map((e) => (e as num).toInt())
           .toList() ??
       const [],
+  role:
+      $enumDecodeNullable(_$UserRoleEnumMap, json['role']) ?? UserRole.regular,
 );
 
 Map<String, dynamic> _$AuthUserToJson(_AuthUser instance) => <String, dynamic>{
@@ -30,4 +32,11 @@ Map<String, dynamic> _$AuthUserToJson(_AuthUser instance) => <String, dynamic>{
   'phoneNumber': instance.phoneNumber,
   'authProvider': instance.authProvider,
   'favorites': instance.favorites,
+  'role': _$UserRoleEnumMap[instance.role]!,
+};
+
+const _$UserRoleEnumMap = {
+  UserRole.regular: 'regular',
+  UserRole.businessOwner: 'business_owner',
+  UserRole.superAdmin: 'super_admin',
 };

@@ -1,4 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'user_role.dart';
 
 part 'auth_user.freezed.dart';
 part 'auth_user.g.dart';
@@ -15,6 +16,7 @@ sealed class AuthUser with _$AuthUser {
     String? phoneNumber,
     String? authProvider,
     @Default([]) List<int> favorites,
+    @Default(UserRole.regular) UserRole role,
   }) = _AuthUser;
 
   factory AuthUser.fromJson(Map<String, dynamic> json) =>

@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:core/src/turbo_core_repositories/admin_auth_repository/models/admin_user.dart';
+import 'package:core/src/turbo_core_repositories/admin_auth_repository/models/auth_result.dart';
 import 'package:core/src/turbo_core_repositories/admin_auth_repository/models/business_owner_registration_result.dart';
 import 'package:core/src/turbo_core_repositories/admin_auth_repository/models/business_owner_request.dart';
 import 'package:core/src/turbo_core_repositories/authentication_repository/service/authentication_service.dart';
@@ -63,7 +64,52 @@ class AdminAuthService {
     }
   }
 
-  /// 🔐 Inicia sesión con email y contraseña
+  /// 🔐 Login unificado que determina el tipo de usuario automáticamente
+  Future<AuthResult> signInUnified({
+    required String email,
+    required String password,
+  }) async {
+    try {
+      // 1. Autenticar con Firebase Auth
+      final userCredential = await _firebaseAuth.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+
+      final firebaseUser = userCredential.user;
+      if (firebaseUser == null) {
+        throw AdminAuthException('Error en autenticación');
+      }
+
+      // 2. Verificar en orden de prioridad:
+
+      // A. ¿Es Super Admin o Admin aprobado?
+      final adminUser = await getAdminUserByUid(firebaseUser.uid);
+      if (adminUser != null) {
+        await _updateLastLogin(_adminUsersRef, adminUser.uid);
+        return AuthResult.admin(adminUser.copyWith(lastLogin: DateTime.now()));
+      }
+
+      // B. ¿Es Business Owner (con solicitud)?
+      final businessOwnerRequest = await getBusinessOwnerById(firebaseUser.uid);
+      if (businessOwnerRequest != null) {
+        await _updateLastLogin(_businessOwnerRequestsRef, firebaseUser.uid);
+        return AuthResult.businessOwner(
+          businessOwnerRequest.copyWith(lastLogin: DateTime.now()),
+        );
+      }
+
+      // C. Usuario no autorizado para admin panel
+      await _firebaseAuth.signOut();
+      throw AdminAuthException('Usuario no autorizado para admin panel');
+    } on FirebaseAuthException catch (e) {
+      throw AdminAuthException(_getAuthErrorMessage(e.code));
+    } catch (e) {
+      throw AdminAuthException('Error de autenticación: $e');
+    }
+  }
+
+  /// 🔐 Inicia sesión con email y contraseña (solo para admins aprobados)
   Future<AdminUser> signInWithEmailAndPassword({
     required String email,
     required String password,
@@ -80,12 +126,17 @@ class AdminAuthService {
         throw AdminAuthException('Error en autenticación');
       }
 
-      // 2. Verificar que existe en admin_users
+      // 2. Verificar que sea un admin aprobado
       final adminUser = await getAdminUserByUid(firebaseUser.uid);
       if (adminUser == null) {
-        // Cerrar sesión si no es usuario administrativo
         await _firebaseAuth.signOut();
         throw AdminAuthException('Usuario no autorizado para admin panel');
+      }
+
+      // 3. Verificar que esté activo
+      if (!adminUser.isActive) {
+        await _firebaseAuth.signOut();
+        throw AdminAuthException('Cuenta inactiva');
       }
 
       // 4. Actualizar último login
@@ -330,42 +381,6 @@ class AdminAuthService {
   }
 
   // ==================== AUTO-REGISTRO DE BUSINESS OWNERS ====================
-  /// 🔐 Inicia sesión con email y contraseña para business owners
-  Future<BusinessOwnerRequest> signInWithEmailAndPasswordBusinessOwner({
-    required String email,
-    required String password,
-  }) async {
-    try {
-      // 1. Autenticar con Firebase Auth
-      final userCredential = await _firebaseAuth.signInWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
-
-      final firebaseUser = userCredential.user;
-      if (firebaseUser == null) {
-        throw AdminAuthException('Error en autenticación');
-      }
-
-      // 2. Verificar que existe en business_owner_requests
-      final businessOwnerRequest = await getBusinessOwnerById(firebaseUser.uid);
-      if (businessOwnerRequest == null) {
-        // Cerrar sesión si no es usuario administrativo
-        await _firebaseAuth.signOut();
-        throw AdminAuthException('Usuario no autorizado para business owner');
-      }
-
-      // 4. Actualizar último login
-      await _updateLastLogin(_businessOwnerRequestsRef, firebaseUser.uid);
-
-      return businessOwnerRequest.copyWith(lastLogin: DateTime.now());
-    } on FirebaseAuthException catch (e) {
-      throw AdminAuthException(_getAuthErrorMessage(e.code));
-    } catch (e) {
-      throw AdminAuthException('Error de autenticación: $e');
-    }
-  }
-
   /// 🆕 Solicitar registro como business owner (usuario ya registrado)
   Future<BusinessOwnerRequest> submitBusinessOwnerRequest({
     required String userId, // UID del usuario ya registrado
@@ -438,6 +453,42 @@ class AdminAuthService {
       return request;
     } catch (e) {
       throw AdminAuthException('Error enviando solicitud: $e');
+    }
+  }
+
+  /// 🔐 Inicia sesión con email y contraseña para business owners
+  Future<BusinessOwnerRequest> signInWithEmailAndPasswordBusinessOwner({
+    required String email,
+    required String password,
+  }) async {
+    try {
+      // 1. Autenticar con Firebase Auth
+      final userCredential = await _firebaseAuth.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+
+      final firebaseUser = userCredential.user;
+      if (firebaseUser == null) {
+        throw AdminAuthException('Error en autenticación');
+      }
+
+      // 2. Verificar que existe en business_owner_requests
+      final businessOwnerRequest = await getBusinessOwnerById(firebaseUser.uid);
+      if (businessOwnerRequest == null) {
+        // Cerrar sesión si no es usuario administrativo
+        await _firebaseAuth.signOut();
+        throw AdminAuthException('Usuario no autorizado para business owner');
+      }
+
+      // 4. Actualizar último login
+      await _updateLastLogin(_businessOwnerRequestsRef, firebaseUser.uid);
+
+      return businessOwnerRequest.copyWith(lastLogin: DateTime.now());
+    } on FirebaseAuthException catch (e) {
+      throw AdminAuthException(_getAuthErrorMessage(e.code));
+    } catch (e) {
+      throw AdminAuthException('Error de autenticación: $e');
     }
   }
 
@@ -746,20 +797,28 @@ class AdminAuthService {
         throw AdminAuthException('Error registrando usuario');
       }
 
-      // 3. Crear solicitud de business owner
-      final request = await submitBusinessOwnerRequest(
+      // 3. Crear solicitud de business owner directamente
+      final requestId = _uuid.v4();
+      final request = BusinessOwnerRequest(
+        id: requestId,
         userId: newUser.uid,
+        email: newUser.email,
         displayName: displayName,
         businessName: businessName,
         businessDescription: businessDescription,
         businessAddress: businessAddress,
         phoneNumber: phoneNumber,
         website: website,
-        businessMetadata: businessMetadata,
-        contactInfo: contactInfo,
+        status: BusinessOwnerRequestStatus.pending,
+        createdAt: DateTime.now(),
+        businessMetadata: businessMetadata ?? {},
+        contactInfo: contactInfo ?? {},
       );
 
-      // 4. Retornar resultado
+      // 4. Guardar solicitud en Firestore
+      await _businessOwnerRequestsRef.doc(requestId).set(request.toFirestore());
+
+      // 5. Retornar resultado
       return BusinessOwnerRegistrationResult(
         user: newUser,
         request: request,

@@ -6,12 +6,14 @@
 import 'dart:async';
 
 import 'package:core/src/turbo_core_repositories/admin_auth_repository/models/admin_user.dart';
+import 'package:core/src/turbo_core_repositories/admin_auth_repository/models/auth_result.dart';
 import 'package:core/src/turbo_core_repositories/admin_auth_repository/models/business_owner_registration_result.dart';
 import 'package:core/src/turbo_core_repositories/admin_auth_repository/models/business_owner_request.dart';
 import 'package:core/src/turbo_core_repositories/admin_auth_repository/service/admin_auth_service.dart';
 import 'package:dartz/dartz.dart';
 
 export 'models/admin_user.dart';
+export 'models/auth_result.dart';
 export 'models/business_owner_registration_result.dart';
 export 'models/business_owner_request.dart';
 export 'service/admin_auth_service.dart';
@@ -31,6 +33,12 @@ abstract class AdminAuthRepository {
 
   /// 🔐 Inicia sesión con email y contraseña
   Future<Either<AdminAuthFailure, AdminUser>> signInWithEmailAndPassword({
+    required String email,
+    required String password,
+  });
+
+  /// 🎯 Login unificado que determina el tipo de usuario automáticamente
+  Future<Either<AdminAuthFailure, AuthResult>> signInUnified({
     required String email,
     required String password,
   });
@@ -240,6 +248,22 @@ class AdminAuthRepositoryImpl implements AdminAuthRepository {
         password: password,
       );
       return Right(user);
+    } catch (e) {
+      return Left(_mapExceptionToFailure(e));
+    }
+  }
+
+  @override
+  Future<Either<AdminAuthFailure, AuthResult>> signInUnified({
+    required String email,
+    required String password,
+  }) async {
+    try {
+      final result = await _adminAuthService.signInUnified(
+        email: email,
+        password: password,
+      );
+      return Right(result);
     } catch (e) {
       return Left(_mapExceptionToFailure(e));
     }
