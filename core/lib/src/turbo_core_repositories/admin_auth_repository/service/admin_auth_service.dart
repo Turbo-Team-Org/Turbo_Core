@@ -535,7 +535,7 @@ class AdminAuthService {
   }) async {
     try {
       // 1. Verificar permisos del aprobador
-      final approver = await getAdminUserByUid(approvedByUid);
+      final approver = await getAdminUserByUidField(approvedByUid);
       if (approver?.role != AdminRole.superAdmin) {
         throw AdminAuthException(
           'Solo super administradores pueden aprobar solicitudes',
@@ -570,14 +570,12 @@ class AdminAuthService {
         uid: request.userId, // Usar el UID del usuario existente
         email: request.email,
         displayName: request.displayName,
-        role: AdminRole.placeOwner,
         ownedPlaceIds: initialPlaceIds ?? [],
         permissions: _generateDefaultPermissions(
           initialPlaceIds ?? [],
           AdminRole.placeOwner,
         ),
         createdAt: DateTime.now(),
-        isActive: true,
         phoneNumber: request.phoneNumber,
         metadata: {
           'approvedBy': approvedByUid,
@@ -598,13 +596,6 @@ class AdminAuthService {
         'reviewedAt': Timestamp.fromDate(DateTime.now()),
         'reviewedBy': approvedByUid,
         'approvalNotes': approvalNotes,
-      });
-
-      // 8. Opcional: Marcar en el usuario regular que ahora es admin
-      await _firestore.collection('users').doc(request.userId).update({
-        'isBusinessOwner': true,
-        'businessOwnerSince': Timestamp.fromDate(DateTime.now()),
-        'adminUserId': request.userId,
       });
 
       // 9. Notificar al business owner sobre la aprobación
