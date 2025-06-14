@@ -38,7 +38,7 @@ class AdminAuthService {
   Stream<AdminUser?> get authStateChanges {
     return _firebaseAuth.authStateChanges().asyncMap((user) async {
       if (user == null) return null;
-      return await getAdminUserByUid(user.uid);
+      return await getAdminUserByUidField(user.uid);
     });
   }
 
@@ -47,10 +47,10 @@ class AdminAuthService {
     final user = _firebaseAuth.currentUser;
     if (user == null) return null;
 
-    return await getAdminUserByUid(user.uid);
+    return getAdminUserByUidField(user.uid);
   }
 
-  /// 🔍 Obtiene un usuario administrativo por UID
+  /// 🔍 Obtiene un usuario administrativo por UID (busca por document ID)
   Future<AdminUser?> getAdminUserByUid(String uid) async {
     try {
       final doc = await _adminUsersRef.doc(uid).get();
@@ -61,6 +61,21 @@ class AdminAuthService {
       return AdminUser.fromFirestore(data);
     } catch (e) {
       throw AdminAuthException('Error obteniendo usuario: $e');
+    }
+  }
+
+  /// 🔍 Obtiene un usuario administrativo buscando por campo 'uid' en la colección
+  Future<AdminUser?> getAdminUserByUidField(String uid) async {
+    try {
+      final query =
+          await _adminUsersRef.where('uid', isEqualTo: uid).limit(1).get();
+
+      if (query.docs.isEmpty) return null;
+
+      final data = query.docs.first.data();
+      return AdminUser.fromFirestore(data);
+    } catch (e) {
+      throw AdminAuthException('Error obteniendo usuario por campo uid: $e');
     }
   }
 
@@ -83,8 +98,8 @@ class AdminAuthService {
 
       // 2. Verificar en orden de prioridad:
 
-      // A. ¿Es Super Admin o Admin aprobado?
-      final adminUser = await getAdminUserByUid(firebaseUser.uid);
+      // A. ¿Es Super Admin o Admin aprobado? (Buscar por campo uid)
+      final adminUser = await getAdminUserByUidField(firebaseUser.uid);
       if (adminUser != null) {
         await _updateLastLogin(_adminUsersRef, adminUser.uid);
         return AuthResult.admin(adminUser.copyWith(lastLogin: DateTime.now()));
@@ -126,8 +141,8 @@ class AdminAuthService {
         throw AdminAuthException('Error en autenticación');
       }
 
-      // 2. Verificar que sea un admin aprobado
-      final adminUser = await getAdminUserByUid(firebaseUser.uid);
+      // 2. Verificar que sea un admin aprobado (Buscar por campo uid)
+      final adminUser = await getAdminUserByUidField(firebaseUser.uid);
       if (adminUser == null) {
         await _firebaseAuth.signOut();
         throw AdminAuthException('Usuario no autorizado para admin panel');
@@ -401,7 +416,7 @@ class AdminAuthService {
       }
 
       // 2. Verificar que no es ya un usuario administrativo
-      final existingAdmin = await getAdminUserByUid(userId);
+      final existingAdmin = await getAdminUserByUidField(userId);
       if (existingAdmin != null) {
         throw AdminAuthException('El usuario ya es un administrador');
       }
