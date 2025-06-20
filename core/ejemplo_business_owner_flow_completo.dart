@@ -3,21 +3,18 @@
 // Demuestra el flujo completo donde un usuario sin cuenta se registra
 // y solicita convertirse en business owner en un solo proceso
 
-import 'package:core/src/turbo_core_repositories/admin_auth_repository/admin_auth_repository.dart';
-import 'package:core/src/turbo_core_repositories/authentication_repository/authentication_repository.dart';
-import 'package:core/src/turbo_core_repositories/authentication_repository/models/auth_user.dart';
-import 'package:get_it/get_it.dart';
+import 'package:core/src/turbo_core_repositories/admin_auth_repository/admin_auth_repository_imports.dart';
+import 'package:core/src/turbo_core_repositories/authentication_repository/authentication_repository_imports.dart';
 
 /// 🎯 FLUJO COMPLETO: Sin Cuenta → Usuario → Business Owner Request
 class BusinessOwnerRegistrationFlow {
-  final AuthenticationRepository _authRepo;
-  final AdminAuthRepository _adminAuthRepo;
-
   BusinessOwnerRegistrationFlow({
     required AuthenticationRepository authRepo,
     required AdminAuthRepository adminAuthRepo,
   }) : _authRepo = authRepo,
        _adminAuthRepo = adminAuthRepo;
+  final AuthenticationRepository _authRepo;
+  final AdminAuthRepository _adminAuthRepo;
 
   /// 🚀 Método Unificado: Registro + Solicitud Business Owner
   ///

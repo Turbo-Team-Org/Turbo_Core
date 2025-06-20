@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:core/src/turbo_core_repositories/turbo_core_repositories.dart';
 import 'package:core/src/turbo_core_repositories/place_repository/interface/place_authorization_interface.dart';
+import 'package:core/src/turbo_core_repositories/turbo_core_repositories.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:get_it/get_it.dart';
