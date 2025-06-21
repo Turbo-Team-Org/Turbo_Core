@@ -93,7 +93,7 @@ class AdminAuthService {
 
       final firebaseUser = userCredential.user;
       if (firebaseUser == null) {
-        throw AdminAuthException('Error en autenticación');
+        throw const AdminAuthException('Error en autenticación');
       }
 
       // 2. Verificar en orden de prioridad:
@@ -101,14 +101,12 @@ class AdminAuthService {
       // A. ¿Es Super Admin o Admin aprobado? (Buscar por campo uid)
       final adminUser = await getAdminUserByUidField(firebaseUser.uid);
       if (adminUser != null) {
-        await _updateLastLogin(_adminUsersRef, adminUser.uid);
         return AuthResult.admin(adminUser.copyWith(lastLogin: DateTime.now()));
       }
 
       // B. ¿Es Business Owner (con solicitud)?
       final businessOwnerRequest = await getBusinessOwnerById(firebaseUser.uid);
       if (businessOwnerRequest != null) {
-        await _updateLastLogin(_businessOwnerRequestsRef, firebaseUser.uid);
         return AuthResult.businessOwner(
           businessOwnerRequest.copyWith(lastLogin: DateTime.now()),
         );
@@ -570,12 +568,14 @@ class AdminAuthService {
         uid: request.userId, // Usar el UID del usuario existente
         email: request.email,
         displayName: request.displayName,
+        role: AdminRole.placeOwner,
         ownedPlaceIds: initialPlaceIds ?? [],
         permissions: _generateDefaultPermissions(
           initialPlaceIds ?? [],
           AdminRole.placeOwner,
         ),
         createdAt: DateTime.now(),
+        isActive: true,
         phoneNumber: request.phoneNumber,
         metadata: {
           'approvedBy': approvedByUid,

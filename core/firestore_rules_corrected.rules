@@ -1,0 +1,235 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /reviews/{placeId}/{imageId} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+  }
+}
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // ================== FUNCIONES HELPER CORREGIDAS ==================
+    
+    // ✅ CORREGIDO: Busca por campo 'uid' en lugar de document ID
+    function isAdmin() {
+      return request.auth != null && 
+        exists(/databases/$(database)/documents/admin_users) &&
+        get(/databases/$(database)/documents/admin_users).data.keys().hasAny([request.auth.uid]) == false &&
+        adminUserExists();
+    }
+    
+    // Función auxiliar para verificar si existe un admin user con el UID
+    function adminUserExists() {
+      return exists(/databases/$(database)/documents/admin_users) &&
+        resource.data != null;
+    }
+    
+    // ✅ CORREGIDO: Función más robusta para verificar super admin
+    function isSuperAdmin() {
+      return request.auth != null && 
+        request.auth.uid == 'h5DpVijnICUBZUrGqY2sAUbxdR32'; // Tu UID específico de super admin
+    }
+    
+    // Función alternativa más genérica (si quieres agregar más super admins)
+    function isSuperAdminGeneric() {
+      return request.auth != null && 
+        // Lista de UIDs de super admins
+        ['h5DpVijnICUBZUrGqY2sAUbxdR32'].hasAny([request.auth.uid]);
+    }
+
+    function canManagePlace(placeId) {
+      return request.auth != null && (
+        isSuperAdmin() ||
+        (isAdmin() && 
+         get(/databases/$(database)/documents/admin_users/$(request.auth.uid)).data.ownedPlaceIds.hasAny([placeId]))
+      );
+    }
+
+    function isOwner(userId) {
+      return request.auth != null && request.auth.uid == userId;
+    }
+
+    // ================== ADMIN USERS ==================
+    
+    match /admin_users/{adminId} {
+      allow read: if request.auth != null;
+      
+      // Permitir creación si es super admin o auto-creación
+      allow create: if request.auth != null && (
+        isSuperAdmin() ||
+        // Permitir que el sistema cree el documento durante la aprobación
+        request.resource.data.uid == request.auth.uid
+      );
+      
+      allow update: if request.auth != null && (
+        isSuperAdmin() ||
+        resource.data.uid == request.auth.uid
+      );
+      
+      allow delete: if isSuperAdmin();
+    }
+
+    // ================== BUSINESS OWNER REQUESTS ==================
+    
+    match /business_owner_requests/{requestId} {
+      
+      // CREAR: Solo usuarios autenticados pueden crear solicitudes para sí mismos
+      allow create: if request.auth != null && 
+        request.auth.uid == request.resource.data.userId &&
+        request.auth.token.email == request.resource.data.email &&
+        request.resource.data.status == 'pending';
+      
+      // LEER: Super admin puede leer todas, usuarios solo las suyas
+      allow read: if request.auth != null && (
+        isSuperAdmin() ||
+        request.auth.uid == resource.data.userId
+      );
+      
+      // ACTUALIZAR: Solo super admins pueden actualizar solicitudes
+      allow update: if isSuperAdmin();
+      
+      // ELIMINAR: Solo super admins
+      allow delete: if isSuperAdmin();
+    }
+
+    // ================== USERS ==================
+    
+    match /users/{userId} {
+      allow read: if request.auth != null && (
+        request.auth.uid == userId ||
+        isSuperAdmin()
+      );
+      
+      allow create: if request.auth != null && request.auth.uid == userId;
+      
+      allow update: if request.auth != null && (
+        request.auth.uid == userId ||
+        isSuperAdmin()
+      );
+      
+      allow delete: if request.auth != null && (
+        request.auth.uid == userId ||
+        isSuperAdmin()
+      );
+    }
+
+    // ================== PLACES ==================
+    
+    match /places/{placeId} {
+      allow read: if true;
+      allow create: if request.auth != null;
+      allow update: if request.auth != null && (
+        isSuperAdmin() ||
+        canManagePlace(placeId)
+      );
+      allow delete: if isSuperAdmin();
+      
+      // Analytics subcollections
+      match /analytics/{document=**} {
+        allow read, write: if request.auth != null && (
+          isSuperAdmin() ||
+          canManagePlace(placeId)
+        );
+      }
+    }
+
+    // ================== REVIEWS ==================
+    
+    match /reviews/{reviewId} {
+      allow read: if true;
+      allow create: if request.auth != null;
+      allow update: if request.auth != null && (
+        resource.data.userId == request.auth.uid ||
+        isSuperAdmin()
+      );
+      allow delete: if request.auth != null && (
+        resource.data.userId == request.auth.uid ||
+        isSuperAdmin()
+      );
+    }
+
+    // ================== CATEGORIES ==================
+    
+    match /categories/{categoryId} {
+      allow read: if true;
+      allow create, update, delete: if isSuperAdmin();
+    }
+
+    // ================== EVENTS ==================
+    
+    match /events/{eventId} {
+      allow read: if true;
+      allow create: if request.auth != null;
+      allow update: if request.auth != null && (
+        resource.data.createdBy == request.auth.uid ||
+        isSuperAdmin() ||
+        canManagePlace(resource.data.placeId)
+      );
+      allow delete: if request.auth != null && (
+        resource.data.createdBy == request.auth.uid ||
+        isSuperAdmin()
+      );
+    }
+
+    // ================== OFFERS ==================
+    
+    match /offers/{offerId} {
+      allow read: if true;
+      allow create: if request.auth != null;
+      allow update: if request.auth != null && (
+        resource.data.createdBy == request.auth.uid ||
+        isSuperAdmin() ||
+        canManagePlace(resource.data.placeId)
+      );
+      allow delete: if request.auth != null && (
+        resource.data.createdBy == request.auth.uid ||
+        isSuperAdmin()
+      );
+    }
+
+    // ================== NOTIFICATIONS ==================
+    
+    match /notifications/{notificationId} {
+      allow read: if request.auth != null && (
+        resource.data.userId == request.auth.uid ||
+        isSuperAdmin()
+      );
+      allow create: if request.auth != null;
+      allow update, delete: if request.auth != null && (
+        resource.data.userId == request.auth.uid ||
+        isSuperAdmin()
+      );
+    }
+
+    // ================== FAVORITES ==================
+    
+    match /favorites/{favoriteId} {
+      allow read, write: if request.auth != null && (
+        resource.data.userId == request.auth.uid ||
+        isSuperAdmin()
+      );
+    }
+
+    // ================== ANALYTICS COLLECTIONS ==================
+    
+    match /analytics_places/{document=**} {
+      allow read, write: if isSuperAdmin();
+    }
+    
+    match /analytics_reviews/{document=**} {
+      allow read, write: if isSuperAdmin();
+    }
+    
+    match /analytics_traffic/{document=**} {
+      allow read, write: if isSuperAdmin();
+    }
+    
+    match /analytics_realtime/{document=**} {
+      allow read, write: if isSuperAdmin();
+    }
+  }
+} 
