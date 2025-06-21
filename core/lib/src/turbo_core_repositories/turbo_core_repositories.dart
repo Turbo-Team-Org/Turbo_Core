@@ -9,3 +9,4 @@ export 'package:core/src/turbo_core_repositories/location_repository/location_re
 export 'package:core/src/turbo_core_repositories/place_repository/place_repository_imports.dart';
 export 'package:core/src/turbo_core_repositories/review_repository/review_repository_imports.dart';
 export 'package:core/src/turbo_core_repositories/place_category_repository/place_category_repository.dart';
+export 'package:core/src/turbo_core_repositories/reservation_repository/reservation_repository_imports.dart';
