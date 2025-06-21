@@ -1,13 +1,19 @@
+// ignore_for_file: subtype_of_sealed_class
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:core/src/turbo_core_repositories/analytics_repository/service/analytics_service.dart';
+import 'package:core/src/turbo_core_repositories/place_repository/interface/place_authorization_interface.dart';
 import 'package:core/src/turbo_core_repositories/place_repository/models/place/place.dart';
 import 'package:core/src/turbo_core_repositories/place_repository/service/place_service.dart';
-import 'package:core/src/turbo_core_repositories/analytics_repository/service/analytics_service.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
 class MockFirebaseFirestore extends Mock implements FirebaseFirestore {}
 
 class MockAnalyticsService extends Mock implements AnalyticsService {}
+
+class MockPlaceAuthorizationInterface extends Mock
+    implements PlaceAuthorizationInterface {}
 
 class MockCollectionReference extends Mock
     implements CollectionReference<Map<String, dynamic>> {}
@@ -27,6 +33,7 @@ void main() {
   late PlaceService placeService;
   late MockFirebaseFirestore mockFirestore;
   late MockAnalyticsService mockAnalyticsService;
+  late MockPlaceAuthorizationInterface mockAuthorization;
   late MockCollectionReference mockPlacesCollection;
   late MockCollectionReference mockReviewsCollection;
   late MockDocumentReference mockPlaceDoc;
@@ -40,6 +47,7 @@ void main() {
   setUp(() {
     mockFirestore = MockFirebaseFirestore();
     mockAnalyticsService = MockAnalyticsService();
+    mockAuthorization = MockPlaceAuthorizationInterface();
     mockPlacesCollection = MockCollectionReference();
     mockReviewsCollection = MockCollectionReference();
     mockPlaceDoc = MockDocumentReference();
@@ -53,7 +61,11 @@ void main() {
     placeService = PlaceService(
       firestore: mockFirestore,
       analyticsService: mockAnalyticsService,
+      authorization: mockAuthorization,
     );
+
+    // Configurar mock de autorización
+    when(() => mockAuthorization.canManagePlace(any())).thenReturn(true);
 
     // Solo configurar los mocks básicos
     when(

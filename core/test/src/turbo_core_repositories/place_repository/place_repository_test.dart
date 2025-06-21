@@ -225,7 +225,7 @@ void main() {
         // Arrange
         when(
           () => mockPlaceService.deletePlace(testPlaceId),
-        ).thenAnswer((_) async {});
+        ).thenAnswer((_) async => true);
 
         // Act
         final result = await placeRepository.deletePlace(testPlaceId);

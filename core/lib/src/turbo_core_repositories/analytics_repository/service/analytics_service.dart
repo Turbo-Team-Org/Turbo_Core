@@ -483,6 +483,7 @@ class AnalyticsService implements AnalyticsInterface {
         '🗑️ Estructura de analytics limpiada (collections separadas) para: $placeId',
       );
     } catch (e) {
+      print('Error al hacer commit del batch: $e');
       throw Exception('Error al limpiar estructura de analytics: $e');
     }
   }

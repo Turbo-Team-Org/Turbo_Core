@@ -9,6 +9,7 @@ part of 'admin_user.dart';
 _AdminUser _$AdminUserFromJson(Map<String, dynamic> json) => _AdminUser(
   uid: json['uid'] as String,
   email: json['email'] as String,
+  createdAt: DateTime.parse(json['createdAt'] as String),
   displayName: json['displayName'] as String?,
   role:
       $enumDecodeNullable(_$AdminRoleEnumMap, json['role']) ??
@@ -28,7 +29,6 @@ _AdminUser _$AdminUserFromJson(Map<String, dynamic> json) => _AdminUser(
         ),
       ) ??
       const {},
-  createdAt: DateTime.parse(json['createdAt'] as String),
   lastLogin:
       json['lastLogin'] == null
           ? null
@@ -43,13 +43,13 @@ Map<String, dynamic> _$AdminUserToJson(_AdminUser instance) =>
     <String, dynamic>{
       'uid': instance.uid,
       'email': instance.email,
+      'createdAt': instance.createdAt.toIso8601String(),
       'displayName': instance.displayName,
       'role': _$AdminRoleEnumMap[instance.role]!,
       'ownedPlaceIds': instance.ownedPlaceIds,
       'permissions': instance.permissions.map(
         (k, e) => MapEntry(k, e.map((e) => _$PermissionEnumMap[e]!).toList()),
       ),
-      'createdAt': instance.createdAt.toIso8601String(),
       'lastLogin': instance.lastLogin?.toIso8601String(),
       'isActive': instance.isActive,
       'photoUrl': instance.photoUrl,
