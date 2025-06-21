@@ -1,10 +1,9 @@
+// ignore_for_file: public_member_api_docs
+
 import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:core/src/turbo_core_repositories/admin_auth_repository/models/admin_user.dart';
-import 'package:core/src/turbo_core_repositories/admin_auth_repository/models/auth_result.dart';
-import 'package:core/src/turbo_core_repositories/admin_auth_repository/models/business_owner_registration_result.dart';
-import 'package:core/src/turbo_core_repositories/admin_auth_repository/models/business_owner_request.dart';
+import 'package:core/src/turbo_core_repositories/admin_auth_repository/admin_auth_repository_imports.dart';
 import 'package:core/src/turbo_core_repositories/authentication_repository/service/authentication_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:uuid/uuid.dart';
@@ -93,7 +92,7 @@ class AdminAuthService {
 
       final firebaseUser = userCredential.user;
       if (firebaseUser == null) {
-        throw AdminAuthException('Error en autenticación');
+        throw const AdminAuthException('Error en autenticación');
       }
 
       // 2. Verificar en orden de prioridad:
@@ -116,7 +115,7 @@ class AdminAuthService {
 
       // C. Usuario no autorizado para admin panel
       await _firebaseAuth.signOut();
-      throw AdminAuthException('Usuario no autorizado para admin panel');
+      throw const AdminAuthException('Usuario no autorizado para admin panel');
     } on FirebaseAuthException catch (e) {
       throw AdminAuthException(_getAuthErrorMessage(e.code));
     } catch (e) {
@@ -138,20 +137,22 @@ class AdminAuthService {
 
       final firebaseUser = userCredential.user;
       if (firebaseUser == null) {
-        throw AdminAuthException('Error en autenticación');
+        throw const AdminAuthException('Error en autenticación');
       }
 
       // 2. Verificar que sea un admin aprobado (Buscar por campo uid)
       final adminUser = await getAdminUserByUidField(firebaseUser.uid);
       if (adminUser == null) {
         await _firebaseAuth.signOut();
-        throw AdminAuthException('Usuario no autorizado para admin panel');
+        throw const AdminAuthException(
+          'Usuario no autorizado para admin panel',
+        );
       }
 
       // 3. Verificar que esté activo
       if (!adminUser.isActive) {
         await _firebaseAuth.signOut();
-        throw AdminAuthException('Cuenta inactiva');
+        throw const AdminAuthException('Cuenta inactiva');
       }
 
       // 4. Actualizar último login
@@ -179,7 +180,7 @@ class AdminAuthService {
       if (createdByUid != null) {
         final creator = await getAdminUserByUid(createdByUid);
         if (creator?.role != AdminRole.superAdmin) {
-          throw AdminAuthException(
+          throw const AdminAuthException(
             'Solo super administradores pueden crear usuarios',
           );
         }
@@ -193,7 +194,7 @@ class AdminAuthService {
 
       final firebaseUser = userCredential.user;
       if (firebaseUser == null) {
-        throw AdminAuthException('Error creando usuario');
+        throw const AdminAuthException('Error creando usuario');
       }
 
       // 3. Actualizar perfil de Firebase
@@ -252,7 +253,7 @@ class AdminAuthService {
       if (updatedByUid != null) {
         final updater = await getAdminUserByUid(updatedByUid);
         if (updater?.role != AdminRole.superAdmin) {
-          throw AdminAuthException(
+          throw const AdminAuthException(
             'Solo super administradores pueden modificar lugares',
           );
         }
@@ -260,7 +261,7 @@ class AdminAuthService {
 
       final currentUser = await getAdminUserByUid(userId);
       if (currentUser == null) {
-        throw AdminAuthException('Usuario no encontrado');
+        throw const AdminAuthException('Usuario no encontrado');
       }
 
       // Generar nuevos permisos para los lugares actualizados
@@ -292,7 +293,7 @@ class AdminAuthService {
       if (updatedByUid != null) {
         final updater = await getAdminUserByUid(updatedByUid);
         if (updater?.role != AdminRole.superAdmin) {
-          throw AdminAuthException(
+          throw const AdminAuthException(
             'Solo super administradores pueden modificar permisos',
           );
         }
@@ -320,7 +321,7 @@ class AdminAuthService {
       if (updatedByUid != null) {
         final updater = await getAdminUserByUid(updatedByUid);
         if (updater?.role != AdminRole.superAdmin) {
-          throw AdminAuthException(
+          throw const AdminAuthException(
             'Solo super administradores pueden cambiar estado',
           );
         }
@@ -356,7 +357,7 @@ class AdminAuthService {
       if (requestedByUid != null) {
         final requester = await getAdminUserByUid(requestedByUid);
         if (requester?.role != AdminRole.superAdmin) {
-          throw AdminAuthException(
+          throw const AdminAuthException(
             'Solo super administradores pueden ver todos los usuarios',
           );
         }
@@ -379,7 +380,7 @@ class AdminAuthService {
       if (requestedByUid != null) {
         final requester = await getAdminUserByUid(requestedByUid);
         if (requester?.role != AdminRole.superAdmin) {
-          throw AdminAuthException(
+          throw const AdminAuthException(
             'Solo super administradores pueden ver estadísticas',
           );
         }
@@ -412,13 +413,15 @@ class AdminAuthService {
       // 1. Verificar que el usuario existe y está autenticado
       final currentUser = _firebaseAuth.currentUser;
       if (currentUser == null || currentUser.uid != userId) {
-        throw AdminAuthException('Usuario no autenticado o ID no coincide');
+        throw const AdminAuthException(
+          'Usuario no autenticado o ID no coincide',
+        );
       }
 
       // 2. Verificar que no es ya un usuario administrativo
       final existingAdmin = await getAdminUserByUidField(userId);
       if (existingAdmin != null) {
-        throw AdminAuthException('El usuario ya es un administrador');
+        throw const AdminAuthException('El usuario ya es un administrador');
       }
 
       // 3. Verificar que no hay solicitud pendiente para este usuario
@@ -436,7 +439,7 @@ class AdminAuthService {
               .get();
 
       if (existingRequestQuery.docs.isNotEmpty) {
-        throw AdminAuthException(
+        throw const AdminAuthException(
           'Ya tienes una solicitud pendiente para convertirte en propietario',
         );
       }
@@ -453,6 +456,7 @@ class AdminAuthService {
         businessAddress: businessAddress,
         phoneNumber: phoneNumber,
         website: website,
+        // ignore: avoid_redundant_argument_values
         status: BusinessOwnerRequestStatus.pending,
         createdAt: DateTime.now(),
         businessMetadata: businessMetadata ?? {},
@@ -485,7 +489,7 @@ class AdminAuthService {
 
       final firebaseUser = userCredential.user;
       if (firebaseUser == null) {
-        throw AdminAuthException('Error en autenticación');
+        throw const AdminAuthException('Error en autenticación');
       }
 
       // 2. Verificar que existe en business_owner_requests
@@ -493,7 +497,9 @@ class AdminAuthService {
       if (businessOwnerRequest == null) {
         // Cerrar sesión si no es usuario administrativo
         await _firebaseAuth.signOut();
-        throw AdminAuthException('Usuario no autorizado para business owner');
+        throw const AdminAuthException(
+          'Usuario no autorizado para business owner',
+        );
       }
 
       // 4. Actualizar último login
@@ -537,7 +543,7 @@ class AdminAuthService {
       // 1. Verificar permisos del aprobador
       final approver = await getAdminUserByUidField(approvedByUid);
       if (approver?.role != AdminRole.superAdmin) {
-        throw AdminAuthException(
+        throw const AdminAuthException(
           'Solo super administradores pueden aprobar solicitudes',
         );
       }
@@ -545,7 +551,7 @@ class AdminAuthService {
       // 2. Obtener la solicitud
       final requestDoc = await _businessOwnerRequestsRef.doc(requestId).get();
       if (!requestDoc.exists) {
-        throw AdminAuthException('Solicitud no encontrada');
+        throw const AdminAuthException('Solicitud no encontrada');
       }
 
       final request = BusinessOwnerRequest.fromFirestore(requestDoc.data()!);
@@ -553,7 +559,7 @@ class AdminAuthService {
       // 3. Verificar que está pendiente
       if (!request.isPending &&
           request.status != BusinessOwnerRequestStatus.reviewing) {
-        throw AdminAuthException(
+        throw const AdminAuthException(
           'La solicitud no está pendiente de aprobación',
         );
       }
@@ -562,7 +568,7 @@ class AdminAuthService {
       final userDoc =
           await _firestore.collection('users').doc(request.userId).get();
       if (!userDoc.exists) {
-        throw AdminAuthException('El usuario original ya no existe');
+        throw const AdminAuthException('El usuario original ya no existe');
       }
 
       // 5. Crear usuario administrativo (convertir usuario regular en admin)
@@ -617,7 +623,7 @@ class AdminAuthService {
       // 1. Verificar permisos del rechazador
       final rejector = await getAdminUserByUid(rejectedByUid);
       if (rejector?.role != AdminRole.superAdmin) {
-        throw AdminAuthException(
+        throw const AdminAuthException(
           'Solo super administradores pueden rechazar solicitudes',
         );
       }
@@ -625,14 +631,14 @@ class AdminAuthService {
       // 2. Obtener la solicitud
       final requestDoc = await _businessOwnerRequestsRef.doc(requestId).get();
       if (!requestDoc.exists) {
-        throw AdminAuthException('Solicitud no encontrada');
+        throw const AdminAuthException('Solicitud no encontrada');
       }
 
       final request = BusinessOwnerRequest.fromFirestore(requestDoc.data()!);
 
       // 3. Verificar que puede ser rechazada
       if (request.isApproved || request.isRejected) {
-        throw AdminAuthException('La solicitud ya fue procesada');
+        throw const AdminAuthException('La solicitud ya fue procesada');
       }
 
       // 4. Actualizar estado de solicitud
@@ -661,7 +667,7 @@ class AdminAuthService {
       // 1. Verificar permisos
       final updater = await getAdminUserByUid(updatedByUid);
       if (updater?.role != AdminRole.superAdmin) {
-        throw AdminAuthException(
+        throw const AdminAuthException(
           'Solo super administradores pueden actualizar solicitudes',
         );
       }
@@ -669,7 +675,7 @@ class AdminAuthService {
       // 2. Verificar que el estado es válido para actualización
       if (newStatus == BusinessOwnerRequestStatus.approved ||
           newStatus == BusinessOwnerRequestStatus.rejected) {
-        throw AdminAuthException(
+        throw const AdminAuthException(
           'Use métodos específicos para aprobar/rechazar',
         );
       }
@@ -696,7 +702,7 @@ class AdminAuthService {
       if (requestedByUid != null) {
         final requester = await getAdminUserByUid(requestedByUid);
         if (requester?.role != AdminRole.superAdmin) {
-          throw AdminAuthException(
+          throw const AdminAuthException(
             'Solo super administradores pueden ver solicitudes',
           );
         }
@@ -731,7 +737,7 @@ class AdminAuthService {
       if (requestedByUid != null) {
         final requester = await getAdminUserByUid(requestedByUid);
         if (requester?.role != AdminRole.superAdmin) {
-          throw AdminAuthException(
+          throw const AdminAuthException(
             'Solo super administradores pueden ver estadísticas',
           );
         }
@@ -757,7 +763,7 @@ class AdminAuthService {
       if (requestedByUid != null) {
         final requester = await getAdminUserByUid(requestedByUid);
         if (requester?.role != AdminRole.superAdmin) {
-          throw AdminAuthException(
+          throw const AdminAuthException(
             'Solo super administradores pueden ver solicitudes',
           );
         }
@@ -800,7 +806,7 @@ class AdminAuthService {
       );
 
       if (newUser == null) {
-        throw AdminAuthException('Error registrando usuario');
+        throw const AdminAuthException('Error registrando usuario');
       }
 
       // 3. Crear solicitud de business owner directamente
@@ -815,6 +821,7 @@ class AdminAuthService {
         businessAddress: businessAddress,
         phoneNumber: phoneNumber,
         website: website,
+        // ignore: avoid_redundant_argument_values
         status: BusinessOwnerRequestStatus.pending,
         createdAt: DateTime.now(),
         businessMetadata: businessMetadata ?? {},
@@ -1008,81 +1015,4 @@ class AdminAuthService {
       print('⚠️ Error enviando notificación de rechazo: $e');
     }
   }
-}
-
-/// 📊 Estadísticas de usuarios administrativos
-class AdminUsersStats {
-  const AdminUsersStats({
-    required this.totalUsers,
-    required this.activeUsers,
-    required this.placeOwners,
-    required this.superAdmins,
-    required this.usersCreatedThisMonth,
-    required this.lastLoginStats,
-  });
-
-  final int totalUsers;
-  final int activeUsers;
-  final int placeOwners;
-  final int superAdmins;
-  final int usersCreatedThisMonth;
-  final Map<String, int> lastLoginStats; // 'today', 'week', 'month', 'older'
-
-  factory AdminUsersStats.fromUsers(List<AdminUser> users) {
-    final now = DateTime.now();
-    final startOfMonth = DateTime(now.year, now.month, 1);
-    final startOfWeek = now.subtract(Duration(days: now.weekday - 1));
-    final startOfDay = DateTime(now.year, now.month, now.day);
-
-    var usersCreatedThisMonth = 0;
-    var todayLogins = 0;
-    var weekLogins = 0;
-    var monthLogins = 0;
-    var olderLogins = 0;
-
-    for (final user in users) {
-      // Contar usuarios creados este mes
-      if (user.createdAt.isAfter(startOfMonth)) {
-        usersCreatedThisMonth++;
-      }
-
-      // Contar últimos logins
-      final lastLogin = user.lastLogin;
-      if (lastLogin != null) {
-        if (lastLogin.isAfter(startOfDay)) {
-          todayLogins++;
-        } else if (lastLogin.isAfter(startOfWeek)) {
-          weekLogins++;
-        } else if (lastLogin.isAfter(startOfMonth)) {
-          monthLogins++;
-        } else {
-          olderLogins++;
-        }
-      }
-    }
-
-    return AdminUsersStats(
-      totalUsers: users.length,
-      activeUsers: users.where((u) => u.isActive).length,
-      placeOwners: users.where((u) => u.role == AdminRole.placeOwner).length,
-      superAdmins: users.where((u) => u.role == AdminRole.superAdmin).length,
-      usersCreatedThisMonth: usersCreatedThisMonth,
-      lastLoginStats: {
-        'today': todayLogins,
-        'week': weekLogins,
-        'month': monthLogins,
-        'older': olderLogins,
-      },
-    );
-  }
-}
-
-/// ⚠️ Excepción personalizada para errores de autenticación administrativa
-class AdminAuthException implements Exception {
-  const AdminAuthException(this.message);
-
-  final String message;
-
-  @override
-  String toString() => 'AdminAuthException: $message';
 }

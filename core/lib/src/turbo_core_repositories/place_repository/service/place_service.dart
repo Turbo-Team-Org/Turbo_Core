@@ -1,20 +1,28 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:core/src/turbo_core_repositories/analytics_repository/service/analytics_service.dart';
 import 'package:core/src/turbo_core_repositories/place_repository/interface/place_interface.dart';
+import 'package:core/src/turbo_core_repositories/place_repository/interface/place_authorization_interface.dart';
 import 'package:core/src/turbo_core_repositories/place_repository/models/place/place.dart';
 import 'package:core/src/turbo_core_repositories/place_repository/place_repository.dart';
 import 'package:core/src/turbo_core_repositories/review_repository/models/review.dart';
-import 'package:core/src/turbo_core_repositories/analytics_repository/service/analytics_service.dart';
 
 /// Place service
 class PlaceService implements PlaceInterface {
   /// Constructor
-  const PlaceService({required this.firestore, required this.analyticsService});
+  const PlaceService({
+    required this.firestore,
+    required this.analyticsService,
+    required this.authorization,
+  });
 
   /// Firestore instance
   final FirebaseFirestore firestore;
 
   /// Analytics service para inicializar estructura automáticamente
   final AnalyticsService analyticsService;
+
+  /// Interfaz para verificar permisos de gestión de lugares
+  final PlaceAuthorizationInterface authorization;
 
   @override
   Future<List<Place>> getPlaces() async {
@@ -330,21 +338,42 @@ class PlaceService implements PlaceInterface {
   @override
   Future<void> addPlace(Place place) async {
     try {
+      // Ensure place has a valid ID
+      final placeId =
+          place.id.isNotEmpty
+              ? place.id
+              : firestore.collection('places').doc().id;
+      final placeWithId = place.copyWith(id: placeId);
+
       // 1. Crear el documento del lugar
-      await firestore.collection('places').doc(place.id).set(place.toJson());
+      await firestore
+          .collection('places')
+          .doc(placeId)
+          .set(placeWithId.toJson());
 
       // 2. Inicializar automáticamente la estructura de analytics
-      await analyticsService.initializeAnalyticsStructure(place.id);
-
-      print('✅ Lugar creado con analytics inicializados: ${place.name}');
-    } catch (e) {
-      // Si falla la creación de analytics, intentamos limpiar el lugar creado
       try {
-        await firestore.collection('places').doc(place.id).delete();
+        await analyticsService.initializeAnalyticsStructure(placeId);
+        print(
+          '✅ Lugar creado con analytics inicializados: ${placeWithId.name}',
+        );
+      } catch (analyticsError) {
+        print(
+          '⚠️ Lugar creado pero falló la inicialización de analytics: $analyticsError',
+        );
+        // No lanzamos el error para que el lugar se cree igual
+        // Los analytics se pueden inicializar manualmente después
+      }
+    } catch (e) {
+      // Si falla la creación del lugar, intentamos limpiar
+      try {
+        if (place.id.isNotEmpty) {
+          await firestore.collection('places').doc(place.id).delete();
+        }
       } catch (_) {
         // Ignorar errores de limpieza
       }
-      throw Exception('Error adding place with analytics: $e');
+      throw Exception('Error adding place: $e');
     }
   }
 
@@ -385,17 +414,34 @@ class PlaceService implements PlaceInterface {
   }
 
   @override
-  Future<void> deletePlace(String id) async {
+  Future<bool> deletePlace(String id) async {
     try {
-      // 1. Limpiar estructura de analytics primero
-      await analyticsService.cleanupAnalyticsStructure(id);
+      // Primero verificar si el lugar existe y obtener sus datos
+      final placeDoc = await firestore.collection('places').doc(id).get();
 
-      // 2. Eliminar el documento del lugar
+      if (!placeDoc.exists) {
+        throw Exception('El lugar no existe');
+      }
+
+      // Verificar si el usuario actual tiene permisos para eliminar
+      if (!authorization.canManagePlace(id)) {
+        throw Exception('No tienes permisos para eliminar este lugar');
+      }
+
+      // Eliminar el lugar
       await firestore.collection('places').doc(id).delete();
 
-      print('🗑️ Lugar eliminado con analytics limpiados: $id');
+      // Intentar limpiar analytics, pero no bloquear si falla
+      try {
+        await analyticsService.cleanupAnalyticsStructure(id);
+      } catch (e) {
+        print('⚠️ Error al limpiar analytics del lugar $id: $e');
+        // No lanzamos la excepción, continuamos con la eliminación
+      }
+
+      return true;
     } catch (e) {
-      throw Exception('Error deleting place with analytics: $e');
+      throw Exception('Error al eliminar lugar: $e');
     }
   }
 }

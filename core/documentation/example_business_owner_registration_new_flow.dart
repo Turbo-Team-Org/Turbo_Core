@@ -8,8 +8,7 @@
 // 5. Super admin aprueba/rechaza
 // 6. Usuario se convierte en business owner
 
-import 'package:core/src/turbo_core_repositories/admin_auth_repository/admin_auth_repository.dart';
-import 'package:core/src/turbo_core_repositories/admin_auth_repository/models/business_owner_request.dart';
+import 'package:core/src/turbo_core_repositories/admin_auth_repository/admin_auth_repository_imports.dart';
 import 'package:get_it/get_it.dart';
 
 void main() async {
