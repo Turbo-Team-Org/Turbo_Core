@@ -20,6 +20,7 @@ sealed class Reservation with _$Reservation {
     @Default('') String customerName,
     @Default('') String customerEmail,
     @Default('') String customerPhone,
+    String? placeName,
     String? specialRequests,
     String? notes,
     String? tableNumber,
@@ -46,6 +47,7 @@ sealed class Reservation with _$Reservation {
     return Reservation(
       id: data['id'] as String,
       placeId: data['placeId'] as String,
+      placeName: data['placeName'] as String,
       userId: data['userId'] as String,
       reservationDate: (data['reservationDate'] as Timestamp).toDate(),
       startTime: (data['startTime'] as Timestamp).toDate(),
@@ -59,26 +61,21 @@ sealed class Reservation with _$Reservation {
       notes: data['notes'] as String?,
       tableNumber: data['tableNumber'] as String?,
       confirmationCode: data['confirmationCode'] as String?,
-      createdAt:
-          data['createdAt'] != null
-              ? (data['createdAt'] as Timestamp).toDate()
-              : null,
-      updatedAt:
-          data['updatedAt'] != null
-              ? (data['updatedAt'] as Timestamp).toDate()
-              : null,
-      confirmedAt:
-          data['confirmedAt'] != null
-              ? (data['confirmedAt'] as Timestamp).toDate()
-              : null,
-      checkedInAt:
-          data['checkedInAt'] != null
-              ? (data['checkedInAt'] as Timestamp).toDate()
-              : null,
-      cancelledAt:
-          data['cancelledAt'] != null
-              ? (data['cancelledAt'] as Timestamp).toDate()
-              : null,
+      createdAt: data['createdAt'] != null
+          ? (data['createdAt'] as Timestamp).toDate()
+          : null,
+      updatedAt: data['updatedAt'] != null
+          ? (data['updatedAt'] as Timestamp).toDate()
+          : null,
+      confirmedAt: data['confirmedAt'] != null
+          ? (data['confirmedAt'] as Timestamp).toDate()
+          : null,
+      checkedInAt: data['checkedInAt'] != null
+          ? (data['checkedInAt'] as Timestamp).toDate()
+          : null,
+      cancelledAt: data['cancelledAt'] != null
+          ? (data['cancelledAt'] as Timestamp).toDate()
+          : null,
       cancelReason: data['cancelReason'] as String?,
       adminNotes: data['adminNotes'] as String?,
       reminderSent: data['reminderSent'] as bool?,
@@ -92,6 +89,7 @@ sealed class Reservation with _$Reservation {
     return {
       'id': id,
       'placeId': placeId,
+      'placeName': placeName,
       'userId': userId,
       'reservationDate': Timestamp.fromDate(reservationDate),
       'startTime': Timestamp.fromDate(startTime),
