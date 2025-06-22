@@ -70,6 +70,9 @@ Future<void> initCoreDependencies({
     ..registerLazySingleton<AnalyticsService>(
       () => AnalyticsService(firestore: sl<FirebaseFirestore>()),
     )
+    ..registerLazySingleton<ReservationService>(
+      () => ReservationService(firestore: sl<FirebaseFirestore>()),
+    )
     // Register repositories
     ..registerLazySingleton<CategoryRepository>(
       () => CategoryRepository(
@@ -103,5 +106,8 @@ Future<void> initCoreDependencies({
     )
     ..registerLazySingleton<AnalyticsRepository>(
       () => AnalyticsRepository(analyticsService: sl<AnalyticsService>()),
+    )
+    ..registerLazySingleton<ReservationRepository>(
+      () => ReservationRepository(reservationService: sl<ReservationService>()),
     );
 }
