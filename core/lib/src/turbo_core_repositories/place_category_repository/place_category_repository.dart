@@ -1,8 +1,8 @@
 import 'package:core/src/turbo_core_repositories/turbo_core_repositories.dart';
 
 class PlaceCategoryRepository {
-  PlaceCategoryRepository({PlaceCategoryService? service})
-      : _service = service ?? PlaceCategoryService();
+  PlaceCategoryRepository({PlaceCategoryService? placeCategoryService})
+      : _service = placeCategoryService ?? PlaceCategoryService();
 
   final PlaceCategoryService _service;
 

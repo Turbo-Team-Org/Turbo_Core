@@ -86,6 +86,9 @@ Future<void> initCoreDependencies({
     ..registerLazySingleton<LocationRepository>(
       () => LocationRepository(locationService: sl<LocationService>()),
     )
+    ..registerLazySingleton<PlaceCategoryRepository>(() =>
+        PlaceCategoryRepository(
+            placeCategoryService: sl<PlaceCategoryService>()))
     ..registerLazySingleton<PlaceRepository>(
       () => PlaceRepository(placeService: sl<PlaceService>()),
     )
