@@ -1,6 +1,6 @@
 import 'package:core/src/turbo_core_repositories/category_repository/model/category.dart';
 import 'package:core/src/turbo_core_repositories/category_repository/service/category_service.dart';
-import 'package:core/src/turbo_core_repositories/place_category_repository/place_category_repository.dart';
+import 'package:core/src/turbo_core_repositories/place_category_repository/place_category_repository_imports.dart';
 import 'package:core/src/turbo_core_repositories/place_repository/models/place/place.dart';
 
 /// Repository for managing categories and their associations with places.
@@ -9,8 +9,8 @@ class CategoryRepository {
   CategoryRepository({
     required CategoryService categoryService,
     required PlaceCategoryService placeCategoryService,
-  }) : _categoryService = categoryService,
-       _placeCategoryService = placeCategoryService;
+  })  : _categoryService = categoryService,
+        _placeCategoryService = placeCategoryService;
   final CategoryService _categoryService;
   final PlaceCategoryService _placeCategoryService;
 

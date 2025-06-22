@@ -1,27 +1,25 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:core/src/turbo_core_repositories/place_category_repository/interface/place_category_repository_interface.dart';
 import 'package:core/src/turbo_core_repositories/place_category_repository/models/place_category.dart';
-import 'package:core/src/turbo_core_repositories/category_repository/model/category.dart';
 import 'package:core/src/turbo_core_repositories/place_repository/models/place/place.dart';
 
 class PlaceCategoryService implements PlaceCategoryRepositoryInterface {
   PlaceCategoryService({FirebaseFirestore? firestore})
-    : firestore = firestore ?? FirebaseFirestore.instance;
+      : firestore = firestore ?? FirebaseFirestore.instance;
   final FirebaseFirestore firestore;
   final String _collectionName = 'place_categories';
 
   CollectionReference<Map<String, dynamic>> get placeCategoriesCollection =>
       firestore.collection(_collectionName);
 
-  @override
   Future<void> upsertPlaceCategory(PlaceCategory placeCategory) async {
     await placeCategoriesCollection
         .doc('${placeCategory.placeId}_${placeCategory.categoryId}')
         .set({
-          'placeId': placeCategory.placeId,
-          'categoryId': placeCategory.categoryId,
-          'createdAt': placeCategory.createdAt,
-        });
+      'placeId': placeCategory.placeId,
+      'categoryId': placeCategory.categoryId,
+      'createdAt': placeCategory.createdAt,
+    });
   }
 
   /// Asigna una categoría a un lugar
@@ -47,11 +45,10 @@ class PlaceCategoryService implements PlaceCategoryRepositoryInterface {
     String categoryId,
   ) async {
     try {
-      final querySnapshot =
-          await placeCategoriesCollection
-              .where('placeId', isEqualTo: placeId)
-              .where('categoryId', isEqualTo: categoryId)
-              .get();
+      final querySnapshot = await placeCategoriesCollection
+          .where('placeId', isEqualTo: placeId)
+          .where('categoryId', isEqualTo: categoryId)
+          .get();
       for (final doc in querySnapshot.docs) {
         await doc.reference.delete();
       }
@@ -73,16 +70,14 @@ class PlaceCategoryService implements PlaceCategoryRepositoryInterface {
   ) async {
     try {
       await firestore.runTransaction((transaction) async {
-        final querySnapshot =
-            await placeCategoriesCollection
-                .where('placeId', isEqualTo: placeId)
-                .get();
+        final querySnapshot = await placeCategoriesCollection
+            .where('placeId', isEqualTo: placeId)
+            .get();
         for (final doc in querySnapshot.docs) {
           transaction.delete(doc.reference);
           final categoryId = doc.data()['categoryId'] as String;
-          final categoryRef = firestore
-              .collection('categories')
-              .doc(categoryId);
+          final categoryRef =
+              firestore.collection('categories').doc(categoryId);
           transaction.update(categoryRef, {
             'placesCount': FieldValue.increment(-1),
           });
@@ -94,9 +89,8 @@ class PlaceCategoryService implements PlaceCategoryRepositoryInterface {
             'categoryId': categoryId,
             'createdAt': FieldValue.serverTimestamp(),
           });
-          final categoryRef = firestore
-              .collection('categories')
-              .doc(categoryId);
+          final categoryRef =
+              firestore.collection('categories').doc(categoryId);
           transaction.update(categoryRef, {
             'placesCount': FieldValue.increment(1),
           });
@@ -111,25 +105,22 @@ class PlaceCategoryService implements PlaceCategoryRepositoryInterface {
   /// Obtiene todos los lugares de una categoría
   Future<List<Place>> getPlacesInCategory(String categoryId) async {
     try {
-      final querySnapshot =
-          await placeCategoriesCollection
-              .where('categoryId', isEqualTo: categoryId)
-              .get();
+      final querySnapshot = await placeCategoriesCollection
+          .where('categoryId', isEqualTo: categoryId)
+          .get();
       if (querySnapshot.docs.isEmpty) {
         return [];
       }
-      final placeIds =
-          querySnapshot.docs
-              .map((doc) => doc.data()['placeId'] as String)
-              .toList();
+      final placeIds = querySnapshot.docs
+          .map((doc) => doc.data()['placeId'] as String)
+          .toList();
       final places = await Future.wait(
         placeIds.map((id) => firestore.collection('places').doc(id).get()),
       );
-      final placeList =
-          places
-              .where((doc) => doc.exists)
-              .map((doc) => Place.fromJson({'id': doc.id, ...doc.data() ?? {}}))
-              .toList();
+      final placeList = places
+          .where((doc) => doc.exists)
+          .map((doc) => Place.fromJson({'id': doc.id, ...doc.data() ?? {}}))
+          .toList();
       return placeList;
     } catch (e) {
       throw Exception('Error al obtener lugares por categoría: $e');
