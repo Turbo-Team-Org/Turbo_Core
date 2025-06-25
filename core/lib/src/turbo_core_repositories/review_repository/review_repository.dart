@@ -20,31 +20,31 @@ class ReviewRepository implements ReviewInterface {
   /// Get reviews
   @override
   Future<List<Review>> getReviews() async {
-    return reviewService.getReviews();
+    return await reviewService.getReviews();
   }
 
   /// Get reviews from a place
   @override
   Future<List<Review>> getReviewsFromAPlace(String placeId) async {
-    return reviewService.getReviewsFromAPlace(placeId);
+    return await reviewService.getReviewsFromAPlace(placeId);
   }
 
   /// Add review
   @override
   Future<String> addReview(Review review, String placeId) async {
-    return reviewService.addReview(review, placeId);
+    return await reviewService.addReview(review, placeId);
   }
 
   /// Update review
   @override
   Future<void> updateReview(Review review) async {
-    return reviewService.updateReview(review);
+    return await reviewService.updateReview(review);
   }
 
   /// Delete review
   @override
   Future<void> deleteReview(String id) async {
-    return reviewService.deleteReview(id);
+    return await reviewService.deleteReview(id);
   }
 
   // ==================== PAGINATED OPERATIONS ====================
@@ -58,7 +58,7 @@ class ReviewRepository implements ReviewInterface {
     // Validate pagination parameters
     _validatePaginationParams(page: page, limit: limit);
 
-    return reviewService.getAllReviews(
+    return await reviewService.getAllReviews(
       page: page,
       limit: limit,
       status: status,
@@ -77,7 +77,7 @@ class ReviewRepository implements ReviewInterface {
     // Validate cursor pagination parameters
     _validateCursorParams(limit: limit);
 
-    return reviewService.getReviewsCursor(
+    return await reviewService.getReviewsCursor(
       limit: limit,
       status: status,
       placeId: placeId,
@@ -98,7 +98,7 @@ class ReviewRepository implements ReviewInterface {
     // Validate pagination parameters
     _validatePaginationParams(page: page, limit: limit);
 
-    return reviewService.getReviewsPaginated(
+    return await reviewService.getReviewsPaginated(
       page: page,
       limit: limit,
       status: status,
@@ -119,7 +119,7 @@ class ReviewRepository implements ReviewInterface {
     // Validate placeId parameter
     _validateNonEmptyString(placeId, 'placeId');
 
-    return reviewService.getReviewsByPlaceId(
+    return await reviewService.getReviewsByPlaceId(
       placeId,
       page: page,
       limit: limit,
@@ -139,7 +139,7 @@ class ReviewRepository implements ReviewInterface {
     // Validate userId parameter
     _validateNonEmptyString(userId, 'userId');
 
-    return reviewService.getReviewsByUserId(
+    return await reviewService.getReviewsByUserId(
       userId,
       page: page,
       limit: limit,
@@ -156,7 +156,8 @@ class ReviewRepository implements ReviewInterface {
     // Validate pagination parameters
     _validatePaginationParams(page: page, limit: limit);
 
-    return reviewService.getReviewsByStatus(status, page: page, limit: limit);
+    return await reviewService.getReviewsByStatus(status,
+        page: page, limit: limit);
   }
 
   // ==================== MODERATION OPERATIONS ====================
@@ -170,7 +171,7 @@ class ReviewRepository implements ReviewInterface {
     // Validate reviewId parameter
     _validateNonEmptyString(reviewId, 'reviewId');
 
-    return reviewService.approveReview(
+    return await reviewService.approveReview(
       reviewId,
       moderatorId: moderatorId,
       moderationNote: moderationNote,
@@ -186,7 +187,7 @@ class ReviewRepository implements ReviewInterface {
     // Validate reviewId parameter
     _validateNonEmptyString(reviewId, 'reviewId');
 
-    return reviewService.rejectReview(
+    return await reviewService.rejectReview(
       reviewId,
       moderatorId: moderatorId,
       moderationNote: moderationNote,
@@ -202,7 +203,7 @@ class ReviewRepository implements ReviewInterface {
     // Validate reviewId parameter
     _validateNonEmptyString(reviewId, 'reviewId');
 
-    return reviewService.flagReview(
+    return await reviewService.flagReview(
       reviewId,
       moderatorId: moderatorId,
       moderationNote: moderationNote,
@@ -219,7 +220,7 @@ class ReviewRepository implements ReviewInterface {
     // Validate reviewId parameter
     _validateNonEmptyString(reviewId, 'reviewId');
 
-    return reviewService.updateReviewStatus(
+    return await reviewService.updateReviewStatus(
       reviewId,
       status,
       moderatorId: moderatorId,
@@ -234,17 +235,17 @@ class ReviewRepository implements ReviewInterface {
     // Validate placeId parameter
     _validateNonEmptyString(placeId, 'placeId');
 
-    return reviewService.getReviewStats(placeId);
+    return await reviewService.getReviewStats(placeId);
   }
 
   @override
   Future<int> getPendingReviewsCount() async {
-    return reviewService.getPendingReviewsCount();
+    return await reviewService.getPendingReviewsCount();
   }
 
   @override
   Future<int> getFlaggedReviewsCount() async {
-    return reviewService.getFlaggedReviewsCount();
+    return await reviewService.getFlaggedReviewsCount();
   }
 
   // ==================== PRIVATE VALIDATION METHODS ====================

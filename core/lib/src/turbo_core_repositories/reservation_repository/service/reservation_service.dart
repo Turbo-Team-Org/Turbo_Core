@@ -13,7 +13,7 @@ import 'package:core/src/turbo_core_repositories/reservation_repository/models/r
 /// Servicio de gestión de reservas
 class ReservationService implements ReservationInterface {
   ReservationService({FirebaseFirestore? firestore})
-    : _firestore = firestore ?? FirebaseFirestore.instance {
+      : _firestore = firestore ?? FirebaseFirestore.instance {
     _initialize();
   }
 
@@ -295,20 +295,19 @@ class ReservationService implements ReservationInterface {
       final startOfDay = DateTime(date.year, date.month, date.day);
       final endOfDay = startOfDay.add(const Duration(days: 1));
 
-      final querySnapshot =
-          await _reservationsRef
-              .where('placeId', isEqualTo: placeId)
-              .where(
-                'reservationDate',
-                isGreaterThanOrEqualTo: Timestamp.fromDate(startOfDay),
-              )
-              .where(
-                'reservationDate',
-                isLessThan: Timestamp.fromDate(endOfDay),
-              )
-              .orderBy('reservationDate')
-              .orderBy('startTime')
-              .get();
+      final querySnapshot = await _reservationsRef
+          .where('placeId', isEqualTo: placeId)
+          .where(
+            'reservationDate',
+            isGreaterThanOrEqualTo: Timestamp.fromDate(startOfDay),
+          )
+          .where(
+            'reservationDate',
+            isLessThan: Timestamp.fromDate(endOfDay),
+          )
+          .orderBy('reservationDate')
+          .orderBy('startTime')
+          .get();
 
       return querySnapshot.docs
           .map(
@@ -328,20 +327,19 @@ class ReservationService implements ReservationInterface {
     DateTime endDate,
   ) async {
     try {
-      final querySnapshot =
-          await _reservationsRef
-              .where('placeId', isEqualTo: placeId)
-              .where(
-                'reservationDate',
-                isGreaterThanOrEqualTo: Timestamp.fromDate(startDate),
-              )
-              .where(
-                'reservationDate',
-                isLessThanOrEqualTo: Timestamp.fromDate(endDate),
-              )
-              .orderBy('reservationDate')
-              .orderBy('startTime')
-              .get();
+      final querySnapshot = await _reservationsRef
+          .where('placeId', isEqualTo: placeId)
+          .where(
+            'reservationDate',
+            isGreaterThanOrEqualTo: Timestamp.fromDate(startDate),
+          )
+          .where(
+            'reservationDate',
+            isLessThanOrEqualTo: Timestamp.fromDate(endDate),
+          )
+          .orderBy('reservationDate')
+          .orderBy('startTime')
+          .get();
 
       return querySnapshot.docs
           .map(
@@ -364,13 +362,12 @@ class ReservationService implements ReservationInterface {
     try {
       final now = DateTime.now();
 
-      final querySnapshot =
-          await _reservationsRef
-              .where('userId', isEqualTo: userId)
-              .where('startTime', isGreaterThan: Timestamp.fromDate(now))
-              .where('status', whereIn: ['pending', 'confirmed'])
-              .orderBy('startTime')
-              .get();
+      final querySnapshot = await _reservationsRef
+          .where('userId', isEqualTo: userId)
+          .where('startTime', isGreaterThan: Timestamp.fromDate(now))
+          .where('status', whereIn: ['pending', 'confirmed'])
+          .orderBy('startTime')
+          .get();
 
       return querySnapshot.docs
           .map(
@@ -390,14 +387,13 @@ class ReservationService implements ReservationInterface {
         .orderBy('startTime')
         .snapshots()
         .map(
-          (snapshot) =>
-              snapshot.docs
-                  .map(
-                    (doc) => Reservation.fromFirestore(
-                      doc.data()! as Map<String, dynamic>,
-                    ),
-                  )
-                  .toList(),
+          (snapshot) => snapshot.docs
+              .map(
+                (doc) => Reservation.fromFirestore(
+                  doc.data()! as Map<String, dynamic>,
+                ),
+              )
+              .toList(),
         );
   }
 
@@ -415,26 +411,28 @@ class ReservationService implements ReservationInterface {
       final startOfDay = DateTime(date.year, date.month, date.day);
       final endOfDay = startOfDay.add(const Duration(days: 1));
 
+      // CONSULTA SIMPLIFICADA - Solo por placeId para evitar error de índice
       final querySnapshot =
-          await _timeSlotsRef
-              .where('placeId', isEqualTo: placeId)
-              .where(
-                'startTime',
-                isGreaterThanOrEqualTo: Timestamp.fromDate(startOfDay),
-              )
-              .where('startTime', isLessThan: Timestamp.fromDate(endOfDay))
-              .where('isAvailable', isEqualTo: true)
-              .orderBy('startTime')
-              .get();
+          await _timeSlotsRef.where('placeId', isEqualTo: placeId).get();
 
-      return querySnapshot.docs
+      // Filtrar en memoria por ahora
+      final slots = querySnapshot.docs
           .map(
             (doc) => ReservationTimeSlot.fromFirestore(
               doc.data()! as Map<String, dynamic>,
             ),
           )
-          .where((slot) => slot.hasAvailability)
+          .where((slot) =>
+              slot.startTime.isAfter(startOfDay) &&
+              slot.startTime.isBefore(endOfDay) &&
+              slot.isAvailable &&
+              slot.hasAvailability)
           .toList();
+
+      // Ordenar en memoria
+      slots.sort((a, b) => a.startTime.compareTo(b.startTime));
+
+      return slots;
     } catch (e) {
       throw Exception('Error obteniendo slots disponibles: $e');
     }
@@ -512,8 +510,7 @@ class ReservationService implements ReservationInterface {
       }
 
       // Obtener configuraciones
-      final settings =
-          await getReservationSettings(placeId) ??
+      final settings = await getReservationSettings(placeId) ??
           await createDefaultSettings(placeId);
 
       // Obtener horarios disponibles para el día
@@ -691,10 +688,9 @@ class ReservationService implements ReservationInterface {
         throw Exception('Disponibilidad no encontrada');
       }
 
-      final updatedBlackoutDates =
-          availability.blackoutDates
-              .where((blackout) => blackout.reason != blackoutId)
-              .toList();
+      final updatedBlackoutDates = availability.blackoutDates
+          .where((blackout) => blackout.reason != blackoutId)
+          .toList();
 
       final updatedAvailability = availability.copyWith(
         blackoutDates: updatedBlackoutDates,
@@ -765,12 +761,11 @@ class ReservationService implements ReservationInterface {
   ) async {
     try {
       // Buscar slot que coincida con el horario
-      final querySnapshot =
-          await _timeSlotsRef
-              .where('placeId', isEqualTo: placeId)
-              .where('startTime', isEqualTo: Timestamp.fromDate(startTime))
-              .limit(1)
-              .get();
+      final querySnapshot = await _timeSlotsRef
+          .where('placeId', isEqualTo: placeId)
+          .where('startTime', isEqualTo: Timestamp.fromDate(startTime))
+          .limit(1)
+          .get();
 
       if (querySnapshot.docs.isNotEmpty) {
         final doc = querySnapshot.docs.first;
@@ -798,12 +793,11 @@ class ReservationService implements ReservationInterface {
     DateTime startTime,
   ) async {
     try {
-      final querySnapshot =
-          await _timeSlotsRef
-              .where('placeId', isEqualTo: placeId)
-              .where('startTime', isEqualTo: Timestamp.fromDate(startTime))
-              .limit(1)
-              .get();
+      final querySnapshot = await _timeSlotsRef
+          .where('placeId', isEqualTo: placeId)
+          .where('startTime', isEqualTo: Timestamp.fromDate(startTime))
+          .limit(1)
+          .get();
 
       if (querySnapshot.docs.isNotEmpty) {
         final doc = querySnapshot.docs.first;
