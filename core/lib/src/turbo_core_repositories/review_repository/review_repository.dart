@@ -10,7 +10,7 @@ import 'package:core/src/turbo_core_repositories/review_repository/service/revie
 /// This repository provides a clean interface for review-related operations,
 /// following Clean Architecture principles and handling all business logic
 /// related to review management, moderation, and analytics.
-class ReviewRepository implements ReviewInterface {
+class ReviewRepository {
   /// Constructor
   ReviewRepository({required this.reviewService});
 
@@ -18,38 +18,47 @@ class ReviewRepository implements ReviewInterface {
   final ReviewService reviewService;
 
   /// Get reviews
-  @override
+
   Future<List<Review>> getReviews() async {
-    return await reviewService.getReviews();
+    print('🔍 [DEBUG] ReviewRepository.getReviews() - LLAMADO CORRECTAMENTE');
+    print('🔍 [DEBUG] reviewService: ${reviewService.runtimeType}');
+    try {
+      final result = await reviewService.getReviews();
+      print(
+          '✅ [DEBUG] ReviewRepository.getReviews() - Resultado obtenido: ${result.length} reviews');
+      return result;
+    } catch (e) {
+      print('❌ [DEBUG] ReviewRepository.getReviews() - Error: $e');
+      rethrow;
+    }
   }
 
   /// Get reviews from a place
-  @override
+
   Future<List<Review>> getReviewsFromAPlace(String placeId) async {
     return await reviewService.getReviewsFromAPlace(placeId);
   }
 
   /// Add review
-  @override
+
   Future<String> addReview(Review review, String placeId) async {
     return await reviewService.addReview(review, placeId);
   }
 
   /// Update review
-  @override
+
   Future<void> updateReview(Review review) async {
     return await reviewService.updateReview(review);
   }
 
   /// Delete review
-  @override
+
   Future<void> deleteReview(String id) async {
     return await reviewService.deleteReview(id);
   }
 
   // ==================== PAGINATED OPERATIONS ====================
 
-  @override
   Future<PagedResult<Review>> getAllReviews({
     int page = 1,
     int limit = 20,
@@ -65,7 +74,6 @@ class ReviewRepository implements ReviewInterface {
     );
   }
 
-  @override
   Future<PaginatedReviews> getReviewsCursor({
     int limit = 20,
     ReviewStatus? status,
@@ -87,7 +95,6 @@ class ReviewRepository implements ReviewInterface {
     );
   }
 
-  @override
   Future<PagedResult<Review>> getReviewsPaginated({
     int page = 1,
     int limit = 20,
@@ -107,7 +114,6 @@ class ReviewRepository implements ReviewInterface {
     );
   }
 
-  @override
   Future<PagedResult<Review>> getReviewsByPlaceId(
     String placeId, {
     int page = 1,
@@ -127,7 +133,6 @@ class ReviewRepository implements ReviewInterface {
     );
   }
 
-  @override
   Future<PagedResult<Review>> getReviewsByUserId(
     String userId, {
     int page = 1,
@@ -147,7 +152,6 @@ class ReviewRepository implements ReviewInterface {
     );
   }
 
-  @override
   Future<PagedResult<Review>> getReviewsByStatus(
     ReviewStatus status, {
     int page = 1,
@@ -162,7 +166,6 @@ class ReviewRepository implements ReviewInterface {
 
   // ==================== MODERATION OPERATIONS ====================
 
-  @override
   Future<void> approveReview(
     String reviewId, {
     String? moderatorId,
@@ -178,7 +181,6 @@ class ReviewRepository implements ReviewInterface {
     );
   }
 
-  @override
   Future<void> rejectReview(
     String reviewId, {
     String? moderatorId,
@@ -194,7 +196,6 @@ class ReviewRepository implements ReviewInterface {
     );
   }
 
-  @override
   Future<void> flagReview(
     String reviewId, {
     String? moderatorId,
@@ -210,7 +211,6 @@ class ReviewRepository implements ReviewInterface {
     );
   }
 
-  @override
   Future<void> updateReviewStatus(
     String reviewId,
     ReviewStatus status, {
@@ -230,7 +230,6 @@ class ReviewRepository implements ReviewInterface {
 
   // ==================== ANALYTICS OPERATIONS ====================
 
-  @override
   Future<Map<String, dynamic>> getReviewStats(String placeId) async {
     // Validate placeId parameter
     _validateNonEmptyString(placeId, 'placeId');
@@ -238,12 +237,10 @@ class ReviewRepository implements ReviewInterface {
     return await reviewService.getReviewStats(placeId);
   }
 
-  @override
   Future<int> getPendingReviewsCount() async {
     return await reviewService.getPendingReviewsCount();
   }
 
-  @override
   Future<int> getFlaggedReviewsCount() async {
     return await reviewService.getFlaggedReviewsCount();
   }
