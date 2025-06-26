@@ -19,7 +19,7 @@ class ReviewService implements ReviewInterface {
     print('🔍 [DEBUG] firestore: ${firestore.runtimeType}');
     try {
       print('🔍 [DEBUG] Ejecutando consulta a Firestore...');
-      final snapshot = await firestore.collectionGroup('reviews').get();
+      final snapshot = await firestore.collection('reviews').get();
       print('✅ [DEBUG] Snapshot obtenido: ${snapshot.docs.length} documentos');
       final result =
           snapshot.docs.map((doc) => Review.fromFirestore(doc.data())).toList();
