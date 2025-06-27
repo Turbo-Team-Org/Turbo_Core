@@ -168,7 +168,7 @@ flutterfire configure
 {
   "indexes": [
     {
-      "collectionGroup": "admin_users",
+      "collection": "admin_users",
       "queryScope": "COLLECTION",
       "fields": [
         { "fieldPath": "role", "order": "ASCENDING" },
@@ -176,7 +176,7 @@ flutterfire configure
       ]
     },
     {
-      "collectionGroup": "places",
+      "collection": "places",
       "queryScope": "COLLECTION",
       "fields": [
         { "fieldPath": "ownerIds", "arrayConfig": "CONTAINS" },

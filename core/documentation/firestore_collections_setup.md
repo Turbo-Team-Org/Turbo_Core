@@ -176,7 +176,7 @@ node init_collections.js
 {
   "indexes": [
     {
-      "collectionGroup": "business_owner_requests",
+      "collection": "business_owner_requests",
       "queryScope": "COLLECTION",
       "fields": [
         {"fieldPath": "status", "order": "ASCENDING"},
@@ -184,14 +184,14 @@ node init_collections.js
       ]
     },
     {
-      "collectionGroup": "business_owner_requests",
+      "collection": "business_owner_requests",
       "queryScope": "COLLECTION",
       "fields": [
         {"fieldPath": "userId", "order": "ASCENDING"}
       ]
     },
     {
-      "collectionGroup": "notifications",
+      "collection": "notifications",
       "queryScope": "COLLECTION",
       "fields": [
         {"fieldPath": "targetRole", "order": "ASCENDING"},
