@@ -585,11 +585,12 @@ class ReservationService implements ReservationInterface {
   @override
   Future<BusinessAvailability?> getBusinessAvailability(String placeId) async {
     try {
-      final doc = await _availabilityRef.doc(placeId).get();
+      final doc =
+          await _availabilityRef.where('placeId', isEqualTo: placeId).get();
 
-      if (doc.exists && doc.data() != null) {
+      if (doc.docs.isNotEmpty) {
         return BusinessAvailability.fromFirestore(
-          doc.data()! as Map<String, dynamic>,
+          doc.docs.first.data()! as Map<String, dynamic>,
         );
       }
 
@@ -708,9 +709,11 @@ class ReservationService implements ReservationInterface {
   @override
   Future<ReservationSettings?> getReservationSettings(String placeId) async {
     try {
-      final doc = await _settingsRef.doc(placeId).get();
+      final querySnapshot =
+          await _settingsRef.where('placeId', isEqualTo: placeId).get();
 
-      if (doc.exists && doc.data() != null) {
+      if (querySnapshot.docs.isNotEmpty) {
+        final doc = querySnapshot.docs.first;
         return ReservationSettings.fromFirestore(
           doc.data()! as Map<String, dynamic>,
         );
