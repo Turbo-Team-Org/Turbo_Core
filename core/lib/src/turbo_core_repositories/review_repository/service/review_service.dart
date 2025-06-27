@@ -34,12 +34,13 @@ class ReviewService implements ReviewInterface {
   @override
   Future<List<Review>> getReviewsFromAPlace(String placeId) async {
     try {
-      final snapshot = await firestore
-          .collection('places')
-          .doc(placeId)
-          .collection('reviews')
-          .orderBy('date', descending: true)
-          .get();
+      final snapshot =
+          await firestore
+              .collection('places')
+              .doc(placeId)
+              .collection('reviews')
+              .orderBy('date', descending: true)
+              .get();
 
       return snapshot.docs.map((doc) {
         final data = doc.data();
@@ -70,7 +71,8 @@ class ReviewService implements ReviewInterface {
         final currentRating = (currentData['rating'] ?? 0.0) as double;
 
         // Calculate the new average rating
-        final newRating = ((currentRating * currentCount) + review.rating) /
+        final newRating =
+            ((currentRating * currentCount) + review.rating) /
             (currentCount + 1);
 
         transaction.update(placeRef, {
@@ -90,10 +92,11 @@ class ReviewService implements ReviewInterface {
   Future<void> updateReview(Review review) async {
     try {
       // First we need to find the place that the review belongs to
-      final querySnapshot = await firestore
-          .collectionGroup('reviews')
-          .where('id', isEqualTo: review.id)
-          .get();
+      final querySnapshot =
+          await firestore
+              .collection('reviews')
+              .where('id', isEqualTo: review.id)
+              .get();
 
       if (querySnapshot.docs.isEmpty) {
         throw Exception('Review not found');
@@ -110,10 +113,11 @@ class ReviewService implements ReviewInterface {
   Future<void> deleteReview(String reviewId) async {
     try {
       // First we need to find the place that the review belongs to
-      final querySnapshot = await firestore
-          .collectionGroup('reviews')
-          .where('id', isEqualTo: reviewId)
-          .get();
+      final querySnapshot =
+          await firestore
+              .collection('reviews')
+              .where('id', isEqualTo: reviewId)
+              .get();
 
       if (querySnapshot.docs.isEmpty) {
         throw Exception('Review not found');
@@ -138,7 +142,8 @@ class ReviewService implements ReviewInterface {
 
         if (currentCount > 1) {
           // Recalculate the average rating excluding the deleted review
-          final newRating = ((currentRating * currentCount) - review.rating) /
+          final newRating =
+              ((currentRating * currentCount) - review.rating) /
               (currentCount - 1);
           transaction.update(placeRef, {
             'reviews_count': currentCount - 1,
@@ -163,7 +168,7 @@ class ReviewService implements ReviewInterface {
     ReviewStatus? status,
   }) async {
     try {
-      Query query = firestore.collectionGroup('reviews');
+      Query query = firestore.collection('reviews');
 
       // Apply status filter if provided
       if (status != null) {
@@ -178,11 +183,12 @@ class ReviewService implements ReviewInterface {
         query = query.limit(limit);
         final snapshot = await query.get();
 
-        final reviews = snapshot.docs.map((doc) {
-          final data = doc.data() as Map<String, dynamic>;
-          data['id'] = doc.id;
-          return Review.fromFirestore(data);
-        }).toList();
+        final reviews =
+            snapshot.docs.map((doc) {
+              final data = doc.data() as Map<String, dynamic>;
+              data['id'] = doc.id;
+              return Review.fromFirestore(data);
+            }).toList();
 
         // For first page, we don't know total count unless we do a separate query
         // This is a trade-off for performance
@@ -192,7 +198,8 @@ class ReviewService implements ReviewInterface {
           currentPage: page,
           pageSize: limit,
           totalPages: -1, // Unknown for efficiency
-          hasNextPage: reviews.length ==
+          hasNextPage:
+              reviews.length ==
               limit, // Assume there's more if we got a full page
           hasPreviousPage: false,
         );
@@ -205,15 +212,17 @@ class ReviewService implements ReviewInterface {
         final startIndex = skipCount;
         final endIndex = (startIndex + limit).clamp(0, allSnapshot.docs.length);
 
-        final paginatedDocs = startIndex < allSnapshot.docs.length
-            ? allSnapshot.docs.sublist(startIndex, endIndex)
-            : <QueryDocumentSnapshot>[];
+        final paginatedDocs =
+            startIndex < allSnapshot.docs.length
+                ? allSnapshot.docs.sublist(startIndex, endIndex)
+                : <QueryDocumentSnapshot>[];
 
-        final reviews = paginatedDocs.map((doc) {
-          final data = doc.data() as Map<String, dynamic>;
-          data['id'] = doc.id;
-          return Review.fromFirestore(data);
-        }).toList();
+        final reviews =
+            paginatedDocs.map((doc) {
+              final data = doc.data() as Map<String, dynamic>;
+              data['id'] = doc.id;
+              return Review.fromFirestore(data);
+            }).toList();
 
         return PagedResult(
           items: reviews,
@@ -242,13 +251,15 @@ class ReviewService implements ReviewInterface {
     bool includeTotalCount = false,
   }) async {
     try {
-      Query query = firestore.collectionGroup('reviews');
+      Query query = firestore.collection('reviews');
 
       // Apply filters first (most selective)
       if (placeId != null) {
         // For place-specific reviews, use the specific collection for better performance
-        query =
-            firestore.collection('places').doc(placeId).collection('reviews');
+        query = firestore
+            .collection('places')
+            .doc(placeId)
+            .collection('reviews');
       }
 
       if (status != null) {
@@ -324,11 +335,12 @@ class ReviewService implements ReviewInterface {
 
         // Try to get the document from the collection
         // Note: This is simplified - in production you'd store more metadata
-        final docSnapshot = await firestore
-            .collectionGroup('reviews')
-            .where(FieldPath.documentId, isEqualTo: docId)
-            .limit(1)
-            .get();
+        final docSnapshot =
+            await firestore
+                .collection('reviews')
+                .where(FieldPath.documentId, isEqualTo: docId)
+                .limit(1)
+                .get();
 
         return docSnapshot.docs.isNotEmpty ? docSnapshot.docs.first : null;
       }
@@ -346,11 +358,13 @@ class ReviewService implements ReviewInterface {
     ReviewStatus? status,
     String? userId,
   }) async {
-    Query countQuery = firestore.collectionGroup('reviews');
+    Query countQuery = firestore.collection('reviews');
 
     if (placeId != null) {
-      countQuery =
-          firestore.collection('places').doc(placeId).collection('reviews');
+      countQuery = firestore
+          .collection('places')
+          .doc(placeId)
+          .collection('reviews');
     }
 
     if (status != null) {
@@ -374,7 +388,7 @@ class ReviewService implements ReviewInterface {
     String? userId,
   }) async {
     try {
-      Query query = firestore.collectionGroup('reviews');
+      Query query = firestore.collection('reviews');
 
       // Apply filters
       if (status != null) {
@@ -382,8 +396,10 @@ class ReviewService implements ReviewInterface {
       }
       if (placeId != null) {
         // For place-specific reviews, use the specific collection
-        query =
-            firestore.collection('places').doc(placeId).collection('reviews');
+        query = firestore
+            .collection('places')
+            .doc(placeId)
+            .collection('reviews');
         if (status != null) {
           query = query.where('status', isEqualTo: status.value);
         }
@@ -400,11 +416,12 @@ class ReviewService implements ReviewInterface {
         query = query.limit(limit);
         final snapshot = await query.get();
 
-        final reviews = snapshot.docs.map((doc) {
-          final data = doc.data() as Map<String, dynamic>;
-          data['id'] = doc.id;
-          return Review.fromFirestore(data);
-        }).toList();
+        final reviews =
+            snapshot.docs.map((doc) {
+              final data = doc.data() as Map<String, dynamic>;
+              data['id'] = doc.id;
+              return Review.fromFirestore(data);
+            }).toList();
 
         return PagedResult(
           items: reviews,
@@ -423,15 +440,17 @@ class ReviewService implements ReviewInterface {
         final startIndex = skipCount;
         final endIndex = (startIndex + limit).clamp(0, allSnapshot.docs.length);
 
-        final paginatedDocs = startIndex < allSnapshot.docs.length
-            ? allSnapshot.docs.sublist(startIndex, endIndex)
-            : <QueryDocumentSnapshot>[];
+        final paginatedDocs =
+            startIndex < allSnapshot.docs.length
+                ? allSnapshot.docs.sublist(startIndex, endIndex)
+                : <QueryDocumentSnapshot>[];
 
-        final reviews = paginatedDocs.map((doc) {
-          final data = doc.data() as Map<String, dynamic>;
-          data['id'] = doc.id;
-          return Review.fromFirestore(data);
-        }).toList();
+        final reviews =
+            paginatedDocs.map((doc) {
+              final data = doc.data() as Map<String, dynamic>;
+              data['id'] = doc.id;
+              return Review.fromFirestore(data);
+            }).toList();
 
         return PagedResult(
           items: reviews,
@@ -540,10 +559,11 @@ class ReviewService implements ReviewInterface {
   }) async {
     try {
       // Find the review document
-      final querySnapshot = await firestore
-          .collectionGroup('reviews')
-          .where('id', isEqualTo: reviewId)
-          .get();
+      final querySnapshot =
+          await firestore
+              .collection('reviews')
+              .where('id', isEqualTo: reviewId)
+              .get();
 
       if (querySnapshot.docs.isEmpty) {
         throw Exception('Reseña no encontrada');
@@ -573,11 +593,12 @@ class ReviewService implements ReviewInterface {
   @override
   Future<Map<String, dynamic>> getReviewStats(String placeId) async {
     try {
-      final snapshot = await firestore
-          .collection('places')
-          .doc(placeId)
-          .collection('reviews')
-          .get();
+      final snapshot =
+          await firestore
+              .collection('places')
+              .doc(placeId)
+              .collection('reviews')
+              .get();
 
       final reviews =
           snapshot.docs.map((doc) => Review.fromFirestore(doc.data())).toList();
@@ -592,22 +613,26 @@ class ReviewService implements ReviewInterface {
       final flaggedReviews =
           reviews.where((r) => r.status == ReviewStatus.flagged).length;
 
-      final averageRating = reviews.isNotEmpty
-          ? reviews
-                  .where((r) => r.status == ReviewStatus.approved)
-                  .map((r) => r.rating)
-                  .fold(0.0, (sum, rating) => sum + rating) /
-              approvedReviews
-          : 0.0;
+      final averageRating =
+          reviews.isNotEmpty
+              ? reviews
+                      .where((r) => r.status == ReviewStatus.approved)
+                      .map((r) => r.rating)
+                      .fold(0.0, (sum, rating) => sum + rating) /
+                  approvedReviews
+              : 0.0;
 
       // Rating distribution
       final ratingDistribution = <int, int>{};
       for (int i = 1; i <= 5; i++) {
-        ratingDistribution[i] = reviews
-            .where(
-              (r) => r.status == ReviewStatus.approved && r.rating.round() == i,
-            )
-            .length;
+        ratingDistribution[i] =
+            reviews
+                .where(
+                  (r) =>
+                      r.status == ReviewStatus.approved &&
+                      r.rating.round() == i,
+                )
+                .length;
       }
 
       return {
@@ -627,10 +652,11 @@ class ReviewService implements ReviewInterface {
   @override
   Future<int> getPendingReviewsCount() async {
     try {
-      final snapshot = await firestore
-          .collectionGroup('reviews')
-          .where('status', isEqualTo: ReviewStatus.pending.value)
-          .get();
+      final snapshot =
+          await firestore
+              .collection('reviews')
+              .where('status', isEqualTo: ReviewStatus.pending.value)
+              .get();
       return snapshot.docs.length;
     } catch (e) {
       throw Exception('Error al obtener conteo de reseñas pendientes: $e');
@@ -640,10 +666,11 @@ class ReviewService implements ReviewInterface {
   @override
   Future<int> getFlaggedReviewsCount() async {
     try {
-      final snapshot = await firestore
-          .collectionGroup('reviews')
-          .where('status', isEqualTo: ReviewStatus.flagged.value)
-          .get();
+      final snapshot =
+          await firestore
+              .collection('reviews')
+              .where('status', isEqualTo: ReviewStatus.flagged.value)
+              .get();
       return snapshot.docs.length;
     } catch (e) {
       throw Exception('Error al obtener conteo de reseñas reportadas: $e');

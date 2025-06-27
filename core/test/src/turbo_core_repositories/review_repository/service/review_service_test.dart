@@ -70,7 +70,6 @@ void main() {
     when(
       () => mockFirestore.collection('places'),
     ).thenReturn(mockPlacesCollection);
-    when(() => mockFirestore.collectionGroup('reviews')).thenReturn(mockQuery);
     when(() => mockPlacesCollection.doc(any())).thenReturn(mockPlaceDoc);
     when(
       () => mockPlaceDoc.collection('reviews'),
@@ -100,7 +99,7 @@ void main() {
     test('getReviews success', () async {
       when(() => mockReviewSnapshot.data()).thenReturn(getTestReview());
       when(() => mockReviewsSnapshot.docs).thenReturn([mockReviewSnapshot]);
-      // Mock para collectionGroup query
+      // Mock para collection query
       when(() => mockQuery.get()).thenAnswer((_) async => mockReviewsSnapshot);
 
       final result = await reviewService.getReviews();

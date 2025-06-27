@@ -13,7 +13,7 @@ Future<PagedResult<Review>> getReviewsPaginated({
   int limit = 20,
   ReviewStatus? status,
 }) async {
-  Query query = firestore.collectionGroup('reviews');
+  Query query = firestore.collection('reviews');
 
   // 🔥 EXPENSIVE: Reads entire collection
   final countSnapshot = await query.get();
@@ -48,7 +48,7 @@ Future<PaginatedReviews> getReviewsCursor({
   String? pageToken,
   ReviewStatus? status,
 }) async {
-  Query query = firestore.collectionGroup('reviews');
+  Query query = firestore.collection('reviews');
 
   // Apply filters FIRST (most selective)
   if (status != null) {
