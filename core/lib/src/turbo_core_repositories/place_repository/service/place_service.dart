@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:core/src/turbo_core_repositories/analytics_repository/service/analytics_service.dart';
-import 'package:core/src/turbo_core_repositories/place_repository/interface/place_interface.dart';
 import 'package:core/src/turbo_core_repositories/place_repository/interface/place_authorization_interface.dart';
+import 'package:core/src/turbo_core_repositories/place_repository/interface/place_interface.dart';
 import 'package:core/src/turbo_core_repositories/place_repository/models/place/place.dart';
 import 'package:core/src/turbo_core_repositories/place_repository/place_repository.dart';
 import 'package:core/src/turbo_core_repositories/review_repository/models/review.dart';

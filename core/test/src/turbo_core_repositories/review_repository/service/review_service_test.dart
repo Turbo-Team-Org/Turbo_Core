@@ -75,6 +75,21 @@ void main() {
       () => mockPlaceDoc.collection('reviews'),
     ).thenReturn(mockReviewsCollection);
     when(() => mockReviewsCollection.doc(any())).thenReturn(mockReviewDoc);
+
+    // Configurar mockQuery para que funcione como una consulta sobre la colección
+    when(
+      () => mockReviewsCollection.where(any(), isEqualTo: any()),
+    ).thenReturn(mockQuery);
+    when(
+      () => mockReviewsCollection.orderBy(any(), descending: any()),
+    ).thenReturn(mockQuery);
+    when(
+      () => mockQuery.orderBy(any(), descending: any()),
+    ).thenReturn(mockQuery);
+    when(() => mockQuery.where(any(), isEqualTo: any())).thenReturn(mockQuery);
+    when(() => mockQuery.limit(any())).thenReturn(mockQuery);
+    when(() => mockQuery.get()).thenAnswer((_) async => mockReviewsSnapshot);
+
     when(() => mockTimestamp.toDate()).thenReturn(DateTime.now());
     when(
       () => mockDocSnapshot.data(),
@@ -99,8 +114,10 @@ void main() {
     test('getReviews success', () async {
       when(() => mockReviewSnapshot.data()).thenReturn(getTestReview());
       when(() => mockReviewsSnapshot.docs).thenReturn([mockReviewSnapshot]);
-      // Mock para collection query
-      when(() => mockQuery.get()).thenAnswer((_) async => mockReviewsSnapshot);
+      // Mock para collection query - usar mockReviewsCollection directamente
+      when(
+        () => mockReviewsCollection.get(),
+      ).thenAnswer((_) async => mockReviewsSnapshot);
 
       final result = await reviewService.getReviews();
 
@@ -168,14 +185,16 @@ void main() {
             return mockSnapshot;
           }).toList();
 
-      // Mock para el conteo total
+      // Mock para el conteo total - usar mockReviewsCollection
       when(() => mockReviewsSnapshot.docs).thenReturn(mockSnapshots);
-      when(() => mockQuery.get()).thenAnswer((_) async => mockReviewsSnapshot);
+      when(
+        () => mockReviewsCollection.get(),
+      ).thenAnswer((_) async => mockReviewsSnapshot);
 
       // Mock para la consulta con ordenamiento
       final mockOrderedQuery = MockQuery();
       when(
-        () => mockQuery.orderBy('date', descending: true),
+        () => mockReviewsCollection.orderBy('date', descending: true),
       ).thenReturn(mockOrderedQuery);
 
       // Mock para la consulta con límite
@@ -209,7 +228,10 @@ void main() {
       // Mock para consulta con filtro de estado
       final mockFilteredQuery = MockQuery();
       when(
-        () => mockQuery.where('status', isEqualTo: ReviewStatus.approved.value),
+        () => mockReviewsCollection.where(
+          'status',
+          isEqualTo: ReviewStatus.approved.value,
+        ),
       ).thenReturn(mockFilteredQuery);
 
       // Mock para el conteo con filtro

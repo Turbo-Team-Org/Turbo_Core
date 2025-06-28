@@ -121,11 +121,15 @@ sealed class Place with _$Place {
       createdBy: asString(data?['createdBy']),
       createdAt:
           data?['createdAt'] != null
-              ? (data?['createdAt'] as Timestamp).toDate()
+              ? (data?['createdAt'] is Timestamp
+                  ? (data?['createdAt'] as Timestamp).toDate()
+                  : DateTime.tryParse(data?['createdAt'].toString() ?? ''))
               : null,
       lastUpdated:
           data?['lastUpdated'] != null
-              ? (data?['lastUpdated'] as Timestamp).toDate()
+              ? (data?['lastUpdated'] is Timestamp
+                  ? (data?['lastUpdated'] as Timestamp).toDate()
+                  : DateTime.tryParse(data?['lastUpdated'].toString() ?? ''))
               : null,
     );
   }
