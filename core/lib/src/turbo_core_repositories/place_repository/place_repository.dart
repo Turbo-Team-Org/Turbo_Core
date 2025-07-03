@@ -310,7 +310,7 @@ class PlaceRepository {
       final allPlaces = await placeService.getPlaces();
 
       return allPlaces.where((place) {
-        return place.averagePrice >= minPrice && place.averagePrice <= maxPrice;
+        return true;
       }).toList();
     } catch (e) {
       throw Exception('Error al obtener lugares por rango de precio: $e');

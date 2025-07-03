@@ -346,10 +346,9 @@ class PlaceService implements PlaceInterface {
       final placeWithId = place.copyWith(id: placeId);
 
       // 1. Crear el documento del lugar
-      await firestore
-          .collection('places')
-          .doc(placeId)
-          .set(placeWithId.toJson());
+      final placeData = placeWithId.toJson();
+      placeData['createdAt'] = FieldValue.serverTimestamp();
+      await firestore.collection('places').doc(placeId).set(placeData);
 
       // 2. Inicializar automáticamente la estructura de analytics
       try {
