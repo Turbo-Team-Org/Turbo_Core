@@ -8,6 +8,12 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:get_it/get_it.dart';
 
+// Supabase services imports
+import 'package:core/src/turbo_core_repositories/analytics_repository/service/analytics_service_supabase.dart';
+import 'package:core/src/turbo_core_repositories/analytics_repository/interface/analytics_interface.dart';
+import 'package:core/src/turbo_core_repositories/admin_auth_repository/service/admin_auth_service_supabase.dart';
+import 'package:core/src/turbo_core_repositories/place_repository/service/place_service_supabase.dart';
+
 /// Initialize dependencies based on environment configuration
 /// Supports dynamic switching between Firebase (dev) and Supabase (staging/prod)
 ///
@@ -314,8 +320,42 @@ Future<void> _registerSupabaseServices(GetIt sl) async {
     print('   ✅ LocationServiceSupabase');
   }
 
-  // TODO: Place, Analytics y Admin Auth services requieren más configuración
-  print('   ⏳ Place, Analytics y Admin Auth services pendientes');
+  // Analytics Service
+  if (!sl.isRegistered<AnalyticsInterface>()) {
+    sl.registerLazySingleton<AnalyticsInterface>(
+      () => AnalyticsServiceSupabase(
+        supabaseClient: sl<SupabaseClient>(),
+      ),
+    );
+    print('   ✅ AnalyticsServiceSupabase');
+  }
+
+  // Place Service (requiere AnalyticsInterface)
+  if (!sl.isRegistered<PlaceInterface>()) {
+    sl.registerLazySingleton<PlaceInterface>(
+      () => PlaceServiceSupabase(
+        supabase: sl<SupabaseClient>(),
+        analyticsService: sl<AnalyticsInterface>(),
+        authorization: sl<PlaceAuthorizationInterface>(),
+      ),
+    );
+    print('   ✅ PlaceServiceSupabase');
+  }
+
+  // Admin Auth Service
+  if (!sl.isRegistered<AdminAuthServiceSupabase>()) {
+    sl.registerLazySingleton<AdminAuthServiceSupabase>(
+      () => AdminAuthServiceSupabase(
+        supabaseClient: sl<SupabaseClient>(),
+      ),
+    );
+    print('   ✅ AdminAuthServiceSupabase');
+  }
+
+  print('🎉 Servicios avanzados para Supabase completados:');
+  print('   - Analytics con métricas empresariales');
+  print('   - Places con auto-inicialización de analytics');
+  print('   - Admin Auth con gestión de usuarios');
 }
 
 /// Utility function to check if a specific repository is available in current environment

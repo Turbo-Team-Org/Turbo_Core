@@ -1,4 +1,4 @@
-import 'package:core/src/turbo_core_repositories/analytics_repository/service/analytics_service.dart';
+import 'package:core/src/turbo_core_repositories/analytics_repository/interface/analytics_interface.dart';
 import 'package:core/src/turbo_core_repositories/place_repository/interface/place_authorization_interface.dart';
 import 'package:core/src/turbo_core_repositories/place_repository/interface/place_interface.dart';
 import 'package:core/src/turbo_core_repositories/place_repository/models/place/place.dart';
@@ -19,7 +19,7 @@ class PlaceServiceSupabase implements PlaceInterface {
   final SupabaseClient supabase;
 
   /// Analytics service para inicializar estructura automáticamente
-  final AnalyticsService analyticsService;
+  final AnalyticsInterface analyticsService;
 
   /// Interfaz para verificar permisos de gestión de lugares
   final PlaceAuthorizationInterface authorization;
