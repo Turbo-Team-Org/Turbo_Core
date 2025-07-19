@@ -21,3 +21,4 @@ export 'repository/admin_auth_repository.dart';
 export 'repository/admin_auth_repository_impl.dart';
 // Services
 export 'service/admin_auth_service.dart';
+export 'service/admin_auth_service_supabase.dart';
