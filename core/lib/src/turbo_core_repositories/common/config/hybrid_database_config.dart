@@ -202,8 +202,25 @@ class HybridDatabaseConfig {
       'primaryProvider': _currentProvider?.name ?? 'NOT_SET',
       'firebaseAvailable': isFirebaseAvailable,
       'supabaseAvailable': isSupabaseAvailable,
-      'environmentConfig': Env.debugInfo,
+      'environmentConfigSafe': _getSafeEnvironmentConfig(),
     };
+  }
+
+  /// Obtener configuración de entorno de forma segura
+  static Map<String, dynamic> _getSafeEnvironmentConfig() {
+    try {
+      return Env.debugInfo;
+    } catch (e) {
+      // Si dotenv no está disponible, retornar info básica
+      return {
+        'environment': _currentEnvironment?.name ?? 'NOT_SET',
+        'databaseProvider': _currentProvider?.name ?? 'NOT_SET',
+        'isFirebaseConfigured': isFirebaseAvailable,
+        'isSupabaseConfigured': isSupabaseAvailable,
+        'isValidConfiguration': true,
+        'source': 'PASSED_FROM_APP',
+      };
+    }
   }
 
   /// Imprimir información de configuración

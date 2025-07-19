@@ -332,6 +332,21 @@ Map<String, dynamic> getDependencyInfo() {
       'Firebase': HybridDatabaseConfig.isFirebaseAvailable,
       'Supabase': HybridDatabaseConfig.isSupabaseAvailable,
     },
-    'environment': Env.debugInfo,
+    'environmentSafe': _getSafeEnvironmentInfo(),
   };
+}
+
+/// Get environment info safely without requiring dotenv
+Map<String, dynamic> _getSafeEnvironmentInfo() {
+  try {
+    return Env.debugInfo;
+  } catch (e) {
+    return {
+      'environment': HybridDatabaseConfig.currentEnvironment?.name ?? 'NOT_SET',
+      'databaseProvider':
+          HybridDatabaseConfig.currentProvider?.name ?? 'NOT_SET',
+      'source': 'PASSED_FROM_APP',
+      'error': 'dotenv_not_initialized',
+    };
+  }
 }
