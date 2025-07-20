@@ -4,6 +4,7 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:core/src/turbo_core_repositories/admin_auth_repository/admin_auth_repository_imports.dart';
+import 'package:core/src/turbo_core_repositories/admin_auth_repository/interface/admin_auth_interface.dart';
 import 'package:core/src/turbo_core_repositories/authentication_repository/service/authentication_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:uuid/uuid.dart';
@@ -12,12 +13,12 @@ import 'package:uuid/uuid.dart';
 ///
 /// Maneja toda la lógica de autenticación y autorización específica
 /// para usuarios administrativos del Admin Panel de Turbo
-class AdminAuthService {
+class AdminAuthService implements AdminAuthInterface {
   AdminAuthService({
     required FirebaseFirestore firestore,
     required FirebaseAuth firebaseAuth,
-  }) : _firestore = firestore,
-       _firebaseAuth = firebaseAuth;
+  })  : _firestore = firestore,
+        _firebaseAuth = firebaseAuth;
 
   final FirebaseFirestore _firestore;
   final FirebaseAuth _firebaseAuth;
@@ -334,11 +335,10 @@ class AdminAuthService {
   /// 🏢 Obtiene administradores de un lugar específico
   Future<List<AdminUser>> getAdminsByPlaceId(String placeId) async {
     try {
-      final query =
-          await _adminUsersRef
-              .where('ownedPlaceIds', arrayContains: placeId)
-              .where('isActive', isEqualTo: true)
-              .get();
+      final query = await _adminUsersRef
+          .where('ownedPlaceIds', arrayContains: placeId)
+          .where('isActive', isEqualTo: true)
+          .get();
 
       return query.docs
           .map((doc) => AdminUser.fromFirestore(doc.data()))
@@ -423,18 +423,16 @@ class AdminAuthService {
       }
 
       // 3. Verificar que no hay solicitud pendiente para este usuario
-      final existingRequestQuery =
-          await _businessOwnerRequestsRef
-              .where('userId', isEqualTo: userId)
-              .where(
-                'status',
-                whereIn: [
-                  BusinessOwnerRequestStatus.pending.name,
-                  BusinessOwnerRequestStatus.reviewing.name,
-                  BusinessOwnerRequestStatus.needsMoreInfo.name,
-                ],
-              )
-              .get();
+      final existingRequestQuery = await _businessOwnerRequestsRef
+          .where('userId', isEqualTo: userId)
+          .where(
+        'status',
+        whereIn: [
+          BusinessOwnerRequestStatus.pending.name,
+          BusinessOwnerRequestStatus.reviewing.name,
+          BusinessOwnerRequestStatus.needsMoreInfo.name,
+        ],
+      ).get();
 
       if (existingRequestQuery.docs.isNotEmpty) {
         throw const AdminAuthException(
@@ -515,11 +513,10 @@ class AdminAuthService {
   Future<BusinessOwnerRequest?> getBusinessOwnerById(String userId) async {
     try {
       // Buscar en la colección por la propiedad userId
-      final query =
-          await _businessOwnerRequestsRef
-              .where('userId', isEqualTo: userId)
-              .limit(1)
-              .get();
+      final query = await _businessOwnerRequestsRef
+          .where('userId', isEqualTo: userId)
+          .limit(1)
+          .get();
 
       if (query.docs.isEmpty) return null;
 
@@ -1013,6 +1010,58 @@ class AdminAuthService {
       });
     } catch (e) {
       print('⚠️ Error enviando notificación de rechazo: $e');
+    }
+  }
+
+  /// 🔍 Busca usuarios administrativos por criterios
+  @override
+  Future<List<AdminUser>> searchAdminUsers({
+    String? email,
+    String? displayName,
+    AdminRole? role,
+    bool? isActive,
+    String? requestedByUid,
+  }) async {
+    try {
+      // Verificar permisos del solicitante
+      if (requestedByUid != null) {
+        final requester = await getAdminUserByUid(requestedByUid);
+        if (requester?.role != AdminRole.superAdmin) {
+          throw const AdminAuthException(
+            'Solo super administradores pueden buscar usuarios',
+          );
+        }
+      }
+
+      Query<Map<String, dynamic>> query = _adminUsersRef;
+
+      // Aplicar filtros
+      if (email != null && email.isNotEmpty) {
+        query = query
+            .where('email', isGreaterThanOrEqualTo: email)
+            .where('email', isLessThan: email + '\uf8ff');
+      }
+
+      if (displayName != null && displayName.isNotEmpty) {
+        query = query
+            .where('displayName', isGreaterThanOrEqualTo: displayName)
+            .where('displayName', isLessThan: displayName + '\uf8ff');
+      }
+
+      if (role != null) {
+        query = query.where('role', isEqualTo: role.name);
+      }
+
+      if (isActive != null) {
+        query = query.where('isActive', isEqualTo: isActive);
+      }
+
+      final querySnapshot = await query.get();
+      return querySnapshot.docs
+          .map((doc) => AdminUser.fromFirestore(doc.data()))
+          .toList();
+    } catch (e) {
+      throw AdminAuthException('Error buscando usuarios: $e');
     }
   }
 }

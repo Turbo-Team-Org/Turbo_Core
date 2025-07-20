@@ -1,15 +1,16 @@
 import 'dart:async';
 
 import 'package:core/src/turbo_core_repositories/admin_auth_repository/admin_auth_repository_imports.dart';
+import 'package:core/src/turbo_core_repositories/admin_auth_repository/interface/admin_auth_interface.dart';
 import 'package:dartz/dartz.dart';
 
 /// 🛠️ Implementación concreta del repositorio
 class AdminAuthRepositoryImpl implements AdminAuthRepository {
   // ignore: public_member_api_docs
-  AdminAuthRepositoryImpl({required AdminAuthService adminAuthService})
-    : _adminAuthService = adminAuthService;
+  AdminAuthRepositoryImpl({required AdminAuthInterface adminAuthService})
+      : _adminAuthService = adminAuthService;
 
-  final AdminAuthService _adminAuthService;
+  final AdminAuthInterface _adminAuthService;
 
   @override
   Stream<Either<AdminAuthFailure, AdminUser?>> get authStateChanges {
@@ -20,7 +21,7 @@ class AdminAuthRepositoryImpl implements AdminAuthRepository {
 
   /// StreamTransformer que convierte errores en eventos Left en lugar de errores
   StreamTransformer<Either<F, T>, Either<F, T>>
-  _errorToLeftTransformer<F, T>() {
+      _errorToLeftTransformer<F, T>() {
     return StreamTransformer<Either<F, T>, Either<F, T>>.fromHandlers(
       handleData: (Either<F, T> data, EventSink<Either<F, T>> sink) {
         sink.add(data);
@@ -234,27 +235,26 @@ class AdminAuthRepositoryImpl implements AdminAuthRepository {
       );
 
       // Aplicar filtros
-      final filteredAdmins =
-          allAdmins.where((admin) {
-            if (email != null &&
-                !admin.email.toLowerCase().contains(email.toLowerCase())) {
-              return false;
-            }
-            if (displayName != null &&
-                (admin.displayName?.toLowerCase().contains(
+      final filteredAdmins = allAdmins.where((admin) {
+        if (email != null &&
+            !admin.email.toLowerCase().contains(email.toLowerCase())) {
+          return false;
+        }
+        if (displayName != null &&
+            (admin.displayName?.toLowerCase().contains(
                       displayName.toLowerCase(),
                     ) !=
-                    true)) {
-              return false;
-            }
-            if (role != null && admin.role != role) {
-              return false;
-            }
-            if (isActive != null && admin.isActive != isActive) {
-              return false;
-            }
-            return true;
-          }).toList();
+                true)) {
+          return false;
+        }
+        if (role != null && admin.role != role) {
+          return false;
+        }
+        if (isActive != null && admin.isActive != isActive) {
+          return false;
+        }
+        return true;
+      }).toList();
 
       return Right(filteredAdmins);
     } catch (e) {
@@ -264,16 +264,16 @@ class AdminAuthRepositoryImpl implements AdminAuthRepository {
 
   @override
   Future<Either<AdminAuthFailure, BusinessOwnerRequest>>
-  signInWithEmailAndPasswordBusinessOwner({
+      signInWithEmailAndPasswordBusinessOwner({
     required String email,
     required String password,
   }) async {
     try {
-      final businessOwnerRequest = await _adminAuthService
-          .signInWithEmailAndPasswordBusinessOwner(
-            email: email,
-            password: password,
-          );
+      final businessOwnerRequest =
+          await _adminAuthService.signInWithEmailAndPasswordBusinessOwner(
+        email: email,
+        password: password,
+      );
       return Right(businessOwnerRequest);
     } catch (e) {
       return Left(_mapExceptionToFailure(e));
@@ -282,7 +282,7 @@ class AdminAuthRepositoryImpl implements AdminAuthRepository {
 
   @override
   Future<Either<AdminAuthFailure, BusinessOwnerRequest>>
-  submitBusinessOwnerRequest({
+      submitBusinessOwnerRequest({
     required String userId,
     required String displayName,
     required String businessName,
@@ -371,7 +371,7 @@ class AdminAuthRepositoryImpl implements AdminAuthRepository {
 
   @override
   Future<Either<AdminAuthFailure, List<BusinessOwnerRequest>>>
-  getAllBusinessOwnerRequests({
+      getAllBusinessOwnerRequests({
     String? requestedByUid,
     BusinessOwnerRequestStatus? filterByStatus,
   }) async {
@@ -388,7 +388,7 @@ class AdminAuthRepositoryImpl implements AdminAuthRepository {
 
   @override
   Future<Either<AdminAuthFailure, BusinessOwnerRequestStats>>
-  getBusinessOwnerRequestStats({String? requestedByUid}) async {
+      getBusinessOwnerRequestStats({String? requestedByUid}) async {
     try {
       final stats = await _adminAuthService.getBusinessOwnerRequestStats(
         requestedByUid: requestedByUid,
@@ -401,7 +401,7 @@ class AdminAuthRepositoryImpl implements AdminAuthRepository {
 
   @override
   Future<Either<AdminAuthFailure, BusinessOwnerRequest?>>
-  getBusinessOwnerRequestById(
+      getBusinessOwnerRequestById(
     String requestId, {
     String? requestedByUid,
   }) async {
@@ -418,7 +418,7 @@ class AdminAuthRepositoryImpl implements AdminAuthRepository {
 
   @override
   Future<Either<AdminAuthFailure, BusinessOwnerRegistrationResult>>
-  registerAndRequestBusinessOwner({
+      registerAndRequestBusinessOwner({
     // Datos de usuario
     required String email,
     required String password,

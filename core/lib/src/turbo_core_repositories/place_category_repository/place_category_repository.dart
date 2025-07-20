@@ -1,10 +1,12 @@
+import 'package:core/src/turbo_core_repositories/place_category_repository/interface/place_category_repository_interface.dart';
 import 'package:core/src/turbo_core_repositories/turbo_core_repositories.dart';
 
-class PlaceCategoryRepository {
-  PlaceCategoryRepository({PlaceCategoryService? placeCategoryService})
-      : _service = placeCategoryService ?? PlaceCategoryService();
+class PlaceCategoryRepository implements PlaceCategoryRepositoryInterface {
+  PlaceCategoryRepository(
+      {required PlaceCategoryRepositoryInterface placeCategoryService})
+      : _service = placeCategoryService;
 
-  final PlaceCategoryService _service;
+  final PlaceCategoryRepositoryInterface _service;
 
   Future<void> upsertPlaceCategory(PlaceCategory placeCategory) async {
     return await _service.upsertPlaceCategory(placeCategory);

@@ -13,6 +13,7 @@ import 'package:core/src/turbo_core_repositories/analytics_repository/service/an
 import 'package:core/src/turbo_core_repositories/analytics_repository/interface/analytics_interface.dart';
 import 'package:core/src/turbo_core_repositories/admin_auth_repository/service/admin_auth_service_supabase.dart';
 import 'package:core/src/turbo_core_repositories/place_repository/service/place_service_supabase.dart';
+import 'package:core/src/turbo_core_repositories/place_category_repository/service/place_category_service_supabase.dart';
 
 /// Initialize dependencies based on environment configuration
 /// Supports dynamic switching between Firebase (dev) and Supabase (staging/prod)
@@ -59,9 +60,9 @@ Future<void> initCoreDependencies({
   print('   - Services: ✅ Completos (Firebase y Supabase)');
   print('   - Interfaces: ✅ Registradas según entorno');
   print(
-      '   - Repositories: ✅ Authentication, Review, Category, Event, Favorite (ambos entornos)');
+      '   - Repositories: ✅ Authentication, Review, Category, Event, Favorite, Location, Place, Analytics, PlaceCategory, Reservation, AdminAuth (ambos entornos)');
   print('   - Uso uniforme: sl<AuthenticationRepository>() en ambos entornos');
-  print('   - TODO: Refactorizar Location, Place, Analytics\n');
+  print('   - ✅ TODOS LOS REPOSITORIOS REFACTORIZADOS Y REGISTRADOS\n');
 }
 
 /// Initialize with environment passed from app/admin panel
@@ -266,6 +267,37 @@ Future<void> _registerFirebaseServices(GetIt sl) async {
     );
     print('   ✅ LocationService (Firebase)');
   }
+
+  // Place Category Service
+  if (!sl.isRegistered<PlaceCategoryRepositoryInterface>()) {
+    sl.registerLazySingleton<PlaceCategoryRepositoryInterface>(
+      () => PlaceCategoryService(
+        firestore: sl<FirebaseFirestore>(),
+      ),
+    );
+    print('   ✅ PlaceCategoryService (Firebase)');
+  }
+
+  // Reservation Service
+  if (!sl.isRegistered<ReservationInterface>()) {
+    sl.registerLazySingleton<ReservationInterface>(
+      () => ReservationService(
+        firestore: sl<FirebaseFirestore>(),
+      ),
+    );
+    print('   ✅ ReservationService (Firebase)');
+  }
+
+  // Admin Auth Service
+  if (!sl.isRegistered<AdminAuthService>()) {
+    sl.registerLazySingleton<AdminAuthService>(
+      () => AdminAuthService(
+        firestore: sl<FirebaseFirestore>(),
+        firebaseAuth: sl<FirebaseAuth>(),
+      ),
+    );
+    print('   ✅ AdminAuthService (Firebase)');
+  }
 }
 
 /// Register Supabase services
@@ -353,6 +385,16 @@ Future<void> _registerSupabaseServices(GetIt sl) async {
     print('   ✅ PlaceServiceSupabase');
   }
 
+  // Place Category Service
+  if (!sl.isRegistered<PlaceCategoryServiceSupabase>()) {
+    sl.registerLazySingleton<PlaceCategoryServiceSupabase>(
+      () => PlaceCategoryServiceSupabase(
+        supabaseClient: sl<SupabaseClient>(),
+      ),
+    );
+    print('   ✅ PlaceCategoryServiceSupabase');
+  }
+
   // Admin Auth Service
   if (!sl.isRegistered<AdminAuthServiceSupabase>()) {
     sl.registerLazySingleton<AdminAuthServiceSupabase>(
@@ -418,6 +460,35 @@ Future<void> _registerSupabaseServices(GetIt sl) async {
       () => sl<PlaceServiceSupabase>(),
     );
     print('   ✅ PlaceInterface -> Supabase');
+  }
+
+  if (!sl.isRegistered<PlaceCategoryRepositoryInterface>()) {
+    sl.registerLazySingleton<PlaceCategoryRepositoryInterface>(
+      () => PlaceCategoryServiceSupabase(
+        supabaseClient: sl<SupabaseClient>(),
+      ),
+    );
+    print('   ✅ PlaceCategoryRepositoryInterface -> Supabase');
+  }
+
+  if (!sl.isRegistered<ReservationInterface>()) {
+    sl.registerLazySingleton<ReservationInterface>(
+      () => ReservationService(
+        firestore: sl<FirebaseFirestore>(),
+      ),
+    );
+    print(
+        '   ✅ ReservationInterface -> Supabase (usando Firebase temporalmente)');
+  }
+
+  if (!sl.isRegistered<AdminAuthService>()) {
+    sl.registerLazySingleton<AdminAuthService>(
+      () => AdminAuthService(
+        firestore: sl<FirebaseFirestore>(),
+        firebaseAuth: sl<FirebaseAuth>(),
+      ),
+    );
+    print('   ✅ AdminAuthService -> Supabase (usando Firebase temporalmente)');
   }
 
   print('🎉 Servicios e interfaces Supabase registrados correctamente');
@@ -556,6 +627,36 @@ void _registerFirebaseRepositories(GetIt sl) {
     print('   ✅ AnalyticsRepository (Firebase)');
   }
 
+  // Place Category Repository
+  if (!sl.isRegistered<PlaceCategoryRepository>()) {
+    sl.registerLazySingleton<PlaceCategoryRepository>(
+      () => PlaceCategoryRepository(
+        placeCategoryService: sl<PlaceCategoryRepositoryInterface>(),
+      ),
+    );
+    print('   ✅ PlaceCategoryRepository (Firebase)');
+  }
+
+  // Reservation Repository
+  if (!sl.isRegistered<ReservationRepository>()) {
+    sl.registerLazySingleton<ReservationRepository>(
+      () => ReservationRepository(
+        reservationService: sl<ReservationInterface>(),
+      ),
+    );
+    print('   ✅ ReservationRepository (Firebase)');
+  }
+
+  // Admin Auth Repository
+  if (!sl.isRegistered<AdminAuthRepository>()) {
+    sl.registerLazySingleton<AdminAuthRepository>(
+      () => AdminAuthRepositoryImpl(
+        adminAuthService: sl<AdminAuthService>(),
+      ),
+    );
+    print('   ✅ AdminAuthRepository (Firebase)');
+  }
+
   print('   🎉 ¡Todos los repositorios refactorizados!');
 }
 
@@ -640,6 +741,37 @@ void _registerSupabaseRepositories(GetIt sl) {
       ),
     );
     print('   ✅ AnalyticsRepository (Supabase)');
+  }
+
+  // Place Category Repository
+  if (!sl.isRegistered<PlaceCategoryRepository>()) {
+    sl.registerLazySingleton<PlaceCategoryRepository>(
+      () => PlaceCategoryRepository(
+        placeCategoryService: sl<PlaceCategoryRepositoryInterface>(),
+      ),
+    );
+    print('   ✅ PlaceCategoryRepository (Supabase)');
+  }
+
+  // Reservation Repository
+  if (!sl.isRegistered<ReservationRepository>()) {
+    sl.registerLazySingleton<ReservationRepository>(
+      () => ReservationRepository(
+        reservationService: sl<ReservationInterface>(),
+      ),
+    );
+    print('   ✅ ReservationRepository (Supabase)');
+  }
+
+  // Admin Auth Repository
+  if (!sl.isRegistered<AdminAuthRepository>()) {
+    sl.registerLazySingleton<AdminAuthRepository>(
+      () => AdminAuthRepositoryImpl(
+        adminAuthService: sl<AdminAuthService>(),
+      ),
+    );
+    print(
+        '   ✅ AdminAuthRepository (Supabase - usando Firebase temporalmente)');
   }
 
   print('   🎉 ¡Todos los repositorios refactorizados!');
