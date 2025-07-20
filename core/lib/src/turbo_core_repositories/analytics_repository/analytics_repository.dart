@@ -1,7 +1,6 @@
 import 'package:core/src/turbo_core_repositories/analytics_repository/interface/analytics_interface.dart';
 import 'package:core/src/turbo_core_repositories/analytics_repository/models/business_dashboard.dart';
 import 'package:core/src/turbo_core_repositories/analytics_repository/models/date_range.dart';
-import 'package:core/src/turbo_core_repositories/analytics_repository/service/analytics_service.dart';
 
 /// Repository responsable de gestionar el sistema de analytics de negocios.
 ///
@@ -12,8 +11,8 @@ class AnalyticsRepository implements AnalyticsInterface {
   /// Constructor
   AnalyticsRepository({required this.analyticsService});
 
-  /// Servicio de analytics
-  final AnalyticsService analyticsService;
+  /// Servicio de analytics (ahora acepta interfaz para flexibilidad de ambiente)
+  final AnalyticsInterface analyticsService;
 
   // ==================== DASHBOARD PRINCIPAL ====================
 

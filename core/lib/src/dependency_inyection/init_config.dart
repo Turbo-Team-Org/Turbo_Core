@@ -51,7 +51,17 @@ Future<void> initCoreDependencies({
   // 4. Register basic services based on current environment
   await _registerBasicServices(sl);
 
+  // 5. Register repositories
+  _registerRepositories(sl);
+
   print('✅ Dependencias Turbo Core inicializadas correctamente\n');
+  print('📋 ESTADO DE REGISTROS:');
+  print('   - Services: ✅ Completos (Firebase y Supabase)');
+  print('   - Interfaces: ✅ Registradas según entorno');
+  print(
+      '   - Repositories: ✅ Authentication, Review, Category, Event, Favorite (ambos entornos)');
+  print('   - Uso uniforme: sl<AuthenticationRepository>() en ambos entornos');
+  print('   - TODO: Refactorizar Location, Place, Analytics\n');
 }
 
 /// Initialize with environment passed from app/admin panel
@@ -260,9 +270,10 @@ Future<void> _registerFirebaseServices(GetIt sl) async {
 
 /// Register Supabase services
 Future<void> _registerSupabaseServices(GetIt sl) async {
+  // Register concrete Supabase services
   // Authentication Service
-  if (!sl.isRegistered<AuthenticationInterface>()) {
-    sl.registerLazySingleton<AuthenticationInterface>(
+  if (!sl.isRegistered<AuthenticationServiceSupabase>()) {
+    sl.registerLazySingleton<AuthenticationServiceSupabase>(
       () => AuthenticationServiceSupabase(
         supabaseClient: sl<SupabaseClient>(),
       ),
@@ -271,8 +282,8 @@ Future<void> _registerSupabaseServices(GetIt sl) async {
   }
 
   // Review Service
-  if (!sl.isRegistered<ReviewInterface>()) {
-    sl.registerLazySingleton<ReviewInterface>(
+  if (!sl.isRegistered<ReviewServiceSupabase>()) {
+    sl.registerLazySingleton<ReviewServiceSupabase>(
       () => ReviewServiceSupabase(
         supabaseClient: sl<SupabaseClient>(),
       ),
@@ -281,8 +292,8 @@ Future<void> _registerSupabaseServices(GetIt sl) async {
   }
 
   // Category Service
-  if (!sl.isRegistered<CategoryInterface>()) {
-    sl.registerLazySingleton<CategoryInterface>(
+  if (!sl.isRegistered<CategoryServiceSupabase>()) {
+    sl.registerLazySingleton<CategoryServiceSupabase>(
       () => CategoryServiceSupabase(
         supabaseClient: sl<SupabaseClient>(),
       ),
@@ -291,8 +302,8 @@ Future<void> _registerSupabaseServices(GetIt sl) async {
   }
 
   // Event Service
-  if (!sl.isRegistered<EventInterface>()) {
-    sl.registerLazySingleton<EventInterface>(
+  if (!sl.isRegistered<EventServiceSupabase>()) {
+    sl.registerLazySingleton<EventServiceSupabase>(
       () => EventServiceSupabase(
         supabaseClient: sl<SupabaseClient>(),
       ),
@@ -301,8 +312,8 @@ Future<void> _registerSupabaseServices(GetIt sl) async {
   }
 
   // Favorite Service
-  if (!sl.isRegistered<FavoriteInterface>()) {
-    sl.registerLazySingleton<FavoriteInterface>(
+  if (!sl.isRegistered<FavoriteServiceSupabase>()) {
+    sl.registerLazySingleton<FavoriteServiceSupabase>(
       () => FavoriteServiceSupabase(
         supabaseClient: sl<SupabaseClient>(),
       ),
@@ -311,8 +322,8 @@ Future<void> _registerSupabaseServices(GetIt sl) async {
   }
 
   // Location Service
-  if (!sl.isRegistered<LocationInterface>()) {
-    sl.registerLazySingleton<LocationInterface>(
+  if (!sl.isRegistered<LocationServiceSupabase>()) {
+    sl.registerLazySingleton<LocationServiceSupabase>(
       () => LocationServiceSupabase(
         supabaseClient: sl<SupabaseClient>(),
       ),
@@ -321,8 +332,8 @@ Future<void> _registerSupabaseServices(GetIt sl) async {
   }
 
   // Analytics Service
-  if (!sl.isRegistered<AnalyticsInterface>()) {
-    sl.registerLazySingleton<AnalyticsInterface>(
+  if (!sl.isRegistered<AnalyticsServiceSupabase>()) {
+    sl.registerLazySingleton<AnalyticsServiceSupabase>(
       () => AnalyticsServiceSupabase(
         supabaseClient: sl<SupabaseClient>(),
       ),
@@ -330,12 +341,12 @@ Future<void> _registerSupabaseServices(GetIt sl) async {
     print('   ✅ AnalyticsServiceSupabase');
   }
 
-  // Place Service (requiere AnalyticsInterface)
-  if (!sl.isRegistered<PlaceInterface>()) {
-    sl.registerLazySingleton<PlaceInterface>(
+  // Place Service (requiere AnalyticsServiceSupabase)
+  if (!sl.isRegistered<PlaceServiceSupabase>()) {
+    sl.registerLazySingleton<PlaceServiceSupabase>(
       () => PlaceServiceSupabase(
         supabase: sl<SupabaseClient>(),
-        analyticsService: sl<AnalyticsInterface>(),
+        analyticsService: sl<AnalyticsServiceSupabase>(),
         authorization: sl<PlaceAuthorizationInterface>(),
       ),
     );
@@ -352,10 +363,64 @@ Future<void> _registerSupabaseServices(GetIt sl) async {
     print('   ✅ AdminAuthServiceSupabase');
   }
 
-  print('🎉 Servicios avanzados para Supabase completados:');
-  print('   - Analytics con métricas empresariales');
-  print('   - Places con auto-inicialización de analytics');
-  print('   - Admin Auth con gestión de usuarios');
+  // Register interfaces pointing to Supabase implementations
+  if (!sl.isRegistered<AuthenticationInterface>()) {
+    sl.registerLazySingleton<AuthenticationInterface>(
+      () => sl<AuthenticationServiceSupabase>(),
+    );
+    print('   ✅ AuthenticationInterface -> Supabase');
+  }
+
+  if (!sl.isRegistered<ReviewInterface>()) {
+    sl.registerLazySingleton<ReviewInterface>(
+      () => sl<ReviewServiceSupabase>(),
+    );
+    print('   ✅ ReviewInterface -> Supabase');
+  }
+
+  if (!sl.isRegistered<CategoryInterface>()) {
+    sl.registerLazySingleton<CategoryInterface>(
+      () => sl<CategoryServiceSupabase>(),
+    );
+    print('   ✅ CategoryInterface -> Supabase');
+  }
+
+  if (!sl.isRegistered<EventInterface>()) {
+    sl.registerLazySingleton<EventInterface>(
+      () => sl<EventServiceSupabase>(),
+    );
+    print('   ✅ EventInterface -> Supabase');
+  }
+
+  if (!sl.isRegistered<FavoriteInterface>()) {
+    sl.registerLazySingleton<FavoriteInterface>(
+      () => sl<FavoriteServiceSupabase>(),
+    );
+    print('   ✅ FavoriteInterface -> Supabase');
+  }
+
+  if (!sl.isRegistered<LocationInterface>()) {
+    sl.registerLazySingleton<LocationInterface>(
+      () => sl<LocationServiceSupabase>(),
+    );
+    print('   ✅ LocationInterface -> Supabase');
+  }
+
+  if (!sl.isRegistered<AnalyticsInterface>()) {
+    sl.registerLazySingleton<AnalyticsInterface>(
+      () => sl<AnalyticsServiceSupabase>(),
+    );
+    print('   ✅ AnalyticsInterface -> Supabase');
+  }
+
+  if (!sl.isRegistered<PlaceInterface>()) {
+    sl.registerLazySingleton<PlaceInterface>(
+      () => sl<PlaceServiceSupabase>(),
+    );
+    print('   ✅ PlaceInterface -> Supabase');
+  }
+
+  print('🎉 Servicios e interfaces Supabase registrados correctamente');
 }
 
 /// Utility function to check if a specific repository is available in current environment
@@ -389,4 +454,193 @@ Map<String, dynamic> _getSafeEnvironmentInfo() {
       'error': 'dotenv_not_initialized',
     };
   }
+}
+
+/// Register repositories layer (uses services)
+void _registerRepositories(GetIt sl) {
+  print('📦 Registrando repositorios...');
+
+  // Note: Repositories need concrete service classes, not interfaces
+  // Get current environment to determine which concrete service to use
+  final provider = HybridDatabaseConfig.currentProvider;
+
+  if (provider == DatabaseProvider.firebase) {
+    _registerFirebaseRepositories(sl);
+  } else if (provider == DatabaseProvider.supabase) {
+    _registerSupabaseRepositories(sl);
+  }
+
+  print('🎯 Repositorios registrados correctamente');
+}
+
+/// Register repositories for Firebase environment
+void _registerFirebaseRepositories(GetIt sl) {
+  // Authentication Repository
+  if (!sl.isRegistered<AuthenticationRepository>()) {
+    sl.registerLazySingleton<AuthenticationRepository>(
+      () => AuthenticationRepository(
+        authService: sl<AuthenticationInterface>(),
+      ),
+    );
+    print('   ✅ AuthenticationRepository (Firebase)');
+  }
+
+  // Review Repository
+  if (!sl.isRegistered<ReviewRepository>()) {
+    sl.registerLazySingleton<ReviewRepository>(
+      () => ReviewRepository(
+        reviewService: sl<ReviewInterface>(),
+      ),
+    );
+    print('   ✅ ReviewRepository (Firebase)');
+  }
+
+  // Category Repository
+  if (!sl.isRegistered<CategoryRepository>()) {
+    sl.registerLazySingleton<CategoryRepository>(
+      () => CategoryRepository(
+        categoryService: sl<CategoryInterface>(),
+        placeCategoryService: sl<PlaceCategoryService>(),
+      ),
+    );
+    print('   ✅ CategoryRepository (Firebase)');
+  }
+
+  // Event Repository
+  if (!sl.isRegistered<EventRepository>()) {
+    sl.registerLazySingleton<EventRepository>(
+      () => EventRepository(
+        eventService: sl<EventInterface>(),
+      ),
+    );
+    print('   ✅ EventRepository (Firebase)');
+  }
+
+  // Favorite Repository
+  if (!sl.isRegistered<FavoriteRepository>()) {
+    sl.registerLazySingleton<FavoriteRepository>(
+      () => FavoriteRepository(
+        favoriteService: sl<FavoriteInterface>(),
+      ),
+    );
+    print('   ✅ FavoriteRepository (Firebase)');
+  }
+
+  // Location Repository
+  if (!sl.isRegistered<LocationRepository>()) {
+    sl.registerLazySingleton<LocationRepository>(
+      () => LocationRepository(
+        locationService: sl<LocationInterface>(),
+      ),
+    );
+    print('   ✅ LocationRepository (Firebase)');
+  }
+
+  // Place Repository
+  if (!sl.isRegistered<PlaceRepository>()) {
+    sl.registerLazySingleton<PlaceRepository>(
+      () => PlaceRepository(
+        placeService: sl<PlaceInterface>(),
+      ),
+    );
+    print('   ✅ PlaceRepository (Firebase)');
+  }
+
+  // Analytics Repository
+  if (!sl.isRegistered<AnalyticsRepository>()) {
+    sl.registerLazySingleton<AnalyticsRepository>(
+      () => AnalyticsRepository(
+        analyticsService: sl<AnalyticsInterface>(),
+      ),
+    );
+    print('   ✅ AnalyticsRepository (Firebase)');
+  }
+
+  print('   🎉 ¡Todos los repositorios refactorizados!');
+}
+
+/// Register repositories for Supabase environment
+void _registerSupabaseRepositories(GetIt sl) {
+  // Authentication Repository
+  if (!sl.isRegistered<AuthenticationRepository>()) {
+    sl.registerLazySingleton<AuthenticationRepository>(
+      () => AuthenticationRepository(
+        authService: sl<AuthenticationInterface>(),
+      ),
+    );
+    print('   ✅ AuthenticationRepository (Supabase)');
+  }
+
+  // Review Repository
+  if (!sl.isRegistered<ReviewRepository>()) {
+    sl.registerLazySingleton<ReviewRepository>(
+      () => ReviewRepository(
+        reviewService: sl<ReviewInterface>(),
+      ),
+    );
+    print('   ✅ ReviewRepository (Supabase)');
+  }
+
+  // Category Repository
+  if (!sl.isRegistered<CategoryRepository>()) {
+    sl.registerLazySingleton<CategoryRepository>(
+      () => CategoryRepository(
+        categoryService: sl<CategoryInterface>(),
+        placeCategoryService: sl<PlaceCategoryService>(),
+      ),
+    );
+    print('   ✅ CategoryRepository (Supabase)');
+  }
+
+  // Event Repository
+  if (!sl.isRegistered<EventRepository>()) {
+    sl.registerLazySingleton<EventRepository>(
+      () => EventRepository(
+        eventService: sl<EventInterface>(),
+      ),
+    );
+    print('   ✅ EventRepository (Supabase)');
+  }
+
+  // Favorite Repository
+  if (!sl.isRegistered<FavoriteRepository>()) {
+    sl.registerLazySingleton<FavoriteRepository>(
+      () => FavoriteRepository(
+        favoriteService: sl<FavoriteInterface>(),
+      ),
+    );
+    print('   ✅ FavoriteRepository (Supabase)');
+  }
+
+  // Location Repository
+  if (!sl.isRegistered<LocationRepository>()) {
+    sl.registerLazySingleton<LocationRepository>(
+      () => LocationRepository(
+        locationService: sl<LocationInterface>(),
+      ),
+    );
+    print('   ✅ LocationRepository (Supabase)');
+  }
+
+  // Place Repository
+  if (!sl.isRegistered<PlaceRepository>()) {
+    sl.registerLazySingleton<PlaceRepository>(
+      () => PlaceRepository(
+        placeService: sl<PlaceInterface>(),
+      ),
+    );
+    print('   ✅ PlaceRepository (Supabase)');
+  }
+
+  // Analytics Repository
+  if (!sl.isRegistered<AnalyticsRepository>()) {
+    sl.registerLazySingleton<AnalyticsRepository>(
+      () => AnalyticsRepository(
+        analyticsService: sl<AnalyticsInterface>(),
+      ),
+    );
+    print('   ✅ AnalyticsRepository (Supabase)');
+  }
+
+  print('   🎉 ¡Todos los repositorios refactorizados!');
 }

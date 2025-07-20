@@ -6,6 +6,8 @@ import 'package:core/src/turbo_core_repositories/place_repository/models/place/p
 import 'package:core/src/turbo_core_repositories/place_repository/place_repository.dart';
 import 'package:core/src/turbo_core_repositories/review_repository/models/review.dart';
 
+import '../models/place_owner_analytics.dart';
+
 /// Place service
 class PlaceService implements PlaceInterface {
   /// Constructor
@@ -32,18 +34,16 @@ class PlaceService implements PlaceInterface {
 
       for (final doc in placesSnapshot.docs) {
         final place = Place.fromFirestore(doc);
-        final reviewsSnapshot =
-            await firestore
-                .collection('reviews')
-                .where('placeId', isEqualTo: place.id)
-                .orderBy('date', descending: true)
-                .limit(20)
-                .get();
+        final reviewsSnapshot = await firestore
+            .collection('reviews')
+            .where('placeId', isEqualTo: place.id)
+            .orderBy('date', descending: true)
+            .limit(20)
+            .get();
 
-        final reviews =
-            reviewsSnapshot.docs
-                .map((doc) => Review.fromFirestore(doc.data()))
-                .toList();
+        final reviews = reviewsSnapshot.docs
+            .map((doc) => Review.fromFirestore(doc.data()))
+            .toList();
 
         places.add(place.copyWith(reviews: reviews));
       }
@@ -64,18 +64,16 @@ class PlaceService implements PlaceInterface {
       }
 
       final place = Place.fromFirestore(doc);
-      final reviewsSnapshot =
-          await firestore
-              .collection('reviews')
-              .where('placeId', isEqualTo: place.id)
-              .orderBy('date', descending: true)
-              .limit(20)
-              .get();
+      final reviewsSnapshot = await firestore
+          .collection('reviews')
+          .where('placeId', isEqualTo: place.id)
+          .orderBy('date', descending: true)
+          .limit(20)
+          .get();
 
-      final reviews =
-          reviewsSnapshot.docs
-              .map((doc) => Review.fromFirestore(doc.data()))
-              .toList();
+      final reviews = reviewsSnapshot.docs
+          .map((doc) => Review.fromFirestore(doc.data()))
+          .toList();
 
       return place.copyWith(reviews: reviews);
     } catch (e) {
@@ -86,29 +84,26 @@ class PlaceService implements PlaceInterface {
   @override
   Future<Place> getPlaceByName(String name) async {
     try {
-      final querySnapshot =
-          await firestore
-              .collection('places')
-              .where('name', isEqualTo: name)
-              .get();
+      final querySnapshot = await firestore
+          .collection('places')
+          .where('name', isEqualTo: name)
+          .get();
 
       if (querySnapshot.docs.isEmpty) {
         throw Exception('Place not found');
       }
 
       final place = Place.fromFirestore(querySnapshot.docs.first);
-      final reviewsSnapshot =
-          await firestore
-              .collection('reviews')
-              .where('placeId', isEqualTo: place.id)
-              .orderBy('date', descending: true)
-              .limit(20)
-              .get();
+      final reviewsSnapshot = await firestore
+          .collection('reviews')
+          .where('placeId', isEqualTo: place.id)
+          .orderBy('date', descending: true)
+          .limit(20)
+          .get();
 
-      final reviews =
-          reviewsSnapshot.docs
-              .map((doc) => Review.fromFirestore(doc.data()))
-              .toList();
+      final reviews = reviewsSnapshot.docs
+          .map((doc) => Review.fromFirestore(doc.data()))
+          .toList();
 
       return place.copyWith(reviews: reviews);
     } catch (e) {
@@ -119,28 +114,25 @@ class PlaceService implements PlaceInterface {
   @override
   Future<List<Place>> getPlacesByCategory(String categoryId) async {
     try {
-      final querySnapshot =
-          await firestore
-              .collection('places')
-              .where('categoryId', isEqualTo: categoryId)
-              .get();
+      final querySnapshot = await firestore
+          .collection('places')
+          .where('categoryId', isEqualTo: categoryId)
+          .get();
 
       final places = <Place>[];
 
       for (final doc in querySnapshot.docs) {
         final place = Place.fromFirestore(doc);
-        final reviewsSnapshot =
-            await firestore
-                .collection('reviews')
-                .where('placeId', isEqualTo: place.id)
-                .orderBy('date', descending: true)
-                .limit(20)
-                .get();
+        final reviewsSnapshot = await firestore
+            .collection('reviews')
+            .where('placeId', isEqualTo: place.id)
+            .orderBy('date', descending: true)
+            .limit(20)
+            .get();
 
-        final reviews =
-            reviewsSnapshot.docs
-                .map((doc) => Review.fromFirestore(doc.data()))
-                .toList();
+        final reviews = reviewsSnapshot.docs
+            .map((doc) => Review.fromFirestore(doc.data()))
+            .toList();
 
         places.add(place.copyWith(reviews: reviews));
       }
@@ -156,28 +148,25 @@ class PlaceService implements PlaceInterface {
   /// 🏢 Gets places owned by a specific admin user
   Future<List<Place>> getPlacesByOwnerId(String ownerId) async {
     try {
-      final querySnapshot =
-          await firestore
-              .collection('places')
-              .where('ownerIds', arrayContains: ownerId)
-              .get();
+      final querySnapshot = await firestore
+          .collection('places')
+          .where('ownerIds', arrayContains: ownerId)
+          .get();
 
       final places = <Place>[];
 
       for (final doc in querySnapshot.docs) {
         final place = Place.fromFirestore(doc);
-        final reviewsSnapshot =
-            await firestore
-                .collection('reviews')
-                .where('placeId', isEqualTo: place.id)
-                .orderBy('date', descending: true)
-                .limit(20)
-                .get();
+        final reviewsSnapshot = await firestore
+            .collection('reviews')
+            .where('placeId', isEqualTo: place.id)
+            .orderBy('date', descending: true)
+            .limit(20)
+            .get();
 
-        final reviews =
-            reviewsSnapshot.docs
-                .map((doc) => Review.fromFirestore(doc.data()))
-                .toList();
+        final reviews = reviewsSnapshot.docs
+            .map((doc) => Review.fromFirestore(doc.data()))
+            .toList();
 
         places.add(place.copyWith(reviews: reviews));
       }
@@ -198,29 +187,26 @@ class PlaceService implements PlaceInterface {
       for (int i = 0; i < ownerIds.length; i += batchSize) {
         final batch = ownerIds.skip(i).take(batchSize).toList();
 
-        final querySnapshot =
-            await firestore
-                .collection('places')
-                .where('ownerIds', arrayContainsAny: batch)
-                .get();
+        final querySnapshot = await firestore
+            .collection('places')
+            .where('ownerIds', arrayContainsAny: batch)
+            .get();
 
         for (final doc in querySnapshot.docs) {
           final place = Place.fromFirestore(doc);
 
           // Avoid duplicates
           if (!places.any((p) => p.id == place.id)) {
-            final reviewsSnapshot =
-                await firestore
-                    .collection('reviews')
-                    .where('placeId', isEqualTo: place.id)
-                    .orderBy('date', descending: true)
-                    .limit(20)
-                    .get();
+            final reviewsSnapshot = await firestore
+                .collection('reviews')
+                .where('placeId', isEqualTo: place.id)
+                .orderBy('date', descending: true)
+                .limit(20)
+                .get();
 
-            final reviews =
-                reviewsSnapshot.docs
-                    .map((doc) => Review.fromFirestore(doc.data()))
-                    .toList();
+            final reviews = reviewsSnapshot.docs
+                .map((doc) => Review.fromFirestore(doc.data()))
+                .toList();
 
             places.add(place.copyWith(reviews: reviews));
           }
@@ -290,11 +276,10 @@ class PlaceService implements PlaceInterface {
         for (int i = 0; i < placeIds.length; i += batchSize) {
           final batchIds = placeIds.skip(i).take(batchSize).toList();
 
-          final batchSnapshot =
-              await firestore
-                  .collection('analytics_places')
-                  .where('placeId', whereIn: batchIds)
-                  .get();
+          final batchSnapshot = await firestore
+              .collection('analytics_places')
+              .where('placeId', whereIn: batchIds)
+              .get();
 
           allSnapshots.add(batchSnapshot);
         }
@@ -313,23 +298,40 @@ class PlaceService implements PlaceInterface {
         print('Analytics not available, using calculated values: $e');
       }
 
-      return PlaceOwnerAnalytics(
-        ownerId: ownerId,
-        totalPlaces: ownerPlaces.length,
-        totalViews: totalViews,
-        totalReviews: totalReviews,
-        averageRating:
+      // Calculate monthly views (simplified)
+      final monthlyViews = <String, int>{};
+      final now = DateTime.now();
+      for (int i = 0; i < 12; i++) {
+        final month = DateTime(now.year, now.month - i, 1);
+        final monthKey =
+            '${month.year}-${month.month.toString().padLeft(2, '0')}';
+        monthlyViews[monthKey] = totalViews ~/ 12; // Simplified distribution
+      }
+
+      // Top performing places
+      final topPerformingPlaces = ownerPlaces
+          .take(5)
+          .map((place) => PlacePerformance(
+                placeId: place.id,
+                placeName: place.name,
+                views: place.favoriteCount,
+                reviews: place.reviews.length,
+                rating: place.rating,
+                favorites: place.favoriteCount,
+              ))
+          .toList();
+
+      return PlaceOwnerAnalytics.fromData(ownerId, {
+        'totalPlaces': ownerPlaces.length,
+        'totalViews': totalViews,
+        'totalReviews': totalReviews,
+        'averageRating':
             ownerPlaces.isNotEmpty ? totalRating / ownerPlaces.length : 0.0,
-        totalFavorites: totalFavorites,
-        placesWithHighRating: placesWithHighRating,
-        placesNeedingAttention: placesNeedingAttention,
-        monthlyMetrics: {
-          'currentMonth': DateTime.now().month,
-          'placesAdded': 0, // This would require historical tracking
-          'avgViewsPerPlace':
-              ownerPlaces.isNotEmpty ? totalViews / ownerPlaces.length : 0,
-        },
-      );
+        'totalFavorites': totalFavorites,
+        'monthlyViews': monthlyViews,
+        'topPerformingPlaces':
+            topPerformingPlaces.map((e) => e.toJson()).toList(),
+      });
     } catch (e) {
       throw Exception('Error getting analytics by owner: $e');
     }
@@ -339,10 +341,9 @@ class PlaceService implements PlaceInterface {
   Future<void> addPlace(Place place) async {
     try {
       // Ensure place has a valid ID
-      final placeId =
-          place.id.isNotEmpty
-              ? place.id
-              : firestore.collection('places').doc().id;
+      final placeId = place.id.isNotEmpty
+          ? place.id
+          : firestore.collection('places').doc().id;
       final placeWithId = place.copyWith(id: placeId);
 
       // 1. Crear el documento del lugar

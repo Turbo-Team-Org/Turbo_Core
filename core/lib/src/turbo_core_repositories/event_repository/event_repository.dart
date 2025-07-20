@@ -1,6 +1,6 @@
 import 'package:core/src/turbo_core_repositories/event_repository/interface/event_interface.dart';
 import 'package:core/src/turbo_core_repositories/event_repository/models/event.dart';
-import 'package:core/src/turbo_core_repositories/event_repository/service/event_service.dart';
+import 'package:core/src/turbo_core_repositories/event_repository/models/event_analytics.dart';
 
 /// Repository for managing events and their operations.
 ///
@@ -11,8 +11,8 @@ class EventRepository implements EventInterface {
   /// Constructor for the EventRepository.
   EventRepository({required this.eventService});
 
-  /// Event service instance for data operations
-  final EventService eventService;
+  /// Event service instance for data operations (now accepts interface for environment flexibility)
+  final EventInterface eventService;
 
   // ==================== READ OPERATIONS ====================
 
@@ -298,13 +298,11 @@ class EventRepository implements EventInterface {
         final titleMatches = event.title.toLowerCase().contains(lowercaseQuery);
 
         // Safe checking for description (may be empty string from Firestore)
-        final descriptionMatches =
-            event.description.isNotEmpty &&
+        final descriptionMatches = event.description.isNotEmpty &&
             event.description.toLowerCase().contains(lowercaseQuery);
 
         // Safe checking for tags (may be empty list from Firestore)
-        final tagsMatch =
-            event.tags.isNotEmpty &&
+        final tagsMatch = event.tags.isNotEmpty &&
             event.tags.any((tag) => tag.toLowerCase().contains(lowercaseQuery));
 
         return titleMatches || descriptionMatches || tagsMatch;
@@ -348,9 +346,10 @@ class EventRepository implements EventInterface {
       final allEvents = await eventService.getEvents();
       final now = DateTime.now();
 
-      final upcomingEvents =
-          allEvents.where((event) => event.date.isAfter(now)).toList()
-            ..sort((a, b) => a.date.compareTo(b.date));
+      final upcomingEvents = allEvents
+          .where((event) => event.date.isAfter(now))
+          .toList()
+        ..sort((a, b) => a.date.compareTo(b.date));
 
       if (limit != null && limit > 0) {
         return upcomingEvents.take(limit).toList();
@@ -372,9 +371,10 @@ class EventRepository implements EventInterface {
       final allEvents = await eventService.getEvents();
       final now = DateTime.now();
 
-      final pastEvents =
-          allEvents.where((event) => event.date.isBefore(now)).toList()
-            ..sort((a, b) => b.date.compareTo(a.date)); // Most recent first
+      final pastEvents = allEvents
+          .where((event) => event.date.isBefore(now))
+          .toList()
+        ..sort((a, b) => b.date.compareTo(a.date)); // Most recent first
 
       if (limit != null && limit > 0) {
         return pastEvents.take(limit).toList();
@@ -446,8 +446,8 @@ class EventRepository implements EventInterface {
     try {
       final allEvents = await eventService.getEvents();
 
-      final sortedEvents =
-          allEvents.toList()..sort((a, b) => b.date.compareTo(a.date));
+      final sortedEvents = allEvents.toList()
+        ..sort((a, b) => b.date.compareTo(a.date));
 
       if (limit != null && limit > 0) {
         return sortedEvents.take(limit).toList();
@@ -457,148 +457,5 @@ class EventRepository implements EventInterface {
     } catch (e) {
       throw Exception('Error al obtener eventos ordenados por fecha: $e');
     }
-  }
-}
-
-/// 📊 Analytics data for events managed by an admin user
-class EventAnalytics {
-  const EventAnalytics({
-    required this.adminUserId,
-    required this.totalEvents,
-    required this.activeEvents,
-    required this.pastEvents,
-    required this.upcomingEvents,
-    required this.totalAttendees,
-    required this.averageAttendees,
-    required this.eventsByType,
-    required this.monthlyEventCount,
-    required this.topPerformingEvents,
-  });
-
-  /// ID del administrador
-  final String adminUserId;
-
-  /// Total de eventos en todas sus propiedades
-  final int totalEvents;
-
-  /// Eventos actualmente activos
-  final int activeEvents;
-
-  /// Eventos pasados
-  final int pastEvents;
-
-  /// Eventos próximos
-  final int upcomingEvents;
-
-  /// Total de asistentes en todos los eventos
-  final int totalAttendees;
-
-  /// Promedio de asistentes por evento
-  final double averageAttendees;
-
-  /// Distribución de eventos por tipo
-  final Map<EventType, int> eventsByType;
-
-  /// Conteo de eventos por mes
-  final Map<String, int> monthlyEventCount;
-
-  /// Eventos con mejor rendimiento
-  final List<EventPerformance> topPerformingEvents;
-
-  /// Factory para crear desde datos de Firebase
-  factory EventAnalytics.fromData(
-    String adminUserId,
-    Map<String, dynamic> data,
-  ) {
-    return EventAnalytics(
-      adminUserId: adminUserId,
-      totalEvents: data['totalEvents'] as int? ?? 0,
-      activeEvents: data['activeEvents'] as int? ?? 0,
-      pastEvents: data['pastEvents'] as int? ?? 0,
-      upcomingEvents: data['upcomingEvents'] as int? ?? 0,
-      totalAttendees: data['totalAttendees'] as int? ?? 0,
-      averageAttendees: (data['averageAttendees'] as num?)?.toDouble() ?? 0.0,
-      eventsByType: Map<EventType, int>.fromEntries(
-        (data['eventsByType'] as Map<String, dynamic>? ?? {}).entries.map(
-          (entry) => MapEntry(
-            EventType.values.firstWhere(
-              (type) => type.toString().split('.').last == entry.key,
-              orElse: () => EventType.offer,
-            ),
-            entry.value as int,
-          ),
-        ),
-      ),
-      monthlyEventCount: Map<String, int>.from(
-        data['monthlyEventCount'] as Map<String, dynamic>? ?? {},
-      ),
-      topPerformingEvents:
-          (data['topPerformingEvents'] as List<dynamic>? ?? [])
-              .map(
-                (item) =>
-                    EventPerformance.fromJson(item as Map<String, dynamic>),
-              )
-              .toList(),
-    );
-  }
-
-  /// Convierte a JSON para storage
-  Map<String, dynamic> toJson() {
-    return {
-      'adminUserId': adminUserId,
-      'totalEvents': totalEvents,
-      'activeEvents': activeEvents,
-      'pastEvents': pastEvents,
-      'upcomingEvents': upcomingEvents,
-      'totalAttendees': totalAttendees,
-      'averageAttendees': averageAttendees,
-      'eventsByType': eventsByType.map(
-        (type, count) => MapEntry(type.toString().split('.').last, count),
-      ),
-      'monthlyEventCount': monthlyEventCount,
-      'topPerformingEvents':
-          topPerformingEvents.map((e) => e.toJson()).toList(),
-    };
-  }
-}
-
-/// 🎯 Performance data for individual events
-class EventPerformance {
-  const EventPerformance({
-    required this.eventId,
-    required this.eventName,
-    required this.attendees,
-    required this.views,
-    required this.conversionRate,
-    required this.rating,
-  });
-
-  final String eventId;
-  final String eventName;
-  final int attendees;
-  final int views;
-  final double conversionRate;
-  final double rating;
-
-  factory EventPerformance.fromJson(Map<String, dynamic> json) {
-    return EventPerformance(
-      eventId: json['eventId'] as String,
-      eventName: json['eventName'] as String,
-      attendees: json['attendees'] as int,
-      views: json['views'] as int,
-      conversionRate: (json['conversionRate'] as num).toDouble(),
-      rating: (json['rating'] as num).toDouble(),
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'eventId': eventId,
-      'eventName': eventName,
-      'attendees': attendees,
-      'views': views,
-      'conversionRate': conversionRate,
-      'rating': rating,
-    };
   }
 }

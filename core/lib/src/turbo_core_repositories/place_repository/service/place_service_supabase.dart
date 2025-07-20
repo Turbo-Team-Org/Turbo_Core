@@ -2,6 +2,7 @@ import 'package:core/src/turbo_core_repositories/analytics_repository/interface/
 import 'package:core/src/turbo_core_repositories/place_repository/interface/place_authorization_interface.dart';
 import 'package:core/src/turbo_core_repositories/place_repository/interface/place_interface.dart';
 import 'package:core/src/turbo_core_repositories/place_repository/models/place/place.dart';
+import 'package:core/src/turbo_core_repositories/place_repository/models/place_owner_analytics.dart';
 import 'package:core/src/turbo_core_repositories/review_repository/models/review.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:uuid/uuid.dart';
@@ -250,6 +251,74 @@ class PlaceServiceSupabase implements PlaceInterface {
       return await getPlaceById(placeId);
     } catch (e) {
       throw Exception('Error updating place ownership: $e');
+    }
+  }
+
+  /// 📊 Gets analytics summary for places owned by an admin
+  @override
+  Future<PlaceOwnerAnalytics> getPlaceAnalyticsByOwnerId(String ownerId) async {
+    try {
+      final places = await getPlacesByOwnerId(ownerId);
+
+      if (places.isEmpty) {
+        return PlaceOwnerAnalytics.fromData(ownerId, {
+          'totalPlaces': 0,
+          'totalViews': 0,
+          'totalReviews': 0,
+          'averageRating': 0.0,
+          'totalFavorites': 0,
+          'monthlyViews': <String, int>{},
+          'topPerformingPlaces': <Map<String, dynamic>>[],
+        });
+      }
+
+      // Calculate analytics
+      final totalPlaces = places.length;
+      final totalViews =
+          places.fold(0, (sum, place) => sum + place.favoriteCount);
+      final totalReviews =
+          places.fold(0, (sum, place) => sum + place.reviews.length);
+      final averageRating = places.isNotEmpty
+          ? places.fold(0.0, (sum, place) => sum + place.rating) / places.length
+          : 0.0;
+      final totalFavorites =
+          places.fold(0, (sum, place) => sum + place.favoriteCount);
+
+      // Monthly views (simplified)
+      final monthlyViews = <String, int>{};
+      final now = DateTime.now();
+      for (int i = 0; i < 12; i++) {
+        final month = DateTime(now.year, now.month - i, 1);
+        final monthKey =
+            '${month.year}-${month.month.toString().padLeft(2, '0')}';
+        monthlyViews[monthKey] = totalViews ~/ 12; // Simplified distribution
+      }
+
+      // Top performing places
+      final topPerformingPlaces = places
+          .take(5)
+          .map((place) => PlacePerformance(
+                placeId: place.id,
+                placeName: place.name,
+                views: place.favoriteCount,
+                reviews: place.reviews.length,
+                rating: place.rating,
+                favorites: place.favoriteCount,
+              ))
+          .toList();
+
+      return PlaceOwnerAnalytics.fromData(ownerId, {
+        'totalPlaces': totalPlaces,
+        'totalViews': totalViews,
+        'totalReviews': totalReviews,
+        'averageRating': averageRating,
+        'totalFavorites': totalFavorites,
+        'monthlyViews': monthlyViews,
+        'topPerformingPlaces':
+            topPerformingPlaces.map((e) => e.toJson()).toList(),
+      });
+    } catch (e) {
+      throw Exception('Error getting place analytics by owner: $e');
     }
   }
 
