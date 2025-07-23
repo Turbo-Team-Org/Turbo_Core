@@ -8,11 +8,11 @@ class CategoryRepository {
   /// Constructor for the CategoryRepository.
   CategoryRepository({
     required CategoryInterface categoryService,
-    required PlaceCategoryService placeCategoryService,
+    required PlaceCategoryRepositoryInterface placeCategoryService,
   })  : _categoryService = categoryService,
         _placeCategoryService = placeCategoryService;
   final CategoryInterface _categoryService;
-  final PlaceCategoryService _placeCategoryService;
+  final PlaceCategoryRepositoryInterface _placeCategoryService;
 
   /// Gets all categories.
   Future<List<Category>> getAllCategories() async {

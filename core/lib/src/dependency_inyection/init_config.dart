@@ -583,7 +583,7 @@ void _registerFirebaseRepositories(GetIt sl) {
     sl.registerLazySingleton<CategoryRepository>(
       () => CategoryRepository(
         categoryService: sl<CategoryInterface>(),
-        placeCategoryService: sl<PlaceCategoryService>(),
+        placeCategoryService: sl<PlaceCategoryRepositoryInterface>(),
       ),
     );
     print('   ✅ CategoryRepository (Firebase)');
@@ -699,7 +699,7 @@ void _registerSupabaseRepositories(GetIt sl) {
     sl.registerLazySingleton<CategoryRepository>(
       () => CategoryRepository(
         categoryService: sl<CategoryInterface>(),
-        placeCategoryService: sl<PlaceCategoryService>(),
+        placeCategoryService: sl<PlaceCategoryRepositoryInterface>(),
       ),
     );
     print('   ✅ CategoryRepository (Supabase)');

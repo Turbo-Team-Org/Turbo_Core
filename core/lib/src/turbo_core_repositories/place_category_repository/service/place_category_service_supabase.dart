@@ -1,6 +1,7 @@
 import 'package:core/src/turbo_core_repositories/place_category_repository/interface/place_category_repository_interface.dart';
 import 'package:core/src/turbo_core_repositories/place_category_repository/models/place_category.dart';
 import 'package:core/src/turbo_core_repositories/place_repository/models/place/place.dart';
+import 'package:core/src/turbo_core_repositories/category_repository/model/category.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class PlaceCategoryServiceSupabase implements PlaceCategoryRepositoryInterface {
@@ -10,6 +11,7 @@ class PlaceCategoryServiceSupabase implements PlaceCategoryRepositoryInterface {
   final SupabaseClient _supabase;
   final String _tableName = 'place_categories';
 
+  @override
   Future<void> upsertPlaceCategory(PlaceCategory placeCategory) async {
     try {
       await _supabase.from(_tableName).upsert({
@@ -23,6 +25,7 @@ class PlaceCategoryServiceSupabase implements PlaceCategoryRepositoryInterface {
   }
 
   /// Asigna una categoría a un lugar
+  @override
   Future<bool> assignCategoryToPlace(String placeId, String categoryId) async {
     try {
       // Insert the place-category relationship
@@ -44,6 +47,7 @@ class PlaceCategoryServiceSupabase implements PlaceCategoryRepositoryInterface {
   }
 
   /// Elimina una categoría de un lugar
+  @override
   Future<bool> removeCategoryFromPlace(
     String placeId,
     String categoryId,
@@ -68,6 +72,7 @@ class PlaceCategoryServiceSupabase implements PlaceCategoryRepositoryInterface {
   }
 
   /// Actualiza todas las categorías de un lugar
+  @override
   Future<bool> updatePlaceCategories(
     String placeId,
     List<String> categoryIds,
@@ -118,7 +123,40 @@ class PlaceCategoryServiceSupabase implements PlaceCategoryRepositoryInterface {
     }
   }
 
+  /// Obtiene todas las categorías de un lugar
+  @override
+  Future<List<Category>> getCategoriesForPlace(String placeId) async {
+    try {
+      // Get category IDs for this place
+      final relationshipResponse = await _supabase
+          .from(_tableName)
+          .select('category_id')
+          .eq('place_id', placeId);
+
+      if (relationshipResponse.isEmpty) {
+        return [];
+      }
+
+      final categoryIds = relationshipResponse
+          .map((item) => item['category_id'] as String)
+          .toList();
+
+      // Get the actual categories
+      final categoriesResponse = await _supabase
+          .from('categories')
+          .select('*')
+          .inFilter('id', categoryIds);
+
+      return categoriesResponse
+          .map<Category>((data) => _categoryFromSupabase(data))
+          .toList();
+    } catch (e) {
+      throw Exception('Error al obtener categorías del lugar: $e');
+    }
+  }
+
   /// Obtiene todos los lugares de una categoría
+  @override
   Future<List<Place>> getPlacesInCategory(String categoryId) async {
     try {
       // Get place IDs for this category
@@ -195,6 +233,28 @@ class PlaceCategoryServiceSupabase implements PlaceCategoryRepositoryInterface {
       lastUpdated: data['updated_at'] != null
           ? DateTime.parse(data['updated_at'])
           : null,
+    );
+  }
+
+  /// Converts Supabase data to Category model
+  Category _categoryFromSupabase(Map<String, dynamic> data) {
+    String asString(dynamic value) => value?.toString() ?? '';
+    int asInt(dynamic value) => value == null
+        ? 0
+        : (value is int ? value : int.tryParse(value.toString()) ?? 0);
+    bool asBool(dynamic value) => value is bool ? value : value == true;
+    Map<String, dynamic> asMap(dynamic value) =>
+        value is Map<String, dynamic> ? value : {};
+
+    return Category(
+      id: asString(data['id']),
+      name: asString(data['name']),
+      icon: asString(data['icon']),
+      description: asString(data['description']),
+      imageUrl: asString(data['image_url']),
+      placesCount: asInt(data['places_count']),
+      isFeatured: asBool(data['is_featured']),
+      metadata: asMap(data['metadata']),
     );
   }
 }

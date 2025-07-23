@@ -1,4 +1,3 @@
-import 'package:core/src/turbo_core_repositories/place_category_repository/interface/place_category_repository_interface.dart';
 import 'package:core/src/turbo_core_repositories/turbo_core_repositories.dart';
 
 class PlaceCategoryRepository implements PlaceCategoryRepositoryInterface {
@@ -28,5 +27,9 @@ class PlaceCategoryRepository implements PlaceCategoryRepositoryInterface {
   Future<bool> updatePlaceCategories(
       String placeId, List<String> categoryIds) async {
     return await updatePlaceCategories(placeId, categoryIds);
+  }
+
+  Future<List<Category>> getCategoriesForPlace(String placeId) async {
+    return await _service.getCategoriesForPlace(placeId);
   }
 }
