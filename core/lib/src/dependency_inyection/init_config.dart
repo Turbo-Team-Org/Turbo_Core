@@ -14,6 +14,8 @@ import 'package:core/src/turbo_core_repositories/analytics_repository/interface/
 import 'package:core/src/turbo_core_repositories/admin_auth_repository/service/admin_auth_service_supabase.dart';
 import 'package:core/src/turbo_core_repositories/place_repository/service/place_service_supabase.dart';
 import 'package:core/src/turbo_core_repositories/place_category_repository/service/place_category_service_supabase.dart';
+import 'package:core/src/turbo_core_repositories/reservation_repository/service/reservation_service_supabase.dart';
+import 'package:core/src/turbo_core_repositories/admin_auth_repository/interface/admin_auth_interface.dart';
 
 /// Initialize dependencies based on environment configuration
 /// Supports dynamic switching between Firebase (dev) and Supabase (staging/prod)
@@ -405,6 +407,16 @@ Future<void> _registerSupabaseServices(GetIt sl) async {
     print('   ✅ AdminAuthServiceSupabase');
   }
 
+  // Reservation Service
+  if (!sl.isRegistered<ReservationServiceSupabase>()) {
+    sl.registerLazySingleton<ReservationServiceSupabase>(
+      () => ReservationServiceSupabase(
+        supabaseClient: sl<SupabaseClient>(),
+      ),
+    );
+    print('   ✅ ReservationServiceSupabase');
+  }
+
   // Register interfaces pointing to Supabase implementations
   if (!sl.isRegistered<AuthenticationInterface>()) {
     sl.registerLazySingleton<AuthenticationInterface>(
@@ -471,24 +483,24 @@ Future<void> _registerSupabaseServices(GetIt sl) async {
     print('   ✅ PlaceCategoryRepositoryInterface -> Supabase');
   }
 
+  // Reservation Service
   if (!sl.isRegistered<ReservationInterface>()) {
     sl.registerLazySingleton<ReservationInterface>(
-      () => ReservationService(
-        firestore: sl<FirebaseFirestore>(),
+      () => ReservationServiceSupabase(
+        supabaseClient: sl<SupabaseClient>(),
       ),
     );
-    print(
-        '   ✅ ReservationInterface -> Supabase (usando Firebase temporalmente)');
+    print('   ✅ ReservationInterface -> Supabase');
   }
 
-  if (!sl.isRegistered<AdminAuthService>()) {
-    sl.registerLazySingleton<AdminAuthService>(
-      () => AdminAuthService(
-        firestore: sl<FirebaseFirestore>(),
-        firebaseAuth: sl<FirebaseAuth>(),
+  // Admin Auth Service
+  if (!sl.isRegistered<AdminAuthInterface>()) {
+    sl.registerLazySingleton<AdminAuthInterface>(
+      () => AdminAuthServiceSupabase(
+        supabaseClient: sl<SupabaseClient>(),
       ),
     );
-    print('   ✅ AdminAuthService -> Supabase (usando Firebase temporalmente)');
+    print('   ✅ AdminAuthInterface -> Supabase');
   }
 
   print('🎉 Servicios e interfaces Supabase registrados correctamente');
