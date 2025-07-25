@@ -117,7 +117,7 @@ Map<String, String?> _getConfigurationForEnvironment(
         'firebaseProjectId': null,
         'supabaseUrl': 'https://oiugslxvekwnoubljrde.supabase.co',
         'supabaseAnonKey':
-            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9pdWdzbHh2ZWt3bm91YmxqcmRlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzU2NTUzMTYsImV4cCI6MjA1MTIzMTMxNn0.lFJgh2SM9uq4sBUgkLCxtw_A9dW661N',
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9pdWdzbHh2ZWt3bm91YmxqcmRlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTEzOTYzMDksImV4cCI6MjA2Njk3MjMwOX0.r5yHCTclwn31efrv9HaaRHIPwXbmQRXdu6f0czrn1rk',
       };
   }
 }
