@@ -140,12 +140,11 @@ class PlaceRepository {
   ///
   /// [place] The place object to be added.
   ///
-  /// Returns true if the place was successfully added.
+  /// Returns the ID of the newly added place.
   /// Throws an exception if the operation fails.
-  Future<bool> addPlace(Place place) async {
+  Future<String> addPlace(Place place) async {
     try {
-      await placeService.addPlace(place);
-      return true;
+      return await placeService.addPlace(place);
     } catch (e) {
       throw Exception('Error al agregar lugar: $e');
     }

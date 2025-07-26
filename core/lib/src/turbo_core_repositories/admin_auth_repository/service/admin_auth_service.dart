@@ -240,43 +240,20 @@ class AdminAuthService {
     }
   }
 
-  /// 🏢 Actualiza lugares asignados a un usuario
+  /// Actualiza el listado de ownedPlaceIds de un usuario admin
   Future<void> updateOwnedPlaces(
     String userId,
     List<String> placeIds, {
     String? updatedByUid,
   }) async {
     try {
-      // Verificar permisos del actualizador
-      if (updatedByUid != null) {
-        final updater = await getAdminUserByUid(updatedByUid);
-        if (updater?.role != AdminRole.superAdmin) {
-          throw const AdminAuthException(
-            'Solo super administradores pueden modificar lugares',
-          );
-        }
-      }
-
-      final currentUser = await getAdminUserByUid(userId);
-      if (currentUser == null) {
-        throw const AdminAuthException('Usuario no encontrado');
-      }
-
-      // Generar nuevos permisos para los lugares actualizados
-      final newPermissions = _generateDefaultPermissions(
-        placeIds,
-        currentUser.role,
-      );
-
       await _adminUsersRef.doc(userId).update({
         'ownedPlaceIds': placeIds,
-        'permissions': newPermissions.map(
-          (placeId, perms) =>
-              MapEntry(placeId, perms.map((p) => p.name).toList()),
-        ),
+        if (updatedByUid != null) 'lastUpdatedBy': updatedByUid,
+        'lastUpdatedAt': FieldValue.serverTimestamp(),
       });
     } catch (e) {
-      throw AdminAuthException('Error actualizando lugares: $e');
+      throw AdminAuthException('Error actualizando ownedPlaceIds: $e');
     }
   }
 
