@@ -63,11 +63,23 @@ sealed class Event with _$Event {
     List<String> asStringList(dynamic value) =>
         value is Iterable ? value.map((e) => e.toString()).toList() : [];
 
+    // Helper function to safely convert timestamp or string to DateTime
+    DateTime? _parseDateTime(dynamic value) {
+      if (value == null) return null;
+      if (value is Timestamp) {
+        return value.toDate();
+      }
+      if (value is String) {
+        return DateTime.tryParse(value);
+      }
+      return null;
+    }
+
     return Event(
       id: doc.id,
       title: asString(data?['title']),
       description: asString(data?['description']),
-      date: (data?['date'] as Timestamp).toDate(),
+      date: _parseDateTime(data?['date']) ?? DateTime.now(),
       location: asString(data?['location']),
       imageUrl: asString(data?['imageUrl']),
       type: _parseEventType(asString(data?['type'])),
@@ -83,24 +95,15 @@ sealed class Event with _$Event {
           data?['organizerContact'] != null
               ? asString(data?['organizerContact'])
               : null,
-      endDate:
-          data?['endDate'] != null
-              ? (data?['endDate'] as Timestamp).toDate()
-              : null,
+      endDate: _parseDateTime(data?['endDate']),
       link: data?['link'] != null ? asString(data?['link']) : null,
       createdBy: asString(data?['createdBy']),
-      createdAt:
-          data?['createdAt'] != null
-              ? (data?['createdAt'] as Timestamp).toDate()
-              : null,
       lastUpdatedBy:
           data?['lastUpdatedBy'] != null
               ? asString(data?['lastUpdatedBy'])
               : null,
-      lastUpdatedAt:
-          data?['lastUpdatedAt'] != null
-              ? (data?['lastUpdatedAt'] as Timestamp).toDate()
-              : null,
+      createdAt: _parseDateTime(data?['createdAt']),
+      lastUpdatedAt: _parseDateTime(data?['lastUpdatedAt']),
     );
   }
 }

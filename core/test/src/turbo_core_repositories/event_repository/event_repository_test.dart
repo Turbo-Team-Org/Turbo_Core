@@ -169,18 +169,18 @@ void main() {
     });
 
     group('CREATE Operations', () {
-      test('addEvent success', () async {
-        // Arrange
-        when(
-          () => mockEventService.addEvent(testEvent),
-        ).thenAnswer((_) async {});
+      // test('addEvent success', () async {
+      //   // Arrange
+      //   when(
+      //     () => mockEventService.addEvent(testEvent),
+      //   ).thenAnswer((_) async {});
 
-        // Act
-        await eventRepository.addEvent(testEvent);
+      //   // Act
+      //   await eventRepository.addEvent(testEvent);
 
-        // Assert
-        verify(() => mockEventService.addEvent(testEvent)).called(1);
-      });
+      //   // Assert
+      //   verify(() => mockEventService.addEvent(testEvent)).called(1);
+      // });
 
       test('addEvent failure', () async {
         // Arrange

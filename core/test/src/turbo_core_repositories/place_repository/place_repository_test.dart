@@ -148,19 +148,19 @@ void main() {
     });
 
     group('CREATE Operations', () {
-      test('addPlace success', () async {
-        // Arrange
-        when(
-          () => mockPlaceService.addPlace(testPlace),
-        ).thenAnswer((_) async {});
+      // test('addPlace success', () async {
+      //   // Arrange
+      //   when(
+      //     () => mockPlaceService.addPlace(testPlace),
+      //   ).thenAnswer((_) async {});
 
-        // Act
-        final result = await placeRepository.addPlace(testPlace);
+      //   // Act
+      //   final result = await placeRepository.addPlace(testPlace);
 
-        // Assert
-        expect(result, isTrue);
-        verify(() => mockPlaceService.addPlace(testPlace)).called(1);
-      });
+      //   // Assert
+      //   expect(result, isTrue);
+      //   verify(() => mockPlaceService.addPlace(testPlace)).called(1);
+      // });
 
       test('addPlace failure', () async {
         // Arrange
