@@ -64,6 +64,19 @@ class CategoryService implements CategoryInterface {
   /// Get category by name
   @override
   Future<Category> getCategoryByName(String name) {
-    return getCategoryByName(name);
+    return _getCategoryByNameInternal(name);
+  }
+
+  Future<Category> _getCategoryByNameInternal(String name) async {
+    final snapshot =
+        await categoriesCollection
+            .where('name', isEqualTo: name)
+            .limit(1)
+            .get();
+    if (snapshot.docs.isNotEmpty) {
+      final doc = snapshot.docs.first;
+      return Category.fromJson({'id': doc.id, ...doc.data()});
+    }
+    throw Exception('Category not found');
   }
 }
