@@ -220,7 +220,8 @@ Future<void> _testAuthenticationService() async {
 
       // Probar método básico (sin conexión real)
       print(
-          '   Métodos disponibles: signInWithEmailAndPassword, signOut, etc.');
+        '   Métodos disponibles: signInWithEmailAndPassword, signOut, etc.',
+      );
     } else {
       print('❌ AuthenticationInterface no está registrado');
     }
@@ -298,8 +299,12 @@ class _DemoAppState extends State<DemoApp> {
       final hybridInfo = HybridDatabaseConfig.debugInfo;
       _addLog('📊 Entorno: ${hybridInfo['environment']}');
       _addLog('🗄️ Proveedor: ${hybridInfo['primaryProvider']}');
-      _addLog('🔥 Firebase: ${hybridInfo['firebaseAvailable'] ? '✅' : '❌'}');
-      _addLog('💚 Supabase: ${hybridInfo['supabaseAvailable'] ? '✅' : '❌'}');
+      _addLog(
+        '🔥 Firebase: ${hybridInfo['firebaseAvailable'] == true ? '✅' : '❌'}',
+      );
+      _addLog(
+        '💚 Supabase: ${hybridInfo['supabaseAvailable'] == true ? '✅' : '❌'}',
+      );
 
       // Verificar servicios disponibles
       final services = [
@@ -343,16 +348,14 @@ class _DemoAppState extends State<DemoApp> {
   Future<void> _switchEnvironment() async {
     setState(() {
       _isLoading = true;
-      _currentEnv = _currentEnv == TurboEnvironment.dev
-          ? TurboEnvironment.staging
-          : TurboEnvironment.dev;
+      _currentEnv =
+          _currentEnv == TurboEnvironment.dev
+              ? TurboEnvironment.staging
+              : TurboEnvironment.dev;
     });
 
     await GetIt.instance.reset();
-    await _demoEnvironmentUI(
-      'Switched to ${_currentEnv.name}',
-      _currentEnv,
-    );
+    await _demoEnvironmentUI('Switched to ${_currentEnv.name}', _currentEnv);
 
     setState(() {
       _isLoading = false;
@@ -363,10 +366,7 @@ class _DemoAppState extends State<DemoApp> {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Turbo Core - Environment Demo',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        fontFamily: 'Monaco',
-      ),
+      theme: ThemeData(primarySwatch: Colors.blue, fontFamily: 'Monaco'),
       home: Scaffold(
         appBar: AppBar(
           title: Text('🌍 Turbo Core - Environment Demo'),
@@ -450,19 +450,22 @@ class _DemoAppState extends State<DemoApp> {
                     child: SingleChildScrollView(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
-                        children: _logs
-                            .map((log) => Padding(
-                                  padding: EdgeInsets.only(bottom: 4),
-                                  child: Text(
-                                    log,
-                                    style: TextStyle(
-                                      color: Colors.green[300],
-                                      fontSize: 12,
-                                      fontFamily: 'Courier',
+                        children:
+                            _logs
+                                .map(
+                                  (log) => Padding(
+                                    padding: EdgeInsets.only(bottom: 4),
+                                    child: Text(
+                                      log,
+                                      style: TextStyle(
+                                        color: Colors.green[300],
+                                        fontSize: 12,
+                                        fontFamily: 'Courier',
+                                      ),
                                     ),
                                   ),
-                                ))
-                            .toList(),
+                                )
+                                .toList(),
                       ),
                     ),
                   ),
@@ -476,10 +479,7 @@ class _DemoAppState extends State<DemoApp> {
           child: Text(
             '🚀 Turbo Core - Sistema de Entornos Dinámicos | Firebase (dev) ↔ Supabase (staging)',
             textAlign: TextAlign.center,
-            style: TextStyle(
-              color: Colors.white70,
-              fontSize: 12,
-            ),
+            style: TextStyle(color: Colors.white70, fontSize: 12),
           ),
         ),
       ),

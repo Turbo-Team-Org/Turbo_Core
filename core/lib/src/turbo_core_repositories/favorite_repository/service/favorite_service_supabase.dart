@@ -7,7 +7,7 @@ import 'package:uuid/uuid.dart';
 class FavoriteServiceSupabase implements FavoriteInterface {
   /// Constructor
   FavoriteServiceSupabase({SupabaseClient? supabaseClient})
-      : _supabase = supabaseClient ?? Supabase.instance.client;
+    : _supabase = supabaseClient ?? Supabase.instance.client;
 
   /// Supabase client instance
   final SupabaseClient _supabase;
@@ -18,19 +18,20 @@ class FavoriteServiceSupabase implements FavoriteInterface {
   @override
   Future<void> toggleFavorite(Favorite favorite) async {
     try {
-      final existingFavorite = await _supabase
-          .from('favorites')
-          .select('id')
-          .eq('user_id', favorite.userId)
-          .eq('place_id', favorite.placeId)
-          .maybeSingle();
+      final existingFavorite =
+          await _supabase
+              .from('favorites')
+              .select('id')
+              .eq('user_id', favorite.userId)
+              .eq('place_id', favorite.placeId)
+              .maybeSingle();
 
       if (existingFavorite != null) {
         // Remove favorite
         await _supabase
             .from('favorites')
             .delete()
-            .eq('id', existingFavorite['id']);
+            .eq('id', existingFavorite['id'].toString());
       } else {
         // Add favorite
         final newId = _uuid.v4();
@@ -71,12 +72,13 @@ class FavoriteServiceSupabase implements FavoriteInterface {
   @override
   Future<bool> isFavorite(String userId, String placeId) async {
     try {
-      final response = await _supabase
-          .from('favorites')
-          .select('id')
-          .eq('user_id', userId)
-          .eq('place_id', placeId)
-          .maybeSingle();
+      final response =
+          await _supabase
+              .from('favorites')
+              .select('id')
+              .eq('user_id', userId)
+              .eq('place_id', placeId)
+              .maybeSingle();
 
       return response != null;
     } catch (e) {

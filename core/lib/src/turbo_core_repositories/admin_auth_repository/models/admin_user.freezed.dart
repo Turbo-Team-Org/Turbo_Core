@@ -1,6 +1,5 @@
-// dart format width=80
-// coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
+// coverage:ignore-file
 // ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
@@ -86,6 +85,130 @@ as Map<String, dynamic>,
 
 }
 
+
+/// Adds pattern-matching-related methods to [AdminUser].
+extension AdminUserPatterns on AdminUser {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _AdminUser value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _AdminUser() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _AdminUser value)  $default,){
+final _that = this;
+switch (_that) {
+case _AdminUser():
+return $default(_that);}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _AdminUser value)?  $default,){
+final _that = this;
+switch (_that) {
+case _AdminUser() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String uid,  String email,  DateTime createdAt,  String? displayName,  AdminRole role,  List<String> ownedPlaceIds,  Map<String, List<Permission>> permissions,  DateTime? lastLogin,  bool isActive,  String? photoUrl,  String? phoneNumber,  Map<String, dynamic> metadata)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _AdminUser() when $default != null:
+return $default(_that.uid,_that.email,_that.createdAt,_that.displayName,_that.role,_that.ownedPlaceIds,_that.permissions,_that.lastLogin,_that.isActive,_that.photoUrl,_that.phoneNumber,_that.metadata);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String uid,  String email,  DateTime createdAt,  String? displayName,  AdminRole role,  List<String> ownedPlaceIds,  Map<String, List<Permission>> permissions,  DateTime? lastLogin,  bool isActive,  String? photoUrl,  String? phoneNumber,  Map<String, dynamic> metadata)  $default,) {final _that = this;
+switch (_that) {
+case _AdminUser():
+return $default(_that.uid,_that.email,_that.createdAt,_that.displayName,_that.role,_that.ownedPlaceIds,_that.permissions,_that.lastLogin,_that.isActive,_that.photoUrl,_that.phoneNumber,_that.metadata);}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String uid,  String email,  DateTime createdAt,  String? displayName,  AdminRole role,  List<String> ownedPlaceIds,  Map<String, List<Permission>> permissions,  DateTime? lastLogin,  bool isActive,  String? photoUrl,  String? phoneNumber,  Map<String, dynamic> metadata)?  $default,) {final _that = this;
+switch (_that) {
+case _AdminUser() when $default != null:
+return $default(_that.uid,_that.email,_that.createdAt,_that.displayName,_that.role,_that.ownedPlaceIds,_that.permissions,_that.lastLogin,_that.isActive,_that.photoUrl,_that.phoneNumber,_that.metadata);case _:
+  return null;
+
+}
+}
+
+}
 
 /// @nodoc
 @JsonSerializable()
