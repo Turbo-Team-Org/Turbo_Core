@@ -7,14 +7,24 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:get_it/get_it.dart';
+import 'package:dio/dio.dart';
 
 // Supabase services imports
 import 'package:core/src/turbo_core_repositories/analytics_repository/service/analytics_service_supabase.dart';
 import 'package:core/src/turbo_core_repositories/analytics_repository/interface/analytics_interface.dart';
+import 'package:core/src/turbo_core_repositories/analytics_repository/service/analytics_service_edge.dart';
 import 'package:core/src/turbo_core_repositories/admin_auth_repository/service/admin_auth_service_supabase.dart';
+import 'package:core/src/turbo_core_repositories/admin_auth_repository/service/admin_auth_service_edge.dart';
 import 'package:core/src/turbo_core_repositories/place_repository/service/place_service_supabase.dart';
+import 'package:core/src/turbo_core_repositories/place_repository/service/place_service_edge.dart';
+import 'package:core/src/turbo_core_repositories/category_repository/service/category_service_edge.dart';
+import 'package:core/src/turbo_core_repositories/review_repository/service/review_service_edge.dart';
+import 'package:core/src/turbo_core_repositories/favorite_repository/service/favorite_service_edge.dart';
+import 'package:core/src/turbo_core_repositories/event_repository/service/event_service_edge.dart';
 import 'package:core/src/turbo_core_repositories/place_category_repository/service/place_category_service_supabase.dart';
+import 'package:core/src/turbo_core_repositories/place_category_repository/service/place_category_service_edge.dart';
 import 'package:core/src/turbo_core_repositories/reservation_repository/service/reservation_service_supabase.dart';
+import 'package:core/src/turbo_core_repositories/reservation_repository/service/reservation_service_edge.dart';
 import 'package:core/src/turbo_core_repositories/admin_auth_repository/interface/admin_auth_interface.dart';
 
 /// Initialize dependencies based on environment configuration
@@ -62,16 +72,20 @@ Future<void> initCoreDependencies({
   print('   - Services: ✅ Completos (Firebase y Supabase)');
   print('   - Interfaces: ✅ Registradas según entorno');
   print(
-      '   - Repositories: ✅ Authentication, Review, Category, Event, Favorite, Location, Place, Analytics, PlaceCategory, Reservation, AdminAuth (ambos entornos)');
+    '   - Repositories: ✅ Authentication, Review, Category, Event, Favorite, Location, Place, Analytics, PlaceCategory, Reservation, AdminAuth (ambos entornos)',
+  );
   print('   - Uso uniforme: sl<AuthenticationRepository>() en ambos entornos');
   print('   - ✅ TODOS LOS REPOSITORIOS REFACTORIZADOS Y REGISTRADOS\n');
 }
 
 /// Initialize with environment passed from app/admin panel
 Future<void> _initializeWithPassedEnvironment(
-    TurboEnvironment environment, bool enableDebugLogs) async {
+  TurboEnvironment environment,
+  bool enableDebugLogs,
+) async {
   print(
-      '📱 Inicializando con entorno pasado desde la app: ${environment.name}');
+    '📱 Inicializando con entorno pasado desde la app: ${environment.name}',
+  );
 
   // Determine database provider based on environment
   final provider = _getProviderForEnvironment(environment);
@@ -103,7 +117,8 @@ DatabaseProvider _getProviderForEnvironment(TurboEnvironment environment) {
 
 /// Get configuration for environment
 Map<String, String?> _getConfigurationForEnvironment(
-    TurboEnvironment environment) {
+  TurboEnvironment environment,
+) {
   switch (environment) {
     case TurboEnvironment.dev:
       return {
@@ -124,14 +139,17 @@ Map<String, String?> _getConfigurationForEnvironment(
 
 /// Register database clients (Firebase and/or Supabase)
 Future<void> _registerDatabaseClients(
-    GetIt sl, FirebaseApp? firebaseApp) async {
+  GetIt sl,
+  FirebaseApp? firebaseApp,
+) async {
   // Register Firebase services if available
   if (HybridDatabaseConfig.isFirebaseAvailable) {
     if (!sl.isRegistered<FirebaseFirestore>()) {
       sl.registerLazySingleton<FirebaseFirestore>(
-        () => firebaseApp != null
-            ? FirebaseFirestore.instanceFor(app: firebaseApp)
-            : HybridDatabaseConfig.firestore,
+        () =>
+            firebaseApp != null
+                ? FirebaseFirestore.instanceFor(app: firebaseApp)
+                : HybridDatabaseConfig.firestore,
       );
     }
 
@@ -223,9 +241,7 @@ Future<void> _registerFirebaseServices(GetIt sl) async {
   // Review Service
   if (!sl.isRegistered<ReviewInterface>()) {
     sl.registerLazySingleton<ReviewInterface>(
-      () => ReviewService(
-        firestore: sl<FirebaseFirestore>(),
-      ),
+      () => ReviewService(firestore: sl<FirebaseFirestore>()),
     );
     print('   ✅ ReviewService (Firebase)');
   }
@@ -233,9 +249,7 @@ Future<void> _registerFirebaseServices(GetIt sl) async {
   // Category Service
   if (!sl.isRegistered<CategoryInterface>()) {
     sl.registerLazySingleton<CategoryInterface>(
-      () => CategoryService(
-        firestore: sl<FirebaseFirestore>(),
-      ),
+      () => CategoryService(firestore: sl<FirebaseFirestore>()),
     );
     print('   ✅ CategoryService (Firebase)');
   }
@@ -243,9 +257,7 @@ Future<void> _registerFirebaseServices(GetIt sl) async {
   // Event Service
   if (!sl.isRegistered<EventInterface>()) {
     sl.registerLazySingleton<EventInterface>(
-      () => EventService(
-        firestore: sl<FirebaseFirestore>(),
-      ),
+      () => EventService(firestore: sl<FirebaseFirestore>()),
     );
     print('   ✅ EventService (Firebase)');
   }
@@ -253,9 +265,7 @@ Future<void> _registerFirebaseServices(GetIt sl) async {
   // Favorite Service
   if (!sl.isRegistered<FavoriteInterface>()) {
     sl.registerLazySingleton<FavoriteInterface>(
-      () => FavoriteService(
-        firestore: sl<FirebaseFirestore>(),
-      ),
+      () => FavoriteService(firestore: sl<FirebaseFirestore>()),
     );
     print('   ✅ FavoriteService (Firebase)');
   }
@@ -263,9 +273,7 @@ Future<void> _registerFirebaseServices(GetIt sl) async {
   // Location Service
   if (!sl.isRegistered<LocationInterface>()) {
     sl.registerLazySingleton<LocationInterface>(
-      () => LocationService(
-        firestore: sl<FirebaseFirestore>(),
-      ),
+      () => LocationService(firestore: sl<FirebaseFirestore>()),
     );
     print('   ✅ LocationService (Firebase)');
   }
@@ -273,9 +281,7 @@ Future<void> _registerFirebaseServices(GetIt sl) async {
   // Place Category Service
   if (!sl.isRegistered<PlaceCategoryRepositoryInterface>()) {
     sl.registerLazySingleton<PlaceCategoryRepositoryInterface>(
-      () => PlaceCategoryService(
-        firestore: sl<FirebaseFirestore>(),
-      ),
+      () => PlaceCategoryService(firestore: sl<FirebaseFirestore>()),
     );
     print('   ✅ PlaceCategoryService (Firebase)');
   }
@@ -283,9 +289,7 @@ Future<void> _registerFirebaseServices(GetIt sl) async {
   // Reservation Service
   if (!sl.isRegistered<ReservationInterface>()) {
     sl.registerLazySingleton<ReservationInterface>(
-      () => ReservationService(
-        firestore: sl<FirebaseFirestore>(),
-      ),
+      () => ReservationService(firestore: sl<FirebaseFirestore>()),
     );
     print('   ✅ ReservationService (Firebase)');
   }
@@ -308,9 +312,7 @@ Future<void> _registerSupabaseServices(GetIt sl) async {
   // Authentication Service
   if (!sl.isRegistered<AuthenticationServiceSupabase>()) {
     sl.registerLazySingleton<AuthenticationServiceSupabase>(
-      () => AuthenticationServiceSupabase(
-        supabaseClient: sl<SupabaseClient>(),
-      ),
+      () => AuthenticationServiceSupabase(supabaseClient: sl<SupabaseClient>()),
     );
     print('   ✅ AuthenticationServiceSupabase');
   }
@@ -318,29 +320,33 @@ Future<void> _registerSupabaseServices(GetIt sl) async {
   // Review Service
   if (!sl.isRegistered<ReviewServiceSupabase>()) {
     sl.registerLazySingleton<ReviewServiceSupabase>(
-      () => ReviewServiceSupabase(
-        supabaseClient: sl<SupabaseClient>(),
-      ),
+      () => ReviewServiceSupabase(supabaseClient: sl<SupabaseClient>()),
     );
     print('   ✅ ReviewServiceSupabase');
   }
 
-  // Category Service
+  // Category Service (Supabase directo y alternativa Edge Gateway)
   if (!sl.isRegistered<CategoryServiceSupabase>()) {
-    sl.registerLazySingleton<CategoryServiceSupabase>(
-      () => CategoryServiceSupabase(
-        supabaseClient: sl<SupabaseClient>(),
-      ),
-    );
-    print('   ✅ CategoryServiceSupabase');
+    if (Env.useEdgeGateway && Env.supabaseEdgeBaseUrl.isNotEmpty) {
+      sl.registerLazySingleton<CategoryServiceEdge>(
+        () => CategoryServiceEdge(
+          baseUrl: Env.supabaseEdgeBaseUrl,
+          httpClient: Dio(),
+        ),
+      );
+      print('   ✅ CategoryServiceEdge');
+    } else {
+      sl.registerLazySingleton<CategoryServiceSupabase>(
+        () => CategoryServiceSupabase(supabaseClient: sl<SupabaseClient>()),
+      );
+      print('   ✅ CategoryServiceSupabase');
+    }
   }
 
   // Event Service
   if (!sl.isRegistered<EventServiceSupabase>()) {
     sl.registerLazySingleton<EventServiceSupabase>(
-      () => EventServiceSupabase(
-        supabaseClient: sl<SupabaseClient>(),
-      ),
+      () => EventServiceSupabase(supabaseClient: sl<SupabaseClient>()),
     );
     print('   ✅ EventServiceSupabase');
   }
@@ -348,9 +354,7 @@ Future<void> _registerSupabaseServices(GetIt sl) async {
   // Favorite Service
   if (!sl.isRegistered<FavoriteServiceSupabase>()) {
     sl.registerLazySingleton<FavoriteServiceSupabase>(
-      () => FavoriteServiceSupabase(
-        supabaseClient: sl<SupabaseClient>(),
-      ),
+      () => FavoriteServiceSupabase(supabaseClient: sl<SupabaseClient>()),
     );
     print('   ✅ FavoriteServiceSupabase');
   }
@@ -358,9 +362,7 @@ Future<void> _registerSupabaseServices(GetIt sl) async {
   // Location Service
   if (!sl.isRegistered<LocationServiceSupabase>()) {
     sl.registerLazySingleton<LocationServiceSupabase>(
-      () => LocationServiceSupabase(
-        supabaseClient: sl<SupabaseClient>(),
-      ),
+      () => LocationServiceSupabase(supabaseClient: sl<SupabaseClient>()),
     );
     print('   ✅ LocationServiceSupabase');
   }
@@ -368,31 +370,40 @@ Future<void> _registerSupabaseServices(GetIt sl) async {
   // Analytics Service
   if (!sl.isRegistered<AnalyticsServiceSupabase>()) {
     sl.registerLazySingleton<AnalyticsServiceSupabase>(
-      () => AnalyticsServiceSupabase(
-        supabaseClient: sl<SupabaseClient>(),
-      ),
+      () => AnalyticsServiceSupabase(supabaseClient: sl<SupabaseClient>()),
     );
     print('   ✅ AnalyticsServiceSupabase');
   }
 
-  // Place Service (requiere AnalyticsServiceSupabase)
+  // Place Service (Supabase directo y alternativa Edge Gateway)
   if (!sl.isRegistered<PlaceServiceSupabase>()) {
-    sl.registerLazySingleton<PlaceServiceSupabase>(
-      () => PlaceServiceSupabase(
-        supabase: sl<SupabaseClient>(),
-        analyticsService: sl<AnalyticsServiceSupabase>(),
-        authorization: sl<PlaceAuthorizationInterface>(),
-      ),
-    );
-    print('   ✅ PlaceServiceSupabase');
+    if (Env.useEdgeGateway && Env.supabaseEdgeBaseUrl.isNotEmpty) {
+      // Registrar Edge como servicio concreto
+      sl.registerLazySingleton<PlaceServiceEdge>(
+        () => PlaceServiceEdge(
+          baseUrl: Env.supabaseEdgeBaseUrl,
+          httpClient: Dio(),
+          analyticsService: sl<AnalyticsInterface>(),
+          authorization: sl<PlaceAuthorizationInterface>(),
+        ),
+      );
+      print('   ✅ PlaceServiceEdge');
+    } else {
+      sl.registerLazySingleton<PlaceServiceSupabase>(
+        () => PlaceServiceSupabase(
+          supabase: sl<SupabaseClient>(),
+          analyticsService: sl<AnalyticsServiceSupabase>(),
+          authorization: sl<PlaceAuthorizationInterface>(),
+        ),
+      );
+      print('   ✅ PlaceServiceSupabase');
+    }
   }
 
   // Place Category Service
   if (!sl.isRegistered<PlaceCategoryServiceSupabase>()) {
     sl.registerLazySingleton<PlaceCategoryServiceSupabase>(
-      () => PlaceCategoryServiceSupabase(
-        supabaseClient: sl<SupabaseClient>(),
-      ),
+      () => PlaceCategoryServiceSupabase(supabaseClient: sl<SupabaseClient>()),
     );
     print('   ✅ PlaceCategoryServiceSupabase');
   }
@@ -400,9 +411,7 @@ Future<void> _registerSupabaseServices(GetIt sl) async {
   // Admin Auth Service
   if (!sl.isRegistered<AdminAuthServiceSupabase>()) {
     sl.registerLazySingleton<AdminAuthServiceSupabase>(
-      () => AdminAuthServiceSupabase(
-        supabaseClient: sl<SupabaseClient>(),
-      ),
+      () => AdminAuthServiceSupabase(supabaseClient: sl<SupabaseClient>()),
     );
     print('   ✅ AdminAuthServiceSupabase');
   }
@@ -410,9 +419,7 @@ Future<void> _registerSupabaseServices(GetIt sl) async {
   // Reservation Service
   if (!sl.isRegistered<ReservationServiceSupabase>()) {
     sl.registerLazySingleton<ReservationServiceSupabase>(
-      () => ReservationServiceSupabase(
-        supabaseClient: sl<SupabaseClient>(),
-      ),
+      () => ReservationServiceSupabase(supabaseClient: sl<SupabaseClient>()),
     );
     print('   ✅ ReservationServiceSupabase');
   }
@@ -426,31 +433,83 @@ Future<void> _registerSupabaseServices(GetIt sl) async {
   }
 
   if (!sl.isRegistered<ReviewInterface>()) {
-    sl.registerLazySingleton<ReviewInterface>(
-      () => sl<ReviewServiceSupabase>(),
-    );
-    print('   ✅ ReviewInterface -> Supabase');
+    if (Env.useEdgeGateway && Env.supabaseEdgeBaseUrl.isNotEmpty) {
+      // Registrar ReviewServiceEdge concreto si no existe
+      if (!sl.isRegistered<ReviewServiceEdge>()) {
+        sl.registerLazySingleton<ReviewServiceEdge>(
+          () => ReviewServiceEdge(
+            baseUrl: Env.supabaseEdgeBaseUrl,
+            httpClient: Dio(),
+          ),
+        );
+        print('   ✅ ReviewServiceEdge');
+      }
+      sl.registerLazySingleton<ReviewInterface>(() => sl<ReviewServiceEdge>());
+      print('   ✅ ReviewInterface -> Edge Gateway');
+    } else {
+      sl.registerLazySingleton<ReviewInterface>(
+        () => sl<ReviewServiceSupabase>(),
+      );
+      print('   ✅ ReviewInterface -> Supabase');
+    }
   }
 
   if (!sl.isRegistered<CategoryInterface>()) {
-    sl.registerLazySingleton<CategoryInterface>(
-      () => sl<CategoryServiceSupabase>(),
-    );
-    print('   ✅ CategoryInterface -> Supabase');
+    if (Env.useEdgeGateway && Env.supabaseEdgeBaseUrl.isNotEmpty) {
+      sl.registerLazySingleton<CategoryInterface>(
+        () => sl<CategoryServiceEdge>(),
+      );
+      print('   ✅ CategoryInterface -> Edge Gateway');
+    } else {
+      sl.registerLazySingleton<CategoryInterface>(
+        () => sl<CategoryServiceSupabase>(),
+      );
+      print('   ✅ CategoryInterface -> Supabase');
+    }
   }
 
   if (!sl.isRegistered<EventInterface>()) {
-    sl.registerLazySingleton<EventInterface>(
-      () => sl<EventServiceSupabase>(),
-    );
-    print('   ✅ EventInterface -> Supabase');
+    if (Env.useEdgeGateway && Env.supabaseEdgeBaseUrl.isNotEmpty) {
+      if (!sl.isRegistered<EventServiceEdge>()) {
+        sl.registerLazySingleton<EventServiceEdge>(
+          () => EventServiceEdge(
+            baseUrl: Env.supabaseEdgeBaseUrl,
+            httpClient: Dio(),
+          ),
+        );
+        print('   ✅ EventServiceEdge');
+      }
+      sl.registerLazySingleton<EventInterface>(() => sl<EventServiceEdge>());
+      print('   ✅ EventInterface -> Edge Gateway');
+    } else {
+      sl.registerLazySingleton<EventInterface>(
+        () => sl<EventServiceSupabase>(),
+      );
+      print('   ✅ EventInterface -> Supabase');
+    }
   }
 
   if (!sl.isRegistered<FavoriteInterface>()) {
-    sl.registerLazySingleton<FavoriteInterface>(
-      () => sl<FavoriteServiceSupabase>(),
-    );
-    print('   ✅ FavoriteInterface -> Supabase');
+    if (Env.useEdgeGateway && Env.supabaseEdgeBaseUrl.isNotEmpty) {
+      if (!sl.isRegistered<FavoriteServiceEdge>()) {
+        sl.registerLazySingleton<FavoriteServiceEdge>(
+          () => FavoriteServiceEdge(
+            baseUrl: Env.supabaseEdgeBaseUrl,
+            httpClient: Dio(),
+          ),
+        );
+        print('   ✅ FavoriteServiceEdge');
+      }
+      sl.registerLazySingleton<FavoriteInterface>(
+        () => sl<FavoriteServiceEdge>(),
+      );
+      print('   ✅ FavoriteInterface -> Edge Gateway');
+    } else {
+      sl.registerLazySingleton<FavoriteInterface>(
+        () => sl<FavoriteServiceSupabase>(),
+      );
+      print('   ✅ FavoriteInterface -> Supabase');
+    }
   }
 
   if (!sl.isRegistered<LocationInterface>()) {
@@ -461,46 +520,92 @@ Future<void> _registerSupabaseServices(GetIt sl) async {
   }
 
   if (!sl.isRegistered<AnalyticsInterface>()) {
-    sl.registerLazySingleton<AnalyticsInterface>(
-      () => sl<AnalyticsServiceSupabase>(),
-    );
-    print('   ✅ AnalyticsInterface -> Supabase');
+    if (Env.useEdgeGateway && Env.supabaseEdgeBaseUrl.isNotEmpty) {
+      if (!sl.isRegistered<AnalyticsServiceEdge>()) {
+        sl.registerLazySingleton<AnalyticsServiceEdge>(
+          () => AnalyticsServiceEdge(
+            baseUrl: Env.supabaseEdgeBaseUrl,
+            httpClient: Dio(),
+          ),
+        );
+        print('   ✅ AnalyticsServiceEdge');
+      }
+      sl.registerLazySingleton<AnalyticsInterface>(
+        () => sl<AnalyticsServiceEdge>(),
+      );
+      print('   ✅ AnalyticsInterface -> Edge Gateway');
+    } else {
+      sl.registerLazySingleton<AnalyticsInterface>(
+        () => sl<AnalyticsServiceSupabase>(),
+      );
+      print('   ✅ AnalyticsInterface -> Supabase');
+    }
   }
 
   if (!sl.isRegistered<PlaceInterface>()) {
-    sl.registerLazySingleton<PlaceInterface>(
-      () => sl<PlaceServiceSupabase>(),
-    );
-    print('   ✅ PlaceInterface -> Supabase');
+    if (Env.useEdgeGateway && Env.supabaseEdgeBaseUrl.isNotEmpty) {
+      sl.registerLazySingleton<PlaceInterface>(() => sl<PlaceServiceEdge>());
+      print('   ✅ PlaceInterface -> Edge Gateway');
+    } else {
+      sl.registerLazySingleton<PlaceInterface>(
+        () => sl<PlaceServiceSupabase>(),
+      );
+      print('   ✅ PlaceInterface -> Supabase');
+    }
   }
 
   if (!sl.isRegistered<PlaceCategoryRepositoryInterface>()) {
-    sl.registerLazySingleton<PlaceCategoryRepositoryInterface>(
-      () => PlaceCategoryServiceSupabase(
-        supabaseClient: sl<SupabaseClient>(),
-      ),
-    );
-    print('   ✅ PlaceCategoryRepositoryInterface -> Supabase');
+    if (Env.useEdgeGateway && Env.supabaseEdgeBaseUrl.isNotEmpty) {
+      sl.registerLazySingleton<PlaceCategoryRepositoryInterface>(
+        () => PlaceCategoryServiceEdge(
+          baseUrl: Env.supabaseEdgeBaseUrl,
+          httpClient: Dio(),
+        ),
+      );
+      print('   ✅ PlaceCategoryRepositoryInterface -> Edge Gateway');
+    } else {
+      sl.registerLazySingleton<PlaceCategoryRepositoryInterface>(
+        () =>
+            PlaceCategoryServiceSupabase(supabaseClient: sl<SupabaseClient>()),
+      );
+      print('   ✅ PlaceCategoryRepositoryInterface -> Supabase');
+    }
   }
 
   // Reservation Service
   if (!sl.isRegistered<ReservationInterface>()) {
-    sl.registerLazySingleton<ReservationInterface>(
-      () => ReservationServiceSupabase(
-        supabaseClient: sl<SupabaseClient>(),
-      ),
-    );
-    print('   ✅ ReservationInterface -> Supabase');
+    if (Env.useEdgeGateway && Env.supabaseEdgeBaseUrl.isNotEmpty) {
+      sl.registerLazySingleton<ReservationInterface>(
+        () => ReservationServiceEdge(
+          baseUrl: Env.supabaseEdgeBaseUrl,
+          httpClient: Dio(),
+        ),
+      );
+      print('   ✅ ReservationInterface -> Edge Gateway');
+    } else {
+      sl.registerLazySingleton<ReservationInterface>(
+        () => ReservationServiceSupabase(supabaseClient: sl<SupabaseClient>()),
+      );
+      print('   ✅ ReservationInterface -> Supabase');
+    }
   }
 
   // Admin Auth Service
   if (!sl.isRegistered<AdminAuthInterface>()) {
-    sl.registerLazySingleton<AdminAuthInterface>(
-      () => AdminAuthServiceSupabase(
-        supabaseClient: sl<SupabaseClient>(),
-      ),
-    );
-    print('   ✅ AdminAuthInterface -> Supabase');
+    if (Env.useEdgeGateway && Env.supabaseEdgeBaseUrl.isNotEmpty) {
+      sl.registerLazySingleton<AdminAuthInterface>(
+        () => AdminAuthServiceEdge(
+          baseUrl: Env.supabaseEdgeBaseUrl,
+          httpClient: Dio(),
+        ),
+      );
+      print('   ✅ AdminAuthInterface -> Edge Gateway');
+    } else {
+      sl.registerLazySingleton<AdminAuthInterface>(
+        () => AdminAuthServiceSupabase(supabaseClient: sl<SupabaseClient>()),
+      );
+      print('   ✅ AdminAuthInterface -> Supabase');
+    }
   }
 
   print('🎉 Servicios e interfaces Supabase registrados correctamente');
@@ -561,9 +666,8 @@ void _registerFirebaseRepositories(GetIt sl) {
   // Authentication Repository
   if (!sl.isRegistered<AuthenticationRepository>()) {
     sl.registerLazySingleton<AuthenticationRepository>(
-      () => AuthenticationRepository(
-        authService: sl<AuthenticationInterface>(),
-      ),
+      () =>
+          AuthenticationRepository(authService: sl<AuthenticationInterface>()),
     );
     print('   ✅ AuthenticationRepository (Firebase)');
   }
@@ -571,9 +675,7 @@ void _registerFirebaseRepositories(GetIt sl) {
   // Review Repository
   if (!sl.isRegistered<ReviewRepository>()) {
     sl.registerLazySingleton<ReviewRepository>(
-      () => ReviewRepository(
-        reviewService: sl<ReviewInterface>(),
-      ),
+      () => ReviewRepository(reviewService: sl<ReviewInterface>()),
     );
     print('   ✅ ReviewRepository (Firebase)');
   }
@@ -592,9 +694,7 @@ void _registerFirebaseRepositories(GetIt sl) {
   // Event Repository
   if (!sl.isRegistered<EventRepository>()) {
     sl.registerLazySingleton<EventRepository>(
-      () => EventRepository(
-        eventService: sl<EventInterface>(),
-      ),
+      () => EventRepository(eventService: sl<EventInterface>()),
     );
     print('   ✅ EventRepository (Firebase)');
   }
@@ -602,9 +702,7 @@ void _registerFirebaseRepositories(GetIt sl) {
   // Favorite Repository
   if (!sl.isRegistered<FavoriteRepository>()) {
     sl.registerLazySingleton<FavoriteRepository>(
-      () => FavoriteRepository(
-        favoriteService: sl<FavoriteInterface>(),
-      ),
+      () => FavoriteRepository(favoriteService: sl<FavoriteInterface>()),
     );
     print('   ✅ FavoriteRepository (Firebase)');
   }
@@ -612,9 +710,7 @@ void _registerFirebaseRepositories(GetIt sl) {
   // Location Repository
   if (!sl.isRegistered<LocationRepository>()) {
     sl.registerLazySingleton<LocationRepository>(
-      () => LocationRepository(
-        locationService: sl<LocationInterface>(),
-      ),
+      () => LocationRepository(locationService: sl<LocationInterface>()),
     );
     print('   ✅ LocationRepository (Firebase)');
   }
@@ -622,9 +718,7 @@ void _registerFirebaseRepositories(GetIt sl) {
   // Place Repository
   if (!sl.isRegistered<PlaceRepository>()) {
     sl.registerLazySingleton<PlaceRepository>(
-      () => PlaceRepository(
-        placeService: sl<PlaceInterface>(),
-      ),
+      () => PlaceRepository(placeService: sl<PlaceInterface>()),
     );
     print('   ✅ PlaceRepository (Firebase)');
   }
@@ -632,9 +726,7 @@ void _registerFirebaseRepositories(GetIt sl) {
   // Analytics Repository
   if (!sl.isRegistered<AnalyticsRepository>()) {
     sl.registerLazySingleton<AnalyticsRepository>(
-      () => AnalyticsRepository(
-        analyticsService: sl<AnalyticsInterface>(),
-      ),
+      () => AnalyticsRepository(analyticsService: sl<AnalyticsInterface>()),
     );
     print('   ✅ AnalyticsRepository (Firebase)');
   }
@@ -652,9 +744,8 @@ void _registerFirebaseRepositories(GetIt sl) {
   // Reservation Repository
   if (!sl.isRegistered<ReservationRepository>()) {
     sl.registerLazySingleton<ReservationRepository>(
-      () => ReservationRepository(
-        reservationService: sl<ReservationInterface>(),
-      ),
+      () =>
+          ReservationRepository(reservationService: sl<ReservationInterface>()),
     );
     print('   ✅ ReservationRepository (Firebase)');
   }
@@ -662,9 +753,7 @@ void _registerFirebaseRepositories(GetIt sl) {
   // Admin Auth Repository
   if (!sl.isRegistered<AdminAuthRepository>()) {
     sl.registerLazySingleton<AdminAuthRepository>(
-      () => AdminAuthRepositoryImpl(
-        adminAuthService: sl<AdminAuthService>(),
-      ),
+      () => AdminAuthRepositoryImpl(adminAuthService: sl<AdminAuthService>()),
     );
     print('   ✅ AdminAuthRepository (Firebase)');
   }
@@ -677,9 +766,8 @@ void _registerSupabaseRepositories(GetIt sl) {
   // Authentication Repository
   if (!sl.isRegistered<AuthenticationRepository>()) {
     sl.registerLazySingleton<AuthenticationRepository>(
-      () => AuthenticationRepository(
-        authService: sl<AuthenticationInterface>(),
-      ),
+      () =>
+          AuthenticationRepository(authService: sl<AuthenticationInterface>()),
     );
     print('   ✅ AuthenticationRepository (Supabase)');
   }
@@ -687,9 +775,7 @@ void _registerSupabaseRepositories(GetIt sl) {
   // Review Repository
   if (!sl.isRegistered<ReviewRepository>()) {
     sl.registerLazySingleton<ReviewRepository>(
-      () => ReviewRepository(
-        reviewService: sl<ReviewInterface>(),
-      ),
+      () => ReviewRepository(reviewService: sl<ReviewInterface>()),
     );
     print('   ✅ ReviewRepository (Supabase)');
   }
@@ -708,9 +794,7 @@ void _registerSupabaseRepositories(GetIt sl) {
   // Event Repository
   if (!sl.isRegistered<EventRepository>()) {
     sl.registerLazySingleton<EventRepository>(
-      () => EventRepository(
-        eventService: sl<EventInterface>(),
-      ),
+      () => EventRepository(eventService: sl<EventInterface>()),
     );
     print('   ✅ EventRepository (Supabase)');
   }
@@ -718,9 +802,7 @@ void _registerSupabaseRepositories(GetIt sl) {
   // Favorite Repository
   if (!sl.isRegistered<FavoriteRepository>()) {
     sl.registerLazySingleton<FavoriteRepository>(
-      () => FavoriteRepository(
-        favoriteService: sl<FavoriteInterface>(),
-      ),
+      () => FavoriteRepository(favoriteService: sl<FavoriteInterface>()),
     );
     print('   ✅ FavoriteRepository (Supabase)');
   }
@@ -728,9 +810,7 @@ void _registerSupabaseRepositories(GetIt sl) {
   // Location Repository
   if (!sl.isRegistered<LocationRepository>()) {
     sl.registerLazySingleton<LocationRepository>(
-      () => LocationRepository(
-        locationService: sl<LocationInterface>(),
-      ),
+      () => LocationRepository(locationService: sl<LocationInterface>()),
     );
     print('   ✅ LocationRepository (Supabase)');
   }
@@ -738,9 +818,7 @@ void _registerSupabaseRepositories(GetIt sl) {
   // Place Repository
   if (!sl.isRegistered<PlaceRepository>()) {
     sl.registerLazySingleton<PlaceRepository>(
-      () => PlaceRepository(
-        placeService: sl<PlaceInterface>(),
-      ),
+      () => PlaceRepository(placeService: sl<PlaceInterface>()),
     );
     print('   ✅ PlaceRepository (Supabase)');
   }
@@ -748,9 +826,7 @@ void _registerSupabaseRepositories(GetIt sl) {
   // Analytics Repository
   if (!sl.isRegistered<AnalyticsRepository>()) {
     sl.registerLazySingleton<AnalyticsRepository>(
-      () => AnalyticsRepository(
-        analyticsService: sl<AnalyticsInterface>(),
-      ),
+      () => AnalyticsRepository(analyticsService: sl<AnalyticsInterface>()),
     );
     print('   ✅ AnalyticsRepository (Supabase)');
   }
@@ -768,9 +844,8 @@ void _registerSupabaseRepositories(GetIt sl) {
   // Reservation Repository
   if (!sl.isRegistered<ReservationRepository>()) {
     sl.registerLazySingleton<ReservationRepository>(
-      () => ReservationRepository(
-        reservationService: sl<ReservationInterface>(),
-      ),
+      () =>
+          ReservationRepository(reservationService: sl<ReservationInterface>()),
     );
     print('   ✅ ReservationRepository (Supabase)');
   }
@@ -778,12 +853,11 @@ void _registerSupabaseRepositories(GetIt sl) {
   // Admin Auth Repository
   if (!sl.isRegistered<AdminAuthRepository>()) {
     sl.registerLazySingleton<AdminAuthRepository>(
-      () => AdminAuthRepositoryImpl(
-        adminAuthService: sl<AdminAuthService>(),
-      ),
+      () => AdminAuthRepositoryImpl(adminAuthService: sl<AdminAuthService>()),
     );
     print(
-        '   ✅ AdminAuthRepository (Supabase - usando Firebase temporalmente)');
+      '   ✅ AdminAuthRepository (Supabase - usando Firebase temporalmente)',
+    );
   }
 
   print('   🎉 ¡Todos los repositorios refactorizados!');

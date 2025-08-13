@@ -8,10 +8,7 @@ enum TurboEnvironment {
 }
 
 /// Enum para definir el proveedor de base de datos
-enum DatabaseProvider {
-  firebase,
-  supabase,
-}
+enum DatabaseProvider { firebase, supabase }
 
 /// Utility class for accessing environment variables.
 class Env {
@@ -76,6 +73,25 @@ class Env {
   /// Verificar si estamos usando Supabase
   static bool get isUsingSupabase =>
       databaseProvider == DatabaseProvider.supabase;
+
+  /// Flag para usar Edge Gateway (Supabase Edge Functions) en lugar de acceso directo
+  static bool get useEdgeGateway {
+    try {
+      final val = dotenv.env['USE_EDGE_GATEWAY'] ?? 'false';
+      return val.toLowerCase() == 'true' || val == '1';
+    } catch (e) {
+      return false;
+    }
+  }
+
+  /// Base URL de las Edge Functions (ej: https://<project>.functions.supabase.co)
+  static String get supabaseEdgeBaseUrl {
+    try {
+      return dotenv.env['SUPABASE_EDGE_BASE_URL'] ?? '';
+    } catch (e) {
+      return '';
+    }
+  }
 
   // =====================================================
   // FIREBASE CONFIGURATION
@@ -212,9 +228,10 @@ class Env {
       'isValidConfiguration': isCurrentConfigurationValid,
       'firebaseProjectId':
           firebaseProjectId.isNotEmpty ? firebaseProjectId : 'NOT_SET',
-      'supabaseUrl': supabaseUrl.isNotEmpty
-          ? supabaseUrl.split('.')[0] + '...'
-          : 'NOT_SET',
+      'supabaseUrl':
+          supabaseUrl.isNotEmpty
+              ? supabaseUrl.split('.')[0] + '...'
+              : 'NOT_SET',
     };
   }
 }
