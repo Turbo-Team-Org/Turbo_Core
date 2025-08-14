@@ -228,11 +228,11 @@ class PlaceCategoryServiceSupabase implements PlaceCategoryRepositoryInterface {
       ownerIds: asStringList(data['owner_ids']),
       createdBy: asString(data['created_by']),
       createdAt: data['created_at'] != null
-          ? DateTime.parse(data['created_at'])
-          : null,
+          ? DateTime.parse(data['created_at'].toString())
+          : DateTime.now(),
       lastUpdated: data['updated_at'] != null
-          ? DateTime.parse(data['updated_at'])
-          : null,
+          ? DateTime.parse(data['updated_at'].toString())
+          : DateTime.now(),
     );
   }
 

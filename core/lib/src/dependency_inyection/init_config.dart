@@ -17,6 +17,8 @@ import 'package:core/src/turbo_core_repositories/admin_auth_repository/service/a
 import 'package:core/src/turbo_core_repositories/admin_auth_repository/service/admin_auth_service_edge.dart';
 import 'package:core/src/turbo_core_repositories/place_repository/service/place_service_supabase.dart';
 import 'package:core/src/turbo_core_repositories/place_repository/service/place_service_edge.dart';
+import 'package:core/src/turbo_core_repositories/ai_repository/service/ai_service_supabase.dart';
+import 'package:core/src/turbo_core_repositories/ai_repository/service/ai_service_edge.dart';
 import 'package:core/src/turbo_core_repositories/category_repository/service/category_service_edge.dart';
 import 'package:core/src/turbo_core_repositories/review_repository/service/review_service_edge.dart';
 import 'package:core/src/turbo_core_repositories/favorite_repository/service/favorite_service_edge.dart';
@@ -26,6 +28,8 @@ import 'package:core/src/turbo_core_repositories/place_category_repository/servi
 import 'package:core/src/turbo_core_repositories/reservation_repository/service/reservation_service_supabase.dart';
 import 'package:core/src/turbo_core_repositories/reservation_repository/service/reservation_service_edge.dart';
 import 'package:core/src/turbo_core_repositories/admin_auth_repository/interface/admin_auth_interface.dart';
+import 'package:core/src/turbo_core_repositories/ai_repository/interface/ai_interface.dart';
+import 'package:core/src/turbo_core_repositories/ai_repository/ai_repository.dart';
 
 /// Initialize dependencies based on environment configuration
 /// Supports dynamic switching between Firebase (dev) and Supabase (staging/prod)
@@ -72,7 +76,7 @@ Future<void> initCoreDependencies({
   print('   - Services: ✅ Completos (Firebase y Supabase)');
   print('   - Interfaces: ✅ Registradas según entorno');
   print(
-    '   - Repositories: ✅ Authentication, Review, Category, Event, Favorite, Location, Place, Analytics, PlaceCategory, Reservation, AdminAuth (ambos entornos)',
+    '   - Repositories: ✅ Authentication, Review, Category, Event, Favorite, Location, Place, Analytics, PlaceCategory, Reservation, AdminAuth, AI (ambos entornos)',
   );
   print('   - Uso uniforme: sl<AuthenticationRepository>() en ambos entornos');
   print('   - ✅ TODOS LOS REPOSITORIOS REFACTORIZADOS Y REGISTRADOS\n');
@@ -304,6 +308,25 @@ Future<void> _registerFirebaseServices(GetIt sl) async {
     );
     print('   ✅ AdminAuthService (Firebase)');
   }
+
+  // AI Service (vía Edge Gateway)
+  if (!sl.isRegistered<AiServiceEdge>()) {
+    if (Env.useEdgeGateway && Env.supabaseEdgeBaseUrl.isNotEmpty) {
+      sl.registerLazySingleton<AiServiceEdge>(
+        () =>
+            AiServiceEdge(baseUrl: Env.supabaseEdgeBaseUrl, httpClient: Dio()),
+      );
+      print('   ✅ AiServiceEdge (Firebase)');
+    }
+  }
+
+  // Interface -> implementación concreta para AI (Firebase)
+  if (!sl.isRegistered<AiInterface>()) {
+    if (Env.useEdgeGateway && Env.supabaseEdgeBaseUrl.isNotEmpty) {
+      sl.registerLazySingleton<AiInterface>(() => sl<AiServiceEdge>());
+      print('   ✅ AiInterface -> Edge Gateway (Firebase)');
+    }
+  }
 }
 
 /// Register Supabase services
@@ -323,6 +346,23 @@ Future<void> _registerSupabaseServices(GetIt sl) async {
       () => ReviewServiceSupabase(supabaseClient: sl<SupabaseClient>()),
     );
     print('   ✅ ReviewServiceSupabase');
+  }
+
+  // AI Service
+  if (!sl.isRegistered<AiServiceSupabase>()) {
+    if (Env.useEdgeGateway && Env.supabaseEdgeBaseUrl.isNotEmpty) {
+      // Registrar Edge como servicio concreto
+      sl.registerLazySingleton<AiServiceEdge>(
+        () =>
+            AiServiceEdge(baseUrl: Env.supabaseEdgeBaseUrl, httpClient: Dio()),
+      );
+      print('   ✅ AiServiceEdge');
+    } else {
+      sl.registerLazySingleton<AiServiceSupabase>(
+        () => AiServiceSupabase(supabase: sl<SupabaseClient>()),
+      );
+      print('   ✅ AiServiceSupabase');
+    }
   }
 
   // Category Service (Supabase directo y alternativa Edge Gateway)
@@ -554,6 +594,17 @@ Future<void> _registerSupabaseServices(GetIt sl) async {
     }
   }
 
+  // Interface -> implementación concreta para AI
+  if (!sl.isRegistered<AiInterface>()) {
+    if (Env.useEdgeGateway && Env.supabaseEdgeBaseUrl.isNotEmpty) {
+      sl.registerLazySingleton<AiInterface>(() => sl<AiServiceEdge>());
+      print('   ✅ AiInterface -> Edge Gateway');
+    } else {
+      sl.registerLazySingleton<AiInterface>(() => sl<AiServiceSupabase>());
+      print('   ✅ AiInterface -> Supabase');
+    }
+  }
+
   if (!sl.isRegistered<PlaceCategoryRepositoryInterface>()) {
     if (Env.useEdgeGateway && Env.supabaseEdgeBaseUrl.isNotEmpty) {
       sl.registerLazySingleton<PlaceCategoryRepositoryInterface>(
@@ -758,6 +809,14 @@ void _registerFirebaseRepositories(GetIt sl) {
     print('   ✅ AdminAuthRepository (Firebase)');
   }
 
+  // AI Repository
+  if (!sl.isRegistered<AiRepository>()) {
+    sl.registerLazySingleton<AiRepository>(
+      () => AiRepository(aiService: sl<AiInterface>()),
+    );
+    print('   ✅ AiRepository (Firebase)');
+  }
+
   print('   🎉 ¡Todos los repositorios refactorizados!');
 }
 
@@ -858,6 +917,14 @@ void _registerSupabaseRepositories(GetIt sl) {
     print(
       '   ✅ AdminAuthRepository (Supabase - usando Firebase temporalmente)',
     );
+  }
+
+  // AI Repository
+  if (!sl.isRegistered<AiRepository>()) {
+    sl.registerLazySingleton<AiRepository>(
+      () => AiRepository(aiService: sl<AiInterface>()),
+    );
+    print('   ✅ AiRepository (Supabase)');
   }
 
   print('   🎉 ¡Todos los repositorios refactorizados!');
