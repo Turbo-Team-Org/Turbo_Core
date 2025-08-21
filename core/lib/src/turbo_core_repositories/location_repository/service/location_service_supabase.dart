@@ -4,6 +4,7 @@ import 'package:core/src/turbo_core_repositories/location_repository/models/plac
 import 'package:core/src/turbo_core_repositories/location_repository/models/google_place.dart';
 import 'package:core/src/turbo_core_repositories/location_repository/models/distance_result.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:geolocator/geolocator.dart';
 import 'dart:math' as math;
 
 /// Servicio de ubicación usando Supabase
@@ -17,8 +18,38 @@ class LocationServiceSupabase implements LocationInterface {
   // ================== LOCATION TRACKING ==================
   @override
   Future<LocationData> getCurrentLocation() async {
-    // TODO: Implementar si aplica (usualmente esto es local, no de backend)
-    throw UnimplementedError();
+    try {
+      // Check permissions first
+      if (!await hasLocationPermission()) {
+        final granted = await requestLocationPermission();
+        if (!granted) {
+          throw Exception('Permisos de ubicación denegados');
+        }
+      }
+
+      if (!await isLocationServiceEnabled()) {
+        throw Exception('Servicios de ubicación deshabilitados');
+      }
+
+      final position = await Geolocator.getCurrentPosition(
+        locationSettings: const LocationSettings(
+          accuracy: LocationAccuracy.high,
+          timeLimit: Duration(seconds: 10),
+        ),
+      );
+
+      return LocationData(
+        latitude: position.latitude,
+        longitude: position.longitude,
+        accuracy: position.accuracy,
+        altitude: position.altitude,
+        speed: position.speed,
+        heading: position.heading,
+        timestamp: position.timestamp ?? DateTime.now(),
+      );
+    } catch (e) {
+      throw Exception('Error al obtener la ubicación: $e');
+    }
   }
 
   @override
@@ -200,20 +231,21 @@ class LocationServiceSupabase implements LocationInterface {
   // ================== UTILS ==================
   @override
   Future<bool> hasLocationPermission() async {
-    // No aplica en Supabase (esto es local)
-    return true;
+    final permission = await Geolocator.checkPermission();
+    return permission == LocationPermission.whileInUse || 
+           permission == LocationPermission.always;
   }
 
   @override
   Future<bool> requestLocationPermission() async {
-    // No aplica en Supabase (esto es local)
-    return true;
+    final permission = await Geolocator.requestPermission();
+    return permission == LocationPermission.whileInUse || 
+           permission == LocationPermission.always;
   }
 
   @override
   Future<bool> isLocationServiceEnabled() async {
-    // No aplica en Supabase (esto es local)
-    return true;
+    return await Geolocator.isLocationServiceEnabled();
   }
 
   @override
