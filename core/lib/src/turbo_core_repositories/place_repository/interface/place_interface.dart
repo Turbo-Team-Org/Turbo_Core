@@ -40,4 +40,52 @@ abstract class PlaceInterface {
 
   /// 🏢 Adds a new place with admin ownership
   Future<void> addPlaceWithOwner(Place place, String ownerId);
+
+  // ==================== ADVANCED SEARCH METHODS ====================
+
+  /// 🔍 Búsqueda robusta por texto con múltiples campos
+  Future<List<Place>> searchPlacesByText(
+    String query, {
+    String? categoryId,
+    double? minRating,
+    double? maxPrice,
+    double? minPrice,
+    bool? isOpen,
+    int limit = 50,
+  });
+
+  /// 🎤 Búsqueda por voz (convierte texto a búsqueda)
+  Future<List<Place>> searchPlacesByVoice(
+    String voiceQuery, {
+    String? categoryId,
+    double? minRating,
+    double? maxPrice,
+    double? minPrice,
+    bool? isOpen,
+    int limit = 50,
+  });
+
+  /// 🔍 Búsqueda inteligente con múltiples estrategias
+  Future<List<Place>> intelligentSearch(
+    String query, {
+    String? categoryId,
+    double? minRating,
+    double? maxPrice,
+    double? minPrice,
+    bool? isOpen,
+    int limit = 50,
+  });
+
+  /// 🎯 Búsqueda por ubicación con radio configurable
+  Future<List<Place>> searchPlacesByLocation({
+    required double latitude,
+    required double longitude,
+    double radiusKm = 10.0,
+    String? categoryId,
+    double? minRating,
+    double? maxPrice,
+    double? minPrice,
+    bool? isOpen,
+    int limit = 50,
+  });
 }

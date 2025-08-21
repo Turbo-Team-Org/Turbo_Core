@@ -6,6 +6,7 @@ import 'package:core/src/turbo_core_repositories/place_repository/models/place_o
 import 'package:core/src/turbo_core_repositories/review_repository/models/review.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:uuid/uuid.dart';
+import 'dart:math' as math;
 
 /// Place service for Supabase
 class PlaceServiceSupabase implements PlaceInterface {
@@ -49,9 +50,10 @@ class PlaceServiceSupabase implements PlaceInterface {
             .order('created_at', ascending: false)
             .limit(20);
 
-        final reviews = reviewsResponse
-            .map((reviewData) => _reviewFromSupabase(reviewData))
-            .toList();
+        final reviews =
+            reviewsResponse
+                .map((reviewData) => _reviewFromSupabase(reviewData))
+                .toList();
 
         places.add(place.copyWith(reviews: reviews));
       }
@@ -82,9 +84,10 @@ class PlaceServiceSupabase implements PlaceInterface {
           .order('created_at', ascending: false)
           .limit(20);
 
-      final reviews = reviewsResponse
-          .map((reviewData) => _reviewFromSupabase(reviewData))
-          .toList();
+      final reviews =
+          reviewsResponse
+              .map((reviewData) => _reviewFromSupabase(reviewData))
+              .toList();
 
       return place.copyWith(reviews: reviews);
     } catch (e) {
@@ -95,11 +98,12 @@ class PlaceServiceSupabase implements PlaceInterface {
   @override
   Future<Place> getPlaceByName(String name) async {
     try {
-      final placeResponse = await supabase
-          .from('places')
-          .select('*')
-          .eq('name', name)
-          .maybeSingle();
+      final placeResponse =
+          await supabase
+              .from('places')
+              .select('*')
+              .eq('name', name)
+              .maybeSingle();
 
       if (placeResponse == null) {
         throw Exception('Place not found');
@@ -115,9 +119,10 @@ class PlaceServiceSupabase implements PlaceInterface {
           .order('created_at', ascending: false)
           .limit(20);
 
-      final reviews = reviewsResponse
-          .map((reviewData) => _reviewFromSupabase(reviewData))
-          .toList();
+      final reviews =
+          reviewsResponse
+              .map((reviewData) => _reviewFromSupabase(reviewData))
+              .toList();
 
       return place.copyWith(reviews: reviews);
     } catch (e) {
@@ -147,9 +152,10 @@ class PlaceServiceSupabase implements PlaceInterface {
             .order('created_at', ascending: false)
             .limit(20);
 
-        final reviews = reviewsResponse
-            .map((reviewData) => _reviewFromSupabase(reviewData))
-            .toList();
+        final reviews =
+            reviewsResponse
+                .map((reviewData) => _reviewFromSupabase(reviewData))
+                .toList();
 
         places.add(place.copyWith(reviews: reviews));
       }
@@ -165,8 +171,11 @@ class PlaceServiceSupabase implements PlaceInterface {
   /// 🏢 Gets places owned by a specific admin user
   Future<List<Place>> getPlacesByOwnerId(String ownerId) async {
     try {
-      final placesResponse = await supabase.from('places').select('*').contains(
-          'owner_ids', [ownerId]).order('created_at', ascending: false);
+      final placesResponse = await supabase
+          .from('places')
+          .select('*')
+          .contains('owner_ids', [ownerId])
+          .order('created_at', ascending: false);
 
       final places = <Place>[];
 
@@ -181,9 +190,10 @@ class PlaceServiceSupabase implements PlaceInterface {
             .order('created_at', ascending: false)
             .limit(20);
 
-        final reviews = reviewsResponse
-            .map((reviewData) => _reviewFromSupabase(reviewData))
-            .toList();
+        final reviews =
+            reviewsResponse
+                .map((reviewData) => _reviewFromSupabase(reviewData))
+                .toList();
 
         places.add(place.copyWith(reviews: reviews));
       }
@@ -221,9 +231,10 @@ class PlaceServiceSupabase implements PlaceInterface {
               .order('created_at', ascending: false)
               .limit(20);
 
-          final reviews = reviewsResponse
-              .map((reviewData) => _reviewFromSupabase(reviewData))
-              .toList();
+          final reviews =
+              reviewsResponse
+                  .map((reviewData) => _reviewFromSupabase(reviewData))
+                  .toList();
 
           places.add(place.copyWith(reviews: reviews));
         }
@@ -242,10 +253,13 @@ class PlaceServiceSupabase implements PlaceInterface {
   ) async {
     try {
       // Update the place with new owners
-      await supabase.from('places').update({
-        'owner_ids': ownerIds,
-        'updated_at': DateTime.now().toIso8601String(),
-      }).eq('id', placeId);
+      await supabase
+          .from('places')
+          .update({
+            'owner_ids': ownerIds,
+            'updated_at': DateTime.now().toIso8601String(),
+          })
+          .eq('id', placeId);
 
       // Return the updated place
       return await getPlaceById(placeId);
@@ -274,15 +288,23 @@ class PlaceServiceSupabase implements PlaceInterface {
 
       // Calculate analytics
       final totalPlaces = places.length;
-      final totalViews =
-          places.fold(0, (sum, place) => sum + place.favoriteCount);
-      final totalReviews =
-          places.fold(0, (sum, place) => sum + place.reviews.length);
-      final averageRating = places.isNotEmpty
-          ? places.fold(0.0, (sum, place) => sum + place.rating) / places.length
-          : 0.0;
-      final totalFavorites =
-          places.fold(0, (sum, place) => sum + place.favoriteCount);
+      final totalViews = places.fold(
+        0,
+        (sum, place) => sum + place.favoriteCount,
+      );
+      final totalReviews = places.fold(
+        0,
+        (sum, place) => sum + place.reviews.length,
+      );
+      final averageRating =
+          places.isNotEmpty
+              ? places.fold(0.0, (sum, place) => sum + place.rating) /
+                  places.length
+              : 0.0;
+      final totalFavorites = places.fold(
+        0,
+        (sum, place) => sum + place.favoriteCount,
+      );
 
       // Monthly views (simplified)
       final monthlyViews = <String, int>{};
@@ -295,17 +317,20 @@ class PlaceServiceSupabase implements PlaceInterface {
       }
 
       // Top performing places
-      final topPerformingPlaces = places
-          .take(5)
-          .map((place) => PlacePerformance(
-                placeId: place.id,
-                placeName: place.name,
-                views: place.favoriteCount,
-                reviews: place.reviews.length,
-                rating: place.rating,
-                favorites: place.favoriteCount,
-              ))
-          .toList();
+      final topPerformingPlaces =
+          places
+              .take(5)
+              .map(
+                (place) => PlacePerformance(
+                  placeId: place.id,
+                  placeName: place.name,
+                  views: place.favoriteCount,
+                  reviews: place.reviews.length,
+                  rating: place.rating,
+                  favorites: place.favoriteCount,
+                ),
+              )
+              .toList();
 
       return PlaceOwnerAnalytics.fromData(ownerId, {
         'totalPlaces': totalPlaces,
@@ -336,10 +361,12 @@ class PlaceServiceSupabase implements PlaceInterface {
       try {
         await analyticsService.initializeAnalyticsStructure(placeId);
         print(
-            '✅ Lugar creado con analytics inicializados: ${placeWithId.name}');
+          '✅ Lugar creado con analytics inicializados: ${placeWithId.name}',
+        );
       } catch (analyticsError) {
         print(
-            '⚠️ Lugar creado pero falló la inicialización de analytics: $analyticsError');
+          '⚠️ Lugar creado pero falló la inicialización de analytics: $analyticsError',
+        );
         // No lanzamos el error para que el lugar se cree igual
         // Los analytics se pueden inicializar manualmente después
       }
@@ -429,12 +456,16 @@ class PlaceServiceSupabase implements PlaceInterface {
   /// Converts Supabase data to Place model
   Place _placeFromSupabase(Map<String, dynamic> data) {
     String asString(dynamic value) => value?.toString() ?? '';
-    double asDouble(dynamic value) => value == null
-        ? 0.0
-        : (value is double ? value : double.tryParse(value.toString()) ?? 0.0);
-    int asInt(dynamic value) => value == null
-        ? 0
-        : (value is int ? value : int.tryParse(value.toString()) ?? 0);
+    double asDouble(dynamic value) =>
+        value == null
+            ? 0.0
+            : (value is double
+                ? value
+                : double.tryParse(value.toString()) ?? 0.0);
+    int asInt(dynamic value) =>
+        value == null
+            ? 0
+            : (value is int ? value : int.tryParse(value.toString()) ?? 0);
     bool asBool(dynamic value) => value is bool ? value : value == true;
     List<String> asStringList(dynamic value) =>
         value is List ? List<String>.from(value) : [];
@@ -468,12 +499,14 @@ class PlaceServiceSupabase implements PlaceInterface {
       metadata: asMap(data['metadata']),
       ownerIds: asStringList(data['owner_ids']),
       createdBy: asString(data['created_by']),
-      createdAt: data['created_at'] != null
-          ? DateTime.parse(data['created_at'] as String)
-          : null,
-      lastUpdated: data['updated_at'] != null
-          ? DateTime.parse(data['updated_at'] as String)
-          : null,
+      createdAt:
+          data['created_at'] != null
+              ? DateTime.parse(data['created_at'] as String)
+              : null,
+      lastUpdated:
+          data['updated_at'] != null
+              ? DateTime.parse(data['updated_at'] as String)
+              : null,
     );
   }
 
@@ -505,7 +538,8 @@ class PlaceServiceSupabase implements PlaceInterface {
       'owner_ids': place.ownerIds,
       'created_by': place.createdBy,
       'created_at': place.createdAt?.toIso8601String(),
-      'updated_at': place.lastUpdated?.toIso8601String() ??
+      'updated_at':
+          place.lastUpdated?.toIso8601String() ??
           DateTime.now().toIso8601String(),
     };
   }
@@ -519,9 +553,447 @@ class PlaceServiceSupabase implements PlaceInterface {
       userAvatar: data['user_photo_url'] as String? ?? '',
       comment: data['comment'] as String? ?? '',
       rating: (data['rating'] as num?)?.toDouble() ?? 0.0,
-      date: data['created_at'] != null
-          ? DateTime.parse(data['created_at'] as String)
-          : DateTime.now(),
+      date:
+          data['created_at'] != null
+              ? DateTime.parse(data['created_at'] as String)
+              : DateTime.now(),
     );
+  }
+
+  // ==================== ADVANCED SEARCH METHODS ====================
+
+  /// 🔍 Búsqueda robusta por texto con múltiples campos
+  Future<List<Place>> searchPlacesByText(
+    String query, {
+    String? categoryId,
+    double? minRating,
+    double? maxPrice,
+    double? minPrice,
+    bool? isOpen,
+    int limit = 50,
+  }) async {
+    try {
+      if (query.trim().isEmpty) {
+        return [];
+      }
+
+      final searchQuery = query.trim().toLowerCase();
+
+      // Búsqueda principal usando ILIKE para coincidencias parciales
+      var supabaseQuery = supabase
+          .from('places')
+          .select('*')
+          .eq('is_active', true)
+          .or(
+            'name.ilike.%$searchQuery%,description.ilike.%$searchQuery%,address.ilike.%$searchQuery%,tags.cs.{$searchQuery}',
+          );
+
+      // Aplicar filtros adicionales
+      if (categoryId != null && categoryId.isNotEmpty) {
+        supabaseQuery = supabaseQuery.eq('category_id', categoryId);
+      }
+
+      if (minRating != null && minRating > 0) {
+        supabaseQuery = supabaseQuery.gte('rating', minRating);
+      }
+
+      if (maxPrice != null) {
+        supabaseQuery = supabaseQuery.lte('average_price', maxPrice);
+      }
+
+      if (minPrice != null) {
+        supabaseQuery = supabaseQuery.gte('average_price', minPrice);
+      }
+
+      if (isOpen != null) {
+        supabaseQuery = supabaseQuery.eq('is_open', isOpen);
+      }
+
+      final placesResponse = await supabaseQuery
+          .order('rating', ascending: false)
+          .limit(limit);
+
+      final places = <Place>[];
+
+      for (final placeData in placesResponse) {
+        final place = _placeFromSupabase(placeData);
+
+        // Get reviews for this place
+        final reviewsResponse = await supabase
+            .from('reviews')
+            .select('*')
+            .eq('place_id', place.id)
+            .order('created_at', ascending: false)
+            .limit(20);
+
+        final reviews =
+            reviewsResponse
+                .map((reviewData) => _reviewFromSupabase(reviewData))
+                .toList();
+
+        places.add(place.copyWith(reviews: reviews));
+      }
+
+      // Ordenar por relevancia (rating + coincidencia exacta en nombre)
+      places.sort((a, b) {
+        final aNameMatch = a.name.toLowerCase().contains(searchQuery);
+        final bNameMatch = b.name.toLowerCase().contains(searchQuery);
+
+        // Priorizar coincidencias exactas en nombre
+        if (aNameMatch && !bNameMatch) return -1;
+        if (!aNameMatch && bNameMatch) return 1;
+
+        // Luego por rating
+        return (b.rating).compareTo(a.rating);
+      });
+
+      return places;
+    } catch (e) {
+      throw Exception('Error searching places by text: $e');
+    }
+  }
+
+  /// 🎤 Búsqueda por voz (convierte texto a búsqueda)
+  Future<List<Place>> searchPlacesByVoice(
+    String voiceQuery, {
+    String? categoryId,
+    double? minRating,
+    double? maxPrice,
+    double? minPrice,
+    bool? isOpen,
+    int limit = 50,
+  }) async {
+    try {
+      // Limpiar y normalizar la consulta de voz
+      final cleanedQuery = _cleanVoiceQuery(voiceQuery);
+
+      if (cleanedQuery.isEmpty) {
+        return [];
+      }
+
+      // Usar el método de búsqueda por texto con la consulta limpia
+      return await searchPlacesByText(
+        cleanedQuery,
+        categoryId: categoryId,
+        minRating: minRating,
+        maxPrice: maxPrice,
+        minPrice: minPrice,
+        isOpen: isOpen,
+        limit: limit,
+      );
+    } catch (e) {
+      throw Exception('Error searching places by voice: $e');
+    }
+  }
+
+  /// 🔍 Búsqueda inteligente con múltiples estrategias
+  Future<List<Place>> intelligentSearch(
+    String query, {
+    String? categoryId,
+    double? minRating,
+    double? maxPrice,
+    double? minPrice,
+    bool? isOpen,
+    int limit = 50,
+  }) async {
+    try {
+      if (query.trim().isEmpty) {
+        return [];
+      }
+
+      final searchQuery = query.trim().toLowerCase();
+      final places = <Place>[];
+
+      // Estrategia 1: Búsqueda exacta por nombre
+      try {
+        final exactMatches = await supabase
+            .from('places')
+            .select('*')
+            .eq('is_active', true)
+            .eq('name', searchQuery)
+            .limit(limit);
+
+        for (final placeData in exactMatches) {
+          final place = _placeFromSupabase(placeData);
+          final reviews = await _getReviewsForPlace(place.id);
+          places.add(place.copyWith(reviews: reviews));
+        }
+      } catch (e) {
+        // Continuar con otras estrategias si falla
+      }
+
+      // Estrategia 2: Búsqueda por texto en múltiples campos
+      if (places.length < limit) {
+        final textResults = await searchPlacesByText(
+          searchQuery,
+          categoryId: categoryId,
+          minRating: minRating,
+          maxPrice: maxPrice,
+          minPrice: minPrice,
+          isOpen: isOpen,
+          limit: limit - places.length,
+        );
+
+        // Agregar solo lugares que no estén ya en la lista
+        final existingIds = places.map((p) => p.id).toSet();
+        for (final place in textResults) {
+          if (!existingIds.contains(place.id) && places.length < limit) {
+            places.add(place);
+          }
+        }
+      }
+
+      // Estrategia 3: Búsqueda por tags si no hay suficientes resultados
+      if (places.length < limit && searchQuery.length > 2) {
+        final tagResults = await supabase
+            .from('places')
+            .select('*')
+            .eq('is_active', true)
+            .contains('tags', [searchQuery])
+            .limit(limit - places.length);
+
+        final existingIds = places.map((p) => p.id).toSet();
+        for (final placeData in tagResults) {
+          if (!existingIds.contains(placeData['id']) && places.length < limit) {
+            final place = _placeFromSupabase(placeData);
+            final reviews = await _getReviewsForPlace(place.id);
+            places.add(place.copyWith(reviews: reviews));
+          }
+        }
+      }
+
+      // Aplicar filtros finales
+      var filteredPlaces = places;
+
+      if (categoryId != null && categoryId.isNotEmpty) {
+        filteredPlaces =
+            filteredPlaces
+                .where((place) => place.categoryId == categoryId)
+                .toList();
+      }
+
+      if (minRating != null && minRating > 0) {
+        filteredPlaces =
+            filteredPlaces.where((place) => place.rating >= minRating).toList();
+      }
+
+      if (maxPrice != null) {
+        filteredPlaces =
+            filteredPlaces
+                .where((place) => place.averagePrice <= maxPrice)
+                .toList();
+      }
+
+      if (minPrice != null) {
+        filteredPlaces =
+            filteredPlaces
+                .where((place) => place.averagePrice >= minPrice)
+                .toList();
+      }
+
+      if (isOpen != null) {
+        filteredPlaces =
+            filteredPlaces.where((place) => place.isOpen == isOpen).toList();
+      }
+
+      // Ordenar por relevancia
+      filteredPlaces.sort((a, b) {
+        final aNameMatch = a.name.toLowerCase().contains(searchQuery);
+        final bNameMatch = b.name.toLowerCase().contains(searchQuery);
+
+        // Priorizar coincidencias exactas en nombre
+        if (aNameMatch && !bNameMatch) return -1;
+        if (!aNameMatch && bNameMatch) return 1;
+
+        // Luego por rating
+        return (b.rating).compareTo(a.rating);
+      });
+
+      return filteredPlaces;
+    } catch (e) {
+      throw Exception('Error in intelligent search: $e');
+    }
+  }
+
+  /// 🎯 Búsqueda por ubicación con radio configurable
+  Future<List<Place>> searchPlacesByLocation({
+    required double latitude,
+    required double longitude,
+    double radiusKm = 10.0,
+    String? categoryId,
+    double? minRating,
+    double? maxPrice,
+    double? minPrice,
+    bool? isOpen,
+    int limit = 50,
+  }) async {
+    try {
+      // Construir la consulta base
+      var query = supabase.from('places').select('*').eq('is_active', true);
+
+      // Aplicar filtros básicos
+      if (categoryId != null && categoryId.isNotEmpty) {
+        query = query.eq('category_id', categoryId);
+      }
+
+      if (minRating != null && minRating > 0) {
+        query = query.gte('rating', minRating);
+      }
+
+      if (maxPrice != null) {
+        query = query.lte('average_price', maxPrice);
+      }
+
+      if (minPrice != null) {
+        query = query.gte('average_price', minPrice);
+      }
+
+      if (isOpen != null) {
+        query = query.eq('is_open', isOpen);
+      }
+
+      final placesResponse = await query
+          .order('rating', ascending: false)
+          .limit(limit);
+
+      final places = <Place>[];
+
+      for (final placeData in placesResponse) {
+        final place = _placeFromSupabase(placeData);
+
+        // Filtrar por distancia
+        if (place.latitude != null && place.longitude != null) {
+          final distance = _calculateDistance(
+            latitude,
+            longitude,
+            place.latitude!,
+            place.longitude!,
+          );
+
+          if (distance <= radiusKm) {
+            // Get reviews for this place
+            final reviews = await _getReviewsForPlace(place.id);
+            places.add(place.copyWith(reviews: reviews));
+          }
+        }
+      }
+
+      // Ordenar por distancia
+      places.sort((a, b) {
+        if (a.latitude == null || a.longitude == null) return 1;
+        if (b.latitude == null || b.longitude == null) return -1;
+
+        final distanceA = _calculateDistance(
+          latitude,
+          longitude,
+          a.latitude!,
+          a.longitude!,
+        );
+        final distanceB = _calculateDistance(
+          latitude,
+          longitude,
+          b.latitude!,
+          b.longitude!,
+        );
+
+        return distanceA.compareTo(distanceB);
+      });
+
+      return places;
+    } catch (e) {
+      throw Exception('Error searching places by location: $e');
+    }
+  }
+
+  // ==================== HELPER METHODS ====================
+
+  /// Limpia y normaliza consultas de voz
+  String _cleanVoiceQuery(String voiceQuery) {
+    if (voiceQuery.isEmpty) return '';
+
+    // Convertir a minúsculas
+    String cleaned = voiceQuery.toLowerCase().trim();
+
+    // Remover palabras comunes que no aportan valor de búsqueda
+    final stopWords = [
+      'buscar',
+      'encuentra',
+      'dónde',
+      'donde',
+      'hay',
+      'quiero',
+      'necesito',
+      'busco',
+      'busca',
+      'encontrar',
+      'lugar',
+      'lugares',
+      'restaurante',
+      'café',
+      'cafe',
+      'bar',
+      'club',
+      'discoteca',
+      'hotel',
+      'tienda',
+    ];
+
+    for (final stopWord in stopWords) {
+      cleaned = cleaned.replaceAll(' $stopWord ', ' ');
+      cleaned = cleaned.replaceAll('$stopWord ', '');
+      cleaned = cleaned.replaceAll(' $stopWord', '');
+    }
+
+    // Limpiar espacios múltiples
+    cleaned = cleaned.replaceAll(RegExp(r'\s+'), ' ').trim();
+
+    return cleaned;
+  }
+
+  /// Calcula distancia entre dos puntos usando fórmula de Haversine
+  double _calculateDistance(
+    double lat1,
+    double lon1,
+    double lat2,
+    double lon2,
+  ) {
+    const double earthRadius = 6371.0; // Radio de la Tierra en km
+
+    final double dLat = _degreesToRadians(lat2 - lat1);
+    final double dLon = _degreesToRadians(lon2 - lon1);
+
+    final double a =
+        math.sin(dLat / 2) * math.sin(dLat / 2) +
+        math.sin(_degreesToRadians(lat1)) *
+            math.sin(_degreesToRadians(lat2)) *
+            math.sin(dLon / 2) *
+            math.sin(dLon / 2);
+
+    final double c = 2 * math.atan(math.sqrt(a) / math.sqrt(1 - a));
+
+    return earthRadius * c;
+  }
+
+  /// Convierte grados a radianes
+  double _degreesToRadians(double degrees) {
+    return degrees * (3.14159265359 / 180);
+  }
+
+  /// Obtiene reseñas para un lugar específico
+  Future<List<Review>> _getReviewsForPlace(String placeId) async {
+    try {
+      final reviewsResponse = await supabase
+          .from('reviews')
+          .select('*')
+          .eq('place_id', placeId)
+          .order('created_at', ascending: false)
+          .limit(20);
+
+      return reviewsResponse
+          .map((reviewData) => _reviewFromSupabase(reviewData))
+          .toList();
+    } catch (e) {
+      return [];
+    }
   }
 }

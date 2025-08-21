@@ -154,17 +154,122 @@ class PlaceRepository {
 
   /// 🏢 Adds a new place with admin ownership.
   ///
-  /// [place] The place object to be added.
-  /// [ownerId] The admin user ID who will own this place.
+  /// [place] The place to add.
+  /// [ownerId] The unique identifier of the admin user who will own the place.
   ///
-  /// Returns true if the place was successfully added with ownership.
-  /// This method ensures the place is automatically assigned to an admin.
-  Future<bool> addPlaceWithOwner(Place place, String ownerId) async {
+  /// This method is used by the Admin Panel when an admin user wants to
+  /// add a new place to their portfolio.
+  Future<void> addPlaceWithOwner(Place place, String ownerId) async {
     try {
       await placeService.addPlaceWithOwner(place, ownerId);
-      return true;
     } catch (e) {
       throw Exception('Error al agregar lugar con propietario: $e');
+    }
+  }
+
+  // ==================== ADVANCED SEARCH METHODS ====================
+
+  /// 🔍 Búsqueda robusta por texto con múltiples campos
+  Future<List<Place>> searchPlacesByText(
+    String query, {
+    String? categoryId,
+    double? minRating,
+    double? maxPrice,
+    double? minPrice,
+    bool? isOpen,
+    int limit = 50,
+  }) async {
+    try {
+      return await placeService.searchPlacesByText(
+        query,
+        categoryId: categoryId,
+        minRating: minRating,
+        maxPrice: maxPrice,
+        minPrice: minPrice,
+        isOpen: isOpen,
+        limit: limit,
+      );
+    } catch (e) {
+      throw Exception('Error al buscar lugares por texto: $e');
+    }
+  }
+
+  /// 🎤 Búsqueda por voz (convierte texto a búsqueda)
+  Future<List<Place>> searchPlacesByVoice(
+    String voiceQuery, {
+    String? categoryId,
+    double? minRating,
+    double? maxPrice,
+    double? minPrice,
+    bool? isOpen,
+    int limit = 50,
+  }) async {
+    try {
+      return await placeService.searchPlacesByVoice(
+        voiceQuery,
+        categoryId: categoryId,
+        minRating: minRating,
+        maxPrice: maxPrice,
+        minPrice: minPrice,
+        isOpen: isOpen,
+        limit: limit,
+      );
+    } catch (e) {
+      throw Exception('Error al buscar lugares por voz: $e');
+    }
+  }
+
+  /// 🔍 Búsqueda inteligente con múltiples estrategias
+  Future<List<Place>> intelligentSearch(
+    String query, {
+    String? categoryId,
+    double? minRating,
+    double? maxPrice,
+    double? minPrice,
+    bool? isOpen,
+    int limit = 50,
+  }) async {
+    try {
+      return await placeService.intelligentSearch(
+        query,
+        categoryId: categoryId,
+        minRating: minRating,
+        maxPrice: maxPrice,
+        minPrice: minPrice,
+        isOpen: isOpen,
+        limit: limit,
+      );
+    } catch (e) {
+      throw Exception('Error en búsqueda inteligente: $e');
+    }
+  }
+
+  /// 🎯 Búsqueda por ubicación con radio configurable
+  Future<List<Place>> searchPlacesByLocation({
+    required double latitude,
+    required double longitude,
+    double radiusKm = 10.0,
+    String? categoryId,
+    double? minRating,
+    double? maxPrice,
+    double? minPrice,
+    bool? isOpen,
+    int limit = 50,
+  }) async {
+    try {
+      return await placeService.searchPlacesByLocation(
+        latitude: latitude,
+        longitude: longitude,
+        radiusKm: radiusKm,
+        categoryId: categoryId,
+        minRating: minRating,
+        maxPrice: maxPrice,
+        minPrice: minPrice,
+        isOpen: isOpen,
+        limit: limit,
+      );
+    } catch (e) {
+      throw Exception('Error al buscar lugares por ubicación: $e');
     }
   }
 
@@ -346,7 +451,8 @@ class PlaceRepository {
     final double dLat = _degreesToRadians(lat2 - lat1);
     final double dLon = _degreesToRadians(lon2 - lon1);
 
-    final double a = sin(dLat / 2) * sin(dLat / 2) +
+    final double a =
+        sin(dLat / 2) * sin(dLat / 2) +
         cos(_degreesToRadians(lat1)) *
             cos(_degreesToRadians(lat2)) *
             sin(dLon / 2) *
