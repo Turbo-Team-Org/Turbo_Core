@@ -5,13 +5,14 @@ import 'package:core/src/turbo_core_repositories/location_repository/models/goog
 import 'package:core/src/turbo_core_repositories/location_repository/models/distance_result.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:flutter/foundation.dart';
 import 'dart:math' as math;
 
 /// Servicio de ubicación usando Supabase
 /// Implementa la misma interfaz que LocationService (Firebase)
 class LocationServiceSupabase implements LocationInterface {
   LocationServiceSupabase({SupabaseClient? supabaseClient})
-      : _supabase = supabaseClient ?? Supabase.instance.client;
+    : _supabase = supabaseClient ?? Supabase.instance.client;
 
   final SupabaseClient _supabase;
 
@@ -232,15 +233,15 @@ class LocationServiceSupabase implements LocationInterface {
   @override
   Future<bool> hasLocationPermission() async {
     final permission = await Geolocator.checkPermission();
-    return permission == LocationPermission.whileInUse || 
-           permission == LocationPermission.always;
+    return permission == LocationPermission.whileInUse ||
+        permission == LocationPermission.always;
   }
 
   @override
   Future<bool> requestLocationPermission() async {
     final permission = await Geolocator.requestPermission();
-    return permission == LocationPermission.whileInUse || 
-           permission == LocationPermission.always;
+    return permission == LocationPermission.whileInUse ||
+        permission == LocationPermission.always;
   }
 
   @override
@@ -260,7 +261,8 @@ class LocationServiceSupabase implements LocationInterface {
     final dLat = _degreesToRadians(lat2 - lat1);
     final dLon = _degreesToRadians(lon2 - lon1);
 
-    final a = math.sin(dLat / 2) * math.sin(dLat / 2) +
+    final a =
+        math.sin(dLat / 2) * math.sin(dLat / 2) +
         math.cos(_degreesToRadians(lat1)) *
             math.cos(_degreesToRadians(lat2)) *
             math.sin(dLon / 2) *
