@@ -271,4 +271,62 @@ class PlaceServiceEdge implements PlaceInterface {
                   : DateTime.now()),
     );
   }
+
+  @override
+  Future<List<Place>> intelligentSearch(
+    String query, {
+    String? categoryId,
+    double? minRating,
+    double? maxPrice,
+    double? minPrice,
+    bool? isOpen,
+    int limit = 50,
+  }) {
+    // TODO: implement intelligentSearch
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<List<Place>> searchPlacesByLocation({
+    required double latitude,
+    required double longitude,
+    double radiusKm = 10.0,
+    String? categoryId,
+    double? minRating,
+    double? maxPrice,
+    double? minPrice,
+    bool? isOpen,
+    int limit = 50,
+  }) {
+    // TODO: implement searchPlacesByLocation
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<List<Place>> searchPlacesByText(
+    String query, {
+    String? categoryId,
+    double? minRating,
+    double? maxPrice,
+    double? minPrice,
+    bool? isOpen,
+    int limit = 50,
+  }) {
+    // TODO: implement searchPlacesByText
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<List<Place>> searchPlacesByVoice(
+    String voiceQuery, {
+    String? categoryId,
+    double? minRating,
+    double? maxPrice,
+    double? minPrice,
+    bool? isOpen,
+    int limit = 50,
+  }) {
+    // TODO: implement searchPlacesByVoice
+    throw UnimplementedError();
+  }
 }
