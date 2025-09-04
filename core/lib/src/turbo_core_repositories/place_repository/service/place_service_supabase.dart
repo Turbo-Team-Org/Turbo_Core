@@ -576,18 +576,25 @@ class PlaceServiceSupabase implements PlaceInterface {
       // Implementación simple que usa getPlaces() y filtra
       final allPlaces = await getPlaces();
       final searchQuery = query.trim().toLowerCase();
-      
+
       if (searchQuery.isEmpty) {
         return allPlaces;
       }
 
-      return allPlaces.where((place) {
-        final nameMatch = place.name.toLowerCase().contains(searchQuery);
-        final descMatch = place.description.toLowerCase().contains(searchQuery);
-        final addressMatch = place.address.toLowerCase().contains(searchQuery);
-        
-        return nameMatch || descMatch || addressMatch;
-      }).take(limit).toList();
+      return allPlaces
+          .where((place) {
+            final nameMatch = place.name.toLowerCase().contains(searchQuery);
+            final descMatch = place.description.toLowerCase().contains(
+              searchQuery,
+            );
+            final addressMatch = place.address.toLowerCase().contains(
+              searchQuery,
+            );
+
+            return nameMatch || descMatch || addressMatch;
+          })
+          .take(limit)
+          .toList();
     } catch (e) {
       throw Exception('Error searching places by text: $e');
     }
@@ -660,19 +667,24 @@ class PlaceServiceSupabase implements PlaceInterface {
     try {
       // Implementación simple que usa getPlaces() y filtra por distancia
       final allPlaces = await getPlaces();
-      
-      final nearbyPlaces = allPlaces.where((place) {
-        if (place.latitude == null || place.longitude == null) return false;
-        
-        final distance = _calculateDistance(
-          latitude,
-          longitude,
-          place.latitude!,
-          place.longitude!,
-        );
-        
-        return distance <= radiusKm;
-      }).take(limit).toList();
+
+      final nearbyPlaces =
+          allPlaces
+              .where((place) {
+                if (place.latitude == null || place.longitude == null)
+                  return false;
+
+                final distance = _calculateDistance(
+                  latitude,
+                  longitude,
+                  place.latitude!,
+                  place.longitude!,
+                );
+
+                return distance <= radiusKm;
+              })
+              .take(limit)
+              .toList();
 
       return nearbyPlaces;
     } catch (e) {
