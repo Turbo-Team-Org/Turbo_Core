@@ -6,6 +6,8 @@ import 'package:core/src/turbo_core_repositories/place_repository/models/place/p
 import 'package:core/src/turbo_core_repositories/place_repository/place_repository.dart';
 import 'package:core/src/turbo_core_repositories/review_repository/models/review.dart';
 
+import '../models/place_owner_analytics.dart';
+
 /// Place service
 class PlaceService implements PlaceInterface {
   /// Constructor
@@ -313,23 +315,43 @@ class PlaceService implements PlaceInterface {
         print('Analytics not available, using calculated values: $e');
       }
 
-      return PlaceOwnerAnalytics(
-        ownerId: ownerId,
-        totalPlaces: ownerPlaces.length,
-        totalViews: totalViews,
-        totalReviews: totalReviews,
-        averageRating:
+      // Calculate monthly views (simplified)
+      final monthlyViews = <String, int>{};
+      final now = DateTime.now();
+      for (int i = 0; i < 12; i++) {
+        final month = DateTime(now.year, now.month - i, 1);
+        final monthKey =
+            '${month.year}-${month.month.toString().padLeft(2, '0')}';
+        monthlyViews[monthKey] = totalViews ~/ 12; // Simplified distribution
+      }
+
+      // Top performing places
+      final topPerformingPlaces =
+          ownerPlaces
+              .take(5)
+              .map(
+                (place) => PlacePerformance(
+                  placeId: place.id,
+                  placeName: place.name,
+                  views: place.favoriteCount,
+                  reviews: place.reviews.length,
+                  rating: place.rating,
+                  favorites: place.favoriteCount,
+                ),
+              )
+              .toList();
+
+      return PlaceOwnerAnalytics.fromData(ownerId, {
+        'totalPlaces': ownerPlaces.length,
+        'totalViews': totalViews,
+        'totalReviews': totalReviews,
+        'averageRating':
             ownerPlaces.isNotEmpty ? totalRating / ownerPlaces.length : 0.0,
-        totalFavorites: totalFavorites,
-        placesWithHighRating: placesWithHighRating,
-        placesNeedingAttention: placesNeedingAttention,
-        monthlyMetrics: {
-          'currentMonth': DateTime.now().month,
-          'placesAdded': 0, // This would require historical tracking
-          'avgViewsPerPlace':
-              ownerPlaces.isNotEmpty ? totalViews / ownerPlaces.length : 0,
-        },
-      );
+        'totalFavorites': totalFavorites,
+        'monthlyViews': monthlyViews,
+        'topPerformingPlaces':
+            topPerformingPlaces.map((e) => e.toJson()).toList(),
+      });
     } catch (e) {
       throw Exception('Error getting analytics by owner: $e');
     }
@@ -437,5 +459,63 @@ class PlaceService implements PlaceInterface {
     } catch (e) {
       throw Exception('Error al eliminar lugar: $e');
     }
+  }
+
+  @override
+  Future<List<Place>> intelligentSearch(
+    String query, {
+    String? categoryId,
+    double? minRating,
+    double? maxPrice,
+    double? minPrice,
+    bool? isOpen,
+    int limit = 50,
+  }) {
+    // TODO: implement intelligentSearch
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<List<Place>> searchPlacesByLocation({
+    required double latitude,
+    required double longitude,
+    double radiusKm = 10.0,
+    String? categoryId,
+    double? minRating,
+    double? maxPrice,
+    double? minPrice,
+    bool? isOpen,
+    int limit = 50,
+  }) {
+    // TODO: implement searchPlacesByLocation
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<List<Place>> searchPlacesByText(
+    String query, {
+    String? categoryId,
+    double? minRating,
+    double? maxPrice,
+    double? minPrice,
+    bool? isOpen,
+    int limit = 50,
+  }) {
+    // TODO: implement searchPlacesByText
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<List<Place>> searchPlacesByVoice(
+    String voiceQuery, {
+    String? categoryId,
+    double? minRating,
+    double? maxPrice,
+    double? minPrice,
+    bool? isOpen,
+    int limit = 50,
+  }) {
+    // TODO: implement searchPlacesByVoice
+    throw UnimplementedError();
   }
 }

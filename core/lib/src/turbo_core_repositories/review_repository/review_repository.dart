@@ -3,7 +3,6 @@ import 'package:core/src/turbo_core_repositories/review_repository/interface/rev
 import 'package:core/src/turbo_core_repositories/review_repository/models/paginated_reviews.dart';
 import 'package:core/src/turbo_core_repositories/review_repository/models/review.dart';
 import 'package:core/src/turbo_core_repositories/review_repository/models/review_status.dart';
-import 'package:core/src/turbo_core_repositories/review_repository/service/review_service.dart';
 
 /// Repository responsible for managing reviews with pagination and moderation capabilities.
 ///
@@ -14,8 +13,8 @@ class ReviewRepository {
   /// Constructor
   ReviewRepository({required this.reviewService});
 
-  /// Review service
-  final ReviewService reviewService;
+  /// Review service (now accepts interface for environment flexibility)
+  final ReviewInterface reviewService;
 
   /// Get reviews
 

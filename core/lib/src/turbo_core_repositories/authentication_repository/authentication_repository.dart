@@ -1,6 +1,5 @@
 import 'package:core/src/turbo_core_repositories/authentication_repository/interface/authentication_interface.dart';
 import 'package:core/src/turbo_core_repositories/authentication_repository/models/auth_user.dart';
-import 'package:core/src/turbo_core_repositories/authentication_repository/service/authentication_service.dart';
 
 /// Repository responsible for user authentication and account management.
 ///
@@ -12,8 +11,8 @@ class AuthenticationRepository implements AuthenticationInterface {
   /// authentication service.
   AuthenticationRepository({required this.authService});
 
-  /// Authentication service used by the repository.
-  final AuthenticationService authService;
+  /// Authentication service used by the repository (now accepts interface for environment flexibility).
+  final AuthenticationInterface authService;
 
   // ==================== AUTHENTICATION OPERATIONS ====================
 

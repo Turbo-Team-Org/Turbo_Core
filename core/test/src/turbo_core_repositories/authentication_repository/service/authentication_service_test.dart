@@ -55,26 +55,26 @@ void main() {
     // Mock Google Sign In method channel
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(
-          const MethodChannel('plugins.flutter.io/google_sign_in'),
-          (MethodCall methodCall) async {
-            switch (methodCall.method) {
-              case 'init':
-                return null;
-              case 'signOut':
-                return null;
-              default:
-                return null;
-            }
-          },
-        );
+      const MethodChannel('plugins.flutter.io/google_sign_in'),
+      (MethodCall methodCall) async {
+        switch (methodCall.method) {
+          case 'init':
+            return null;
+          case 'signOut':
+            return null;
+          default:
+            return null;
+        }
+      },
+    );
   });
 
   tearDown(() {
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(
-          const MethodChannel('plugins.flutter.io/google_sign_in'),
-          null,
-        );
+      const MethodChannel('plugins.flutter.io/google_sign_in'),
+      null,
+    );
   });
 
   group('AuthenticationService', () {

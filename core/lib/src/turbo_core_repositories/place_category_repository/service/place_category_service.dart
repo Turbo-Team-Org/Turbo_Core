@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:core/src/turbo_core_repositories/place_category_repository/interface/place_category_repository_interface.dart';
 import 'package:core/src/turbo_core_repositories/place_category_repository/models/place_category.dart';
 import 'package:core/src/turbo_core_repositories/place_repository/models/place/place.dart';
+import 'package:core/src/turbo_core_repositories/category_repository/model/category.dart';
 
 class PlaceCategoryService implements PlaceCategoryRepositoryInterface {
   PlaceCategoryService({FirebaseFirestore? firestore})
@@ -103,6 +104,7 @@ class PlaceCategoryService implements PlaceCategoryRepositoryInterface {
   }
 
   /// Obtiene todos los lugares de una categoría
+  @override
   Future<List<Place>> getPlacesInCategory(String categoryId) async {
     try {
       final querySnapshot = await placeCategoriesCollection
@@ -124,6 +126,33 @@ class PlaceCategoryService implements PlaceCategoryRepositoryInterface {
       return placeList;
     } catch (e) {
       throw Exception('Error al obtener lugares por categoría: $e');
+    }
+  }
+
+  /// Obtiene todas las categorías de un lugar
+  @override
+  Future<List<Category>> getCategoriesForPlace(String placeId) async {
+    try {
+      final querySnapshot = await placeCategoriesCollection
+          .where('placeId', isEqualTo: placeId)
+          .get();
+      if (querySnapshot.docs.isEmpty) {
+        return [];
+      }
+      final categoryIds = querySnapshot.docs
+          .map((doc) => doc.data()['categoryId'] as String)
+          .toList();
+      final categories = await Future.wait(
+        categoryIds
+            .map((id) => firestore.collection('categories').doc(id).get()),
+      );
+      final categoryList = categories
+          .where((doc) => doc.exists)
+          .map((doc) => Category.fromJson({'id': doc.id, ...doc.data() ?? {}}))
+          .toList();
+      return categoryList;
+    } catch (e) {
+      throw Exception('Error al obtener categorías del lugar: $e');
     }
   }
 }

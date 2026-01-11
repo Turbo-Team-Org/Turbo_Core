@@ -1,6 +1,5 @@
-// dart format width=80
-// coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
+// coverage:ignore-file
 // ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
@@ -88,6 +87,130 @@ as Map<String, dynamic>?,
 
 }
 
+
+/// Adds pattern-matching-related methods to [BusinessAvailability].
+extension BusinessAvailabilityPatterns on BusinessAvailability {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _BusinessAvailability value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _BusinessAvailability() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _BusinessAvailability value)  $default,){
+final _that = this;
+switch (_that) {
+case _BusinessAvailability():
+return $default(_that);}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _BusinessAvailability value)?  $default,){
+final _that = this;
+switch (_that) {
+case _BusinessAvailability() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String placeId,  List<WeeklySchedule> weeklySchedule,  List<SpecialDay> specialDays,  List<BlackoutDate> blackoutDates,  bool acceptsReservations,  int defaultSlotDuration,  int maxPartySizeDefault,  int maxAdvanceBookingDays,  int minAdvanceBookingHours,  DateTime? createdAt,  DateTime? updatedAt,  String? createdBy,  Map<String, dynamic>? metadata)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _BusinessAvailability() when $default != null:
+return $default(_that.id,_that.placeId,_that.weeklySchedule,_that.specialDays,_that.blackoutDates,_that.acceptsReservations,_that.defaultSlotDuration,_that.maxPartySizeDefault,_that.maxAdvanceBookingDays,_that.minAdvanceBookingHours,_that.createdAt,_that.updatedAt,_that.createdBy,_that.metadata);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String placeId,  List<WeeklySchedule> weeklySchedule,  List<SpecialDay> specialDays,  List<BlackoutDate> blackoutDates,  bool acceptsReservations,  int defaultSlotDuration,  int maxPartySizeDefault,  int maxAdvanceBookingDays,  int minAdvanceBookingHours,  DateTime? createdAt,  DateTime? updatedAt,  String? createdBy,  Map<String, dynamic>? metadata)  $default,) {final _that = this;
+switch (_that) {
+case _BusinessAvailability():
+return $default(_that.id,_that.placeId,_that.weeklySchedule,_that.specialDays,_that.blackoutDates,_that.acceptsReservations,_that.defaultSlotDuration,_that.maxPartySizeDefault,_that.maxAdvanceBookingDays,_that.minAdvanceBookingHours,_that.createdAt,_that.updatedAt,_that.createdBy,_that.metadata);}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String placeId,  List<WeeklySchedule> weeklySchedule,  List<SpecialDay> specialDays,  List<BlackoutDate> blackoutDates,  bool acceptsReservations,  int defaultSlotDuration,  int maxPartySizeDefault,  int maxAdvanceBookingDays,  int minAdvanceBookingHours,  DateTime? createdAt,  DateTime? updatedAt,  String? createdBy,  Map<String, dynamic>? metadata)?  $default,) {final _that = this;
+switch (_that) {
+case _BusinessAvailability() when $default != null:
+return $default(_that.id,_that.placeId,_that.weeklySchedule,_that.specialDays,_that.blackoutDates,_that.acceptsReservations,_that.defaultSlotDuration,_that.maxPartySizeDefault,_that.maxAdvanceBookingDays,_that.minAdvanceBookingHours,_that.createdAt,_that.updatedAt,_that.createdBy,_that.metadata);case _:
+  return null;
+
+}
+}
+
+}
 
 /// @nodoc
 @JsonSerializable()
@@ -278,6 +401,130 @@ as String?,
 }
 
 
+/// Adds pattern-matching-related methods to [WeeklySchedule].
+extension WeeklySchedulePatterns on WeeklySchedule {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _WeeklySchedule value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _WeeklySchedule() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _WeeklySchedule value)  $default,){
+final _that = this;
+switch (_that) {
+case _WeeklySchedule():
+return $default(_that);}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _WeeklySchedule value)?  $default,){
+final _that = this;
+switch (_that) {
+case _WeeklySchedule() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int dayOfWeek,  bool isOpen,  List<TimeRange> timeRanges,  String? notes)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _WeeklySchedule() when $default != null:
+return $default(_that.dayOfWeek,_that.isOpen,_that.timeRanges,_that.notes);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int dayOfWeek,  bool isOpen,  List<TimeRange> timeRanges,  String? notes)  $default,) {final _that = this;
+switch (_that) {
+case _WeeklySchedule():
+return $default(_that.dayOfWeek,_that.isOpen,_that.timeRanges,_that.notes);}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int dayOfWeek,  bool isOpen,  List<TimeRange> timeRanges,  String? notes)?  $default,) {final _that = this;
+switch (_that) {
+case _WeeklySchedule() when $default != null:
+return $default(_that.dayOfWeek,_that.isOpen,_that.timeRanges,_that.notes);case _:
+  return null;
+
+}
+}
+
+}
+
 /// @nodoc
 @JsonSerializable()
 
@@ -427,6 +674,130 @@ as String?,
 
 }
 
+
+/// Adds pattern-matching-related methods to [SpecialDay].
+extension SpecialDayPatterns on SpecialDay {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _SpecialDay value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _SpecialDay() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _SpecialDay value)  $default,){
+final _that = this;
+switch (_that) {
+case _SpecialDay():
+return $default(_that);}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _SpecialDay value)?  $default,){
+final _that = this;
+switch (_that) {
+case _SpecialDay() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( DateTime date,  bool isOpen,  List<TimeRange> timeRanges,  String? name,  String? description)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _SpecialDay() when $default != null:
+return $default(_that.date,_that.isOpen,_that.timeRanges,_that.name,_that.description);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( DateTime date,  bool isOpen,  List<TimeRange> timeRanges,  String? name,  String? description)  $default,) {final _that = this;
+switch (_that) {
+case _SpecialDay():
+return $default(_that.date,_that.isOpen,_that.timeRanges,_that.name,_that.description);}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( DateTime date,  bool isOpen,  List<TimeRange> timeRanges,  String? name,  String? description)?  $default,) {final _that = this;
+switch (_that) {
+case _SpecialDay() when $default != null:
+return $default(_that.date,_that.isOpen,_that.timeRanges,_that.name,_that.description);case _:
+  return null;
+
+}
+}
+
+}
 
 /// @nodoc
 @JsonSerializable()
@@ -578,6 +949,130 @@ as String?,
 }
 
 
+/// Adds pattern-matching-related methods to [BlackoutDate].
+extension BlackoutDatePatterns on BlackoutDate {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _BlackoutDate value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _BlackoutDate() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _BlackoutDate value)  $default,){
+final _that = this;
+switch (_that) {
+case _BlackoutDate():
+return $default(_that);}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _BlackoutDate value)?  $default,){
+final _that = this;
+switch (_that) {
+case _BlackoutDate() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( DateTime startDate,  DateTime endDate,  String? reason,  String? description)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _BlackoutDate() when $default != null:
+return $default(_that.startDate,_that.endDate,_that.reason,_that.description);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( DateTime startDate,  DateTime endDate,  String? reason,  String? description)  $default,) {final _that = this;
+switch (_that) {
+case _BlackoutDate():
+return $default(_that.startDate,_that.endDate,_that.reason,_that.description);}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( DateTime startDate,  DateTime endDate,  String? reason,  String? description)?  $default,) {final _that = this;
+switch (_that) {
+case _BlackoutDate() when $default != null:
+return $default(_that.startDate,_that.endDate,_that.reason,_that.description);case _:
+  return null;
+
+}
+}
+
+}
+
 /// @nodoc
 @JsonSerializable()
 
@@ -720,6 +1215,130 @@ as int,
 
 }
 
+
+/// Adds pattern-matching-related methods to [TimeRange].
+extension TimeRangePatterns on TimeRange {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _TimeRange value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _TimeRange() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _TimeRange value)  $default,){
+final _that = this;
+switch (_that) {
+case _TimeRange():
+return $default(_that);}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _TimeRange value)?  $default,){
+final _that = this;
+switch (_that) {
+case _TimeRange() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String startTime,  String endTime,  int maxCapacity)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _TimeRange() when $default != null:
+return $default(_that.startTime,_that.endTime,_that.maxCapacity);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String startTime,  String endTime,  int maxCapacity)  $default,) {final _that = this;
+switch (_that) {
+case _TimeRange():
+return $default(_that.startTime,_that.endTime,_that.maxCapacity);}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String startTime,  String endTime,  int maxCapacity)?  $default,) {final _that = this;
+switch (_that) {
+case _TimeRange() when $default != null:
+return $default(_that.startTime,_that.endTime,_that.maxCapacity);case _:
+  return null;
+
+}
+}
+
+}
 
 /// @nodoc
 @JsonSerializable()

@@ -1,6 +1,5 @@
 import 'package:core/src/turbo_core_repositories/favorite_repository/interface/favorite_interface.dart';
 import 'package:core/src/turbo_core_repositories/favorite_repository/models/favorite.dart';
-import 'package:core/src/turbo_core_repositories/favorite_repository/service/favorite_service.dart';
 
 /// Repository for managing user favorites and their operations.
 ///
@@ -11,8 +10,8 @@ class FavoriteRepository implements FavoriteInterface {
   /// Constructor for the FavoriteRepository.
   FavoriteRepository({required this.favoriteService});
 
-  /// Favorite service instance for data operations
-  final FavoriteService favoriteService;
+  /// Favorite service instance for data operations (now accepts interface for environment flexibility)
+  final FavoriteInterface favoriteService;
 
   // ==================== READ OPERATIONS ====================
 
@@ -171,9 +170,8 @@ class FavoriteRepository implements FavoriteInterface {
     try {
       final allFavorites = await favoriteService.getFavorites(userId);
 
-      final sortedFavorites =
-          allFavorites.toList()
-            ..sort((a, b) => b.date.compareTo(a.date)); // Most recent first
+      final sortedFavorites = allFavorites.toList()
+        ..sort((a, b) => b.date.compareTo(a.date)); // Most recent first
 
       if (limit != null && limit > 0) {
         return sortedFavorites.take(limit).toList();

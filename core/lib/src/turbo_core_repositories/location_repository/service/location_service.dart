@@ -14,8 +14,8 @@ import 'package:core/src/turbo_core_repositories/location_repository/models/dist
 /// Location service with Google Maps integration
 class LocationService implements LocationInterface {
   LocationService({FirebaseFirestore? firestore, String? googleMapsApiKey})
-    : _firestore = firestore ?? FirebaseFirestore.instance,
-      _googleMapsApiKey = googleMapsApiKey ?? _defaultApiKey {
+      : _firestore = firestore ?? FirebaseFirestore.instance,
+        _googleMapsApiKey = googleMapsApiKey ?? _defaultApiKey {
     _initialize();
   }
 
@@ -689,18 +689,16 @@ class LocationService implements LocationInterface {
             country: googlePlace.country,
             postalCode: googlePlace.postalCode,
             googlePlaceId: googlePlaceId,
-            addressComponents:
-                googlePlace.addressComponents
-                    .map((c) => c['long_name'] as String? ?? '')
-                    .toList(),
+            addressComponents: googlePlace.addressComponents
+                .map((c) => c['long_name'] as String? ?? '')
+                .toList(),
             plusCode: googlePlace.plusCode,
             createdAt: DateTime.now(),
             createdBy: userId,
           );
         } else {
           // Fallback to basic location
-          placeLocation =
-              formattedLocation?.copyWith(
+          placeLocation = formattedLocation?.copyWith(
                 placeId: placeId,
                 createdBy: userId,
               ) ??
@@ -717,14 +715,14 @@ class LocationService implements LocationInterface {
         // Use basic geocoding
         placeLocation =
             formattedLocation?.copyWith(placeId: placeId, createdBy: userId) ??
-            PlaceLocation.fromCoordinates(
-              id: DateTime.now().millisecondsSinceEpoch.toString(),
-              placeId: placeId,
-              latitude: coordinates.latitude,
-              longitude: coordinates.longitude,
-              formattedAddress:
-                  '${coordinates.latitude}, ${coordinates.longitude}',
-            );
+                PlaceLocation.fromCoordinates(
+                  id: DateTime.now().millisecondsSinceEpoch.toString(),
+                  placeId: placeId,
+                  latitude: coordinates.latitude,
+                  longitude: coordinates.longitude,
+                  formattedAddress:
+                      '${coordinates.latitude}, ${coordinates.longitude}',
+                );
       }
 
       // Save to Firestore
@@ -815,8 +813,7 @@ class LocationService implements LocationInterface {
     final dLat = _degreesToRadians(lat2 - lat1);
     final dLon = _degreesToRadians(lon2 - lon1);
 
-    final a =
-        math.sin(dLat / 2) * math.sin(dLat / 2) +
+    final a = math.sin(dLat / 2) * math.sin(dLat / 2) +
         math.cos(_degreesToRadians(lat1)) *
             math.cos(_degreesToRadians(lat2)) *
             math.sin(dLon / 2) *

@@ -1,5 +1,4 @@
 import 'package:core/src/turbo_core_repositories/reservation_repository/interface/reservation_interface.dart';
-import 'package:core/src/turbo_core_repositories/reservation_repository/service/reservation_service.dart';
 import 'package:core/src/turbo_core_repositories/reservation_repository/models/reservation.dart';
 import 'package:core/src/turbo_core_repositories/reservation_repository/models/reservation_status.dart';
 import 'package:core/src/turbo_core_repositories/reservation_repository/models/reservation_time_slot.dart';
@@ -16,11 +15,11 @@ import 'package:core/src/turbo_core_repositories/reservation_repository/models/r
 /// - Notificaciones automáticas
 class ReservationRepository implements ReservationInterface {
   /// Constructor
-  ReservationRepository({ReservationService? reservationService})
-    : _reservationService = reservationService ?? ReservationService();
+  ReservationRepository({required ReservationInterface reservationService})
+      : _reservationService = reservationService;
 
-  /// Servicio de reservas
-  final ReservationService _reservationService;
+  /// Servicio de reservas (ahora acepta interfaz para flexibilidad de ambiente)
+  final ReservationInterface _reservationService;
 
   // ================== GESTIÓN DE RESERVAS ==================
 
@@ -407,16 +406,15 @@ class ReservationRepository implements ReservationInterface {
           WeeklySchedule(
             dayOfWeek: day,
             isOpen: isOpen,
-            timeRanges:
-                isOpen
-                    ? [
-                      TimeRange(
-                        startTime: openTime,
-                        endTime: closeTime,
-                        maxCapacity: maxCapacityPerSlot,
-                      ),
-                    ]
-                    : [],
+            timeRanges: isOpen
+                ? [
+                    TimeRange(
+                      startTime: openTime,
+                      endTime: closeTime,
+                      maxCapacity: maxCapacityPerSlot,
+                    ),
+                  ]
+                : [],
           ),
         );
       }
@@ -480,7 +478,9 @@ class ReservationRepository implements ReservationInterface {
 
   @override
   void dispose() {
-    _reservationService.dispose();
+    // No hay implementación de dispose en la interfaz,
+    // ya que el servicio de reservas podría ser un singleton o no tener estado.
+    // Si el servicio de reservas tiene un método dispose, aquí se llamaría.
   }
 }
 
@@ -527,10 +527,9 @@ class AdminReservationDashboard {
   /// Próxima reserva
   Reservation? get nextReservation {
     final now = DateTime.now();
-    final upcoming =
-        todayReservations
-            .where((r) => r.startTime.isAfter(now) && r.status.isActive)
-            .toList();
+    final upcoming = todayReservations
+        .where((r) => r.startTime.isAfter(now) && r.status.isActive)
+        .toList();
 
     if (upcoming.isEmpty) return null;
 

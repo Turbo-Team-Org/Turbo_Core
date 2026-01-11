@@ -1,4 +1,5 @@
 import 'package:core/src/turbo_core_repositories/event_repository/models/event.dart';
+import 'package:core/src/turbo_core_repositories/event_repository/models/event_analytics.dart';
 
 /// Interface for event repository
 abstract class EventInterface {
@@ -36,4 +37,37 @@ abstract class EventInterface {
 
   /// Delete an event by id
   Future<void> deleteEvent(String id);
+
+  // ==================== ADMIN OPERATIONS ====================
+
+  /// 🏢 Gets events from multiple places (used by admins)
+  Future<List<Event>> getEventsByPlaceIds(List<String> placeIds);
+
+  /// 🏢 Gets events managed by a specific admin user
+  Future<List<Event>> getEventsByAdminUser(String adminUserId);
+
+  /// 📊 Gets event analytics for places owned by an admin
+  Future<EventAnalytics> getEventAnalyticsByAdminUser(
+    String adminUserId, {
+    DateTime? startDate,
+    DateTime? endDate,
+  });
+
+  /// 🔍 Searches events in places owned by a specific admin
+  Future<List<Event>> searchEventsByAdminUser(
+    String query,
+    String adminUserId, {
+    EventType? eventType,
+    DateTime? startDate,
+    DateTime? endDate,
+  });
+
+  /// 🏢 Adds a new event with admin ownership validation
+  Future<void> addEventByAdmin(Event event, String adminUserId);
+
+  /// 🏢 Updates an event with admin ownership validation
+  Future<void> updateEventByAdmin(Event event, String adminUserId);
+
+  /// 🏢 Deletes an event with admin ownership validation
+  Future<void> deleteEventByAdmin(String eventId, String adminUserId);
 }

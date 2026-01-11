@@ -1,0 +1,78 @@
+# ==============================================
+# TURBO CORE - ENVIRONMENT CONFIGURATION
+# STAGING ENVIRONMENT WITH EDGE FUNCTIONS
+# ==============================================
+
+# ==============================================
+# ENVIRONMENT CONFIGURATION
+# ==============================================
+
+# Environment: dev (Firebase) | staging (Supabase) | prod
+ENVIRONMENT=staging
+
+# Database Provider: firebase | supabase (optional, auto-detected from ENVIRONMENT)
+DATABASE_PROVIDER=supabase
+
+# ==============================================
+# SUPABASE CONFIGURATION (STAGING ENVIRONMENT)
+# ==============================================
+
+# Real Supabase project credentials (project: oiugslxvekwnoubljrde)
+SUPABASE_URL=https://oiugslxvekwnoubljrde.supabase.co
+SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9pdWdzbHh2ZWt3bm91YmxqcmRlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTEzOTYzMDksImV4cCI6MjA2Njk3MjMwOX0.r5yHCTclwn31efrv9HaaRHIPwXbmQRXdu6f0czrn1rk
+
+# IMPORTANTE: Necesitas obtener esta clave del panel de Supabase
+# Ve a Settings > API > service_role key
+SUPABASE_SERVICE_ROLE_KEY=your-service-role-key-here
+
+# ==============================================
+# EDGE FUNCTIONS CONFIGURATION
+# ==============================================
+
+# Use Edge Gateway (Supabase Edge Functions) instead of direct database access
+USE_EDGE_GATEWAY=true
+
+# Base URL for Edge Functions (Supabase Edge Functions)
+# Esta URL se genera automáticamente cuando creas Edge Functions
+SUPABASE_EDGE_BASE_URL=https://oiugslxvekwnoubljrde.functions.supabase.co
+
+# ==============================================
+# FIREBASE CONFIGURATION (DEV ENVIRONMENT - FALLBACK)
+# ==============================================
+
+# Current Firebase project: turbo-16770
+FIREBASE_API_KEY=AIzaSyAVutR13I58yvzsHjV5ZLtS9pHfe4cLsJ8
+FIREBASE_APP_ID=1:626963970726:web:b87ea452393d72655a1267
+FIREBASE_SENDER_ID=626963970726
+FIREBASE_PROJECT_ID=turbo-16770
+FIREBASE_AUTH_DOMAIN=turbo-16770.firebaseapp.com
+FIREBASE_STORAGE_BUCKET=turbo-16770.firebasestorage.app
+FIREBASE_MEASUREMENT_ID=G-E872L0BE36
+
+# ==============================================
+# LEGACY CONFIGURATION (BACKWARDS COMPATIBILITY)
+# ==============================================
+
+# Legacy environment variables (still supported)
+ENV=staging
+FIREBASE_ENV=dev
+
+# ==============================================
+# INSTRUCCIONES DE CONFIGURACIÓN
+# ==============================================
+
+# 1. Copia este archivo a .env en el directorio core/
+# 2. Obtén SUPABASE_SERVICE_ROLE_KEY del panel de Supabase
+# 3. Verifica que SUPABASE_EDGE_BASE_URL sea correcta
+# 4. Asegúrate de que USE_EDGE_GATEWAY=true
+
+# ==============================================
+# VERIFICACIÓN DE CONFIGURACIÓN
+# ==============================================
+
+# Para verificar que todo esté configurado correctamente:
+# 1. Ejecuta: flutter run --dart-define=ENVIRONMENT=staging
+# 2. Verifica en los logs que aparezca "✅ Edge Functions habilitadas"
+# 3. Prueba una función básica como health check
+
+
