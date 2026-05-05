@@ -242,6 +242,17 @@ Future<void> _registerFirebaseServices(GetIt sl) async {
     print('   ✅ PlaceService (Firebase)');
   }
 
+  // Analytics interface binding (required by AnalyticsRepository).
+  if (!sl.isRegistered<AnalyticsInterface>()) {
+    if (!sl.isRegistered<AnalyticsService>()) {
+      sl.registerLazySingleton<AnalyticsService>(
+        () => AnalyticsService(firestore: sl<FirebaseFirestore>()),
+      );
+    }
+    sl.registerLazySingleton<AnalyticsInterface>(() => sl<AnalyticsService>());
+    print('   ✅ AnalyticsInterface -> Firebase');
+  }
+
   // Review Service
   if (!sl.isRegistered<ReviewInterface>()) {
     sl.registerLazySingleton<ReviewInterface>(
