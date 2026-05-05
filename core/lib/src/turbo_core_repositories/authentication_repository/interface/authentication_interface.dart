@@ -38,4 +38,15 @@ abstract class AuthenticationInterface {
 
   /// Stream of the authentication state.
   Stream<AuthUser?> get authStateChanges;
+
+  // ==================== PROFILE OPERATIONS ====================
+
+  /// Gets the latest persisted profile for the currently authenticated user.
+  Future<AuthUser?> getCurrentProfile();
+
+  /// Updates profile fields and returns the refreshed user profile.
+  Future<AuthUser> updateUserProfile({
+    String? displayName,
+    String? photoUrl,
+  });
 }

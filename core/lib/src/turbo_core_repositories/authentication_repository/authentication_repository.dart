@@ -1,6 +1,5 @@
 import 'package:core/src/turbo_core_repositories/authentication_repository/interface/authentication_interface.dart';
 import 'package:core/src/turbo_core_repositories/authentication_repository/models/auth_user.dart';
-import 'package:core/src/turbo_core_repositories/authentication_repository/service/authentication_service.dart';
 
 /// Repository responsible for user authentication and account management.
 ///
@@ -13,7 +12,7 @@ class AuthenticationRepository implements AuthenticationInterface {
   AuthenticationRepository({required this.authService});
 
   /// Authentication service used by the repository.
-  final AuthenticationService authService;
+  final AuthenticationInterface authService;
 
   // ==================== AUTHENTICATION OPERATIONS ====================
 
@@ -144,6 +143,32 @@ class AuthenticationRepository implements AuthenticationInterface {
   @override
   Stream<AuthUser?> get authStateChanges => authService.authStateChanges;
 
+  /// Loads the persisted profile for the current user.
+  @override
+  Future<AuthUser?> getCurrentProfile() async {
+    try {
+      return await authService.getCurrentProfile();
+    } catch (e) {
+      throw Exception('Error al obtener perfil: $e');
+    }
+  }
+
+  /// Updates profile fields and returns the refreshed user.
+  @override
+  Future<AuthUser> updateUserProfile({
+    String? displayName,
+    String? photoUrl,
+  }) async {
+    try {
+      return await authService.updateUserProfile(
+        displayName: displayName,
+        photoUrl: photoUrl,
+      );
+    } catch (e) {
+      throw Exception('Error al actualizar perfil: $e');
+    }
+  }
+
   // ==================== UTILITY OPERATIONS ====================
 
   /// Gets the current authenticated user.
@@ -176,14 +201,7 @@ class AuthenticationRepository implements AuthenticationInterface {
   /// Throws an exception if no user is authenticated or if the operation fails.
   Future<void> updateDisplayName(String displayName) async {
     try {
-      final user = await getCurrentUser();
-      if (user == null) {
-        throw Exception('No hay usuario autenticado');
-      }
-
-      // This would require additional implementation in the service
-      // For now, we'll throw an exception indicating it's not implemented
-      throw Exception('Actualización de nombre no implementada aún');
+      await updateUserProfile(displayName: displayName);
     } catch (e) {
       throw Exception('Error al actualizar nombre: $e');
     }

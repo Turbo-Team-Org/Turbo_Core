@@ -163,6 +163,46 @@ class AuthenticationService implements AuthenticationInterface {
   Stream<AuthUser?> get authStateChanges =>
       _firebaseAuth.authStateChanges().asyncMap(_userFromFirestore);
 
+  @override
+  Future<AuthUser?> getCurrentProfile() async {
+    return _userFromFirestore(_firebaseAuth.currentUser);
+  }
+
+  @override
+  Future<AuthUser> updateUserProfile({
+    String? displayName,
+    String? photoUrl,
+  }) async {
+    final user = _firebaseAuth.currentUser;
+    if (user == null) {
+      throw Exception('No authenticated user');
+    }
+    if (displayName != null) {
+      await user.updateDisplayName(displayName);
+    }
+    if (photoUrl != null) {
+      await user.updatePhotoURL(photoUrl);
+    }
+    final data = <String, dynamic>{};
+    if (displayName != null) {
+      data['displayName'] = displayName;
+    }
+    if (photoUrl != null) {
+      data['photoUrl'] = photoUrl;
+    }
+    if (data.isNotEmpty) {
+      await firestore
+          .collection('users')
+          .doc(user.uid)
+          .set(data, SetOptions(merge: true));
+    }
+    final refreshed = await _userFromFirestore(user);
+    if (refreshed == null) {
+      throw Exception('Failed to refresh profile');
+    }
+    return refreshed;
+  }
+
   /// Retrieves the [AuthUser] from Firestore or creates a new one if not found.
   Future<AuthUser?> _userFromFirestore(User? user) async {
     if (user == null) {

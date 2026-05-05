@@ -1,10 +1,10 @@
 import 'package:core/src/turbo_core_repositories/authentication_repository/authentication_repository.dart';
+import 'package:core/src/turbo_core_repositories/authentication_repository/interface/authentication_interface.dart';
 import 'package:core/src/turbo_core_repositories/authentication_repository/models/auth_user.dart';
-import 'package:core/src/turbo_core_repositories/authentication_repository/service/authentication_service.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
-class MockAuthenticationService extends Mock implements AuthenticationService {}
+class MockAuthenticationService extends Mock implements AuthenticationInterface {}
 
 void main() {
   late AuthenticationRepository authRepository;
@@ -498,12 +498,26 @@ void main() {
         expect(result, isFalse);
       });
 
-      test('updateDisplayName throws not implemented', () async {
+      test('updateDisplayName delegates to updateUserProfile', () async {
         // Arrange
-        final authStream = Stream<AuthUser?>.value(testAuthUser);
         when(
-          () => mockAuthService.authStateChanges,
-        ).thenAnswer((_) => authStream);
+          () => mockAuthService.updateUserProfile(displayName: 'New Name'),
+        ).thenAnswer((_) async => testAuthUser);
+
+        // Act
+        await authRepository.updateDisplayName('New Name');
+
+        // Assert
+        verify(
+          () => mockAuthService.updateUserProfile(displayName: 'New Name'),
+        ).called(1);
+      });
+
+      test('updateDisplayName propagates errors from service', () async {
+        // Arrange
+        when(
+          () => mockAuthService.updateUserProfile(displayName: 'New Name'),
+        ).thenThrow(Exception('failed'));
 
         // Act & Assert
         expect(
@@ -512,30 +526,43 @@ void main() {
             isA<Exception>().having(
               (e) => e.toString(),
               'message',
-              contains('Actualización de nombre no implementada aún'),
+              contains('Error al actualizar nombre'),
             ),
           ),
         );
       });
 
-      test('updateDisplayName throws when no user authenticated', () async {
-        // Arrange
-        final authStream = Stream<AuthUser?>.value(null);
+      test('getCurrentProfile delegates to auth service', () async {
         when(
-          () => mockAuthService.authStateChanges,
-        ).thenAnswer((_) => authStream);
+          () => mockAuthService.getCurrentProfile(),
+        ).thenAnswer((_) async => testAuthUser);
 
-        // Act & Assert
-        expect(
-          () => authRepository.updateDisplayName('New Name'),
-          throwsA(
-            isA<Exception>().having(
-              (e) => e.toString(),
-              'message',
-              contains('No hay usuario autenticado'),
-            ),
+        final result = await authRepository.getCurrentProfile();
+
+        expect(result, equals(testAuthUser));
+        verify(() => mockAuthService.getCurrentProfile()).called(1);
+      });
+
+      test('updateUserProfile delegates to auth service', () async {
+        when(
+          () => mockAuthService.updateUserProfile(
+            displayName: 'New Name',
+            photoUrl: 'https://x.dev/photo.png',
           ),
+        ).thenAnswer((_) async => testAuthUser);
+
+        final result = await authRepository.updateUserProfile(
+          displayName: 'New Name',
+          photoUrl: 'https://x.dev/photo.png',
         );
+
+        expect(result, equals(testAuthUser));
+        verify(
+          () => mockAuthService.updateUserProfile(
+            displayName: 'New Name',
+            photoUrl: 'https://x.dev/photo.png',
+          ),
+        ).called(1);
       });
 
       test('deleteAccount throws not implemented', () async {
