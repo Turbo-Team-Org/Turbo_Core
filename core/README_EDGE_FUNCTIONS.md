@@ -4,11 +4,13 @@
 
 Este documento contiene **TODAS** las Edge Functions que necesitas implementar en Supabase para que el Core funcione correctamente con Edge Functions.
 
-## 🔧 **ARCHIVOS DISPONIBLES**
+## 🔧 **ARCHIVOS DISPONIBLES (estado actual repo)**
 
 1. **`EDGE_FUNCTIONS_AI_REVIEWS.ts`** - Funciones de IA y Reviews
-2. **`EDGE_FUNCTIONS_PLACES_CATEGORIES.ts`** - Funciones de Places y Categories  
-3. **`EDGE_FUNCTIONS_EVENTS_FAVORITES_ANALYTICS.ts`** - Funciones de Events, Favorites, Analytics y más
+2. **`EDGE_FUNCTIONS_EVENTS_FAVORITES_ANALYTICS.ts`** - Functions de Events, Favorites, Analytics y utilidades
+
+> Nota: `EDGE_FUNCTIONS_PLACES_CATEGORIES.ts` no está actualmente en este repo.
+> Si se requiere ese bundle, debe agregarse o dividirse desde los archivos existentes.
 
 ## 📚 **LISTA COMPLETA DE FUNCIONES (32 TOTAL)**
 

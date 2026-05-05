@@ -111,6 +111,73 @@ CREATE POLICY "admin_users_self_access" ON admin_users
   FOR ALL USING (auth.uid()::text = auth_uid::text);
 
 -- =====================================================
+-- 📅 RESERVATIONS DOMAIN
+-- =====================================================
+
+-- RESERVATIONS: usuario dueño ve/crea; service role administra todo.
+ALTER TABLE reservations ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "reservations_user_read" ON reservations
+  FOR SELECT USING (
+    auth.uid()::text = user_id::text OR
+    auth.role() = 'service_role'
+  );
+
+CREATE POLICY "reservations_user_insert" ON reservations
+  FOR INSERT WITH CHECK (
+    auth.uid()::text = user_id::text OR
+    auth.role() = 'service_role'
+  );
+
+CREATE POLICY "reservations_user_update" ON reservations
+  FOR UPDATE USING (
+    auth.uid()::text = user_id::text OR
+    auth.role() = 'service_role'
+  );
+
+CREATE POLICY "reservations_user_delete" ON reservations
+  FOR DELETE USING (
+    auth.uid()::text = user_id::text OR
+    auth.role() = 'service_role'
+  );
+
+-- RESERVATION_SETTINGS: lectura pública, escritura solo service role.
+ALTER TABLE reservation_settings ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "reservation_settings_public_read" ON reservation_settings
+  FOR SELECT USING (true);
+
+CREATE POLICY "reservation_settings_admin_write" ON reservation_settings
+  FOR ALL USING (auth.role() = 'service_role');
+
+-- BUSINESS_AVAILABILITY: lectura pública, escritura solo service role.
+ALTER TABLE business_availability ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "business_availability_public_read" ON business_availability
+  FOR SELECT USING (true);
+
+CREATE POLICY "business_availability_admin_write" ON business_availability
+  FOR ALL USING (auth.role() = 'service_role');
+
+-- BLACKOUT_DATES: lectura pública, escritura solo service role.
+ALTER TABLE blackout_dates ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "blackout_dates_public_read" ON blackout_dates
+  FOR SELECT USING (true);
+
+CREATE POLICY "blackout_dates_admin_write" ON blackout_dates
+  FOR ALL USING (auth.role() = 'service_role');
+
+-- SPECIAL_DAYS: lectura pública, escritura solo service role.
+ALTER TABLE special_days ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "special_days_public_read" ON special_days
+  FOR SELECT USING (true);
+
+CREATE POLICY "special_days_admin_write" ON special_days
+  FOR ALL USING (auth.role() = 'service_role');
+
+-- =====================================================
 -- 📊 TABLAS DE JUNCIÓN
 -- =====================================================
 

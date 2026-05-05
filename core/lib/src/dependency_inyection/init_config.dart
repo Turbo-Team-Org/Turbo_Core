@@ -912,11 +912,10 @@ void _registerSupabaseRepositories(GetIt sl) {
   // Admin Auth Repository
   if (!sl.isRegistered<AdminAuthRepository>()) {
     sl.registerLazySingleton<AdminAuthRepository>(
-      () => AdminAuthRepositoryImpl(adminAuthService: sl<AdminAuthService>()),
+      () =>
+          AdminAuthRepositoryImpl(adminAuthService: sl<AdminAuthInterface>()),
     );
-    print(
-      '   ✅ AdminAuthRepository (Supabase - usando Firebase temporalmente)',
-    );
+    print('   ✅ AdminAuthRepository (Supabase)');
   }
 
   // AI Repository
