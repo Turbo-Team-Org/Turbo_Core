@@ -23,6 +23,7 @@ dependencies:
   dio: ^5.7.0
   json_annotation: ^4.9.0
   uuid: ^4.5.1
+  crypto: ^3.0.3
   supabase_flutter: ^2.5.9
   postgrest: ^2.1.6
   gotrue: ^2.8.7

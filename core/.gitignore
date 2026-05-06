@@ -42,3 +42,8 @@ app.*.map.json
 
 # Test related
 coverage
+
+# Environment files (local secrets)
+.env
+.env.*
+# Plantillas versionadas (solo placeholders): .env_no_rls, .env_with_rls

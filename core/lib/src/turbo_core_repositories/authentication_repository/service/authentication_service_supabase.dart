@@ -134,6 +134,41 @@ class AuthenticationServiceSupabase implements AuthenticationInterface {
     });
   }
 
+  @override
+  Future<core_models.AuthUser?> getCurrentProfile() async {
+    final user = _supabase.auth.currentUser;
+    if (user == null) {
+      return null;
+    }
+    return _userFromSupabase(user);
+  }
+
+  @override
+  Future<core_models.AuthUser> updateUserProfile({
+    String? displayName,
+    String? photoUrl,
+  }) async {
+    final user = _supabase.auth.currentUser;
+    if (user == null) {
+      throw Exception('No authenticated user');
+    }
+    final updates = <String, dynamic>{};
+    if (displayName != null) {
+      updates['display_name'] = displayName;
+    }
+    if (photoUrl != null) {
+      updates['photo_url'] = photoUrl;
+    }
+    if (updates.isNotEmpty) {
+      await _supabase.from('users').update(updates).eq('id', user.id);
+    }
+    final refreshed = await _userFromSupabase(user);
+    if (refreshed == null) {
+      throw Exception('Failed to refresh profile');
+    }
+    return refreshed;
+  }
+
   /// Creates a user profile in the users table.
   Future<void> _createUserProfile(User user, String? displayName) async {
     try {

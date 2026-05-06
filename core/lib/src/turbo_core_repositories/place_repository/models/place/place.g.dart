@@ -12,13 +12,13 @@ _Place _$PlaceFromJson(Map<String, dynamic> json) => _Place(
   description: json['description'] as String,
   address: json['address'] as String,
   averagePrice: (json['averagePrice'] as num).toDouble(),
-  imageUrls:
-      (json['imageUrls'] as List<dynamic>).map((e) => e as String).toList(),
+  imageUrls: (json['imageUrls'] as List<dynamic>)
+      .map((e) => e as String)
+      .toList(),
   rating: (json['rating'] as num).toDouble(),
-  reviews:
-      (json['reviews'] as List<dynamic>)
-          .map((e) => Review.fromJson(e as Map<String, dynamic>))
-          .toList(),
+  reviews: (json['reviews'] as List<dynamic>)
+      .map((e) => Review.fromJson(e as Map<String, dynamic>))
+      .toList(),
   offers:
       (json['offers'] as List<dynamic>?)
           ?.map((e) => Offer.fromJson(e as Map<String, dynamic>))
@@ -54,14 +54,12 @@ _Place _$PlaceFromJson(Map<String, dynamic> json) => _Place(
       (json['ownerIds'] as List<dynamic>?)?.map((e) => e as String).toList() ??
       const [],
   createdBy: json['createdBy'] as String? ?? '',
-  createdAt:
-      json['createdAt'] == null
-          ? null
-          : DateTime.parse(json['createdAt'] as String),
-  lastUpdated:
-      json['lastUpdated'] == null
-          ? null
-          : DateTime.parse(json['lastUpdated'] as String),
+  createdAt: json['createdAt'] == null
+      ? null
+      : DateTime.parse(json['createdAt'] as String),
+  lastUpdated: json['lastUpdated'] == null
+      ? null
+      : DateTime.parse(json['lastUpdated'] as String),
 );
 
 Map<String, dynamic> _$PlaceToJson(_Place instance) => <String, dynamic>{

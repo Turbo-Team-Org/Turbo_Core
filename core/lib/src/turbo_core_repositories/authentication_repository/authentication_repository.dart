@@ -156,6 +156,32 @@ class AuthenticationRepository implements AuthenticationInterface {
     }
   }
 
+  /// Load persisted profile (e.g. `users` table) for the signed-in user.
+  @override
+  Future<AuthUser?> getCurrentProfile() async {
+    try {
+      return await authService.getCurrentProfile();
+    } catch (e) {
+      throw Exception('Error al obtener perfil: $e');
+    }
+  }
+
+  /// Update profile fields and return the refreshed [AuthUser].
+  @override
+  Future<AuthUser> updateUserProfile({
+    String? displayName,
+    String? photoUrl,
+  }) async {
+    try {
+      return await authService.updateUserProfile(
+        displayName: displayName,
+        photoUrl: photoUrl,
+      );
+    } catch (e) {
+      throw Exception('Error al actualizar perfil: $e');
+    }
+  }
+
   /// Checks if a user is currently authenticated.
   ///
   /// Returns `true` if a user is authenticated, `false` otherwise.
@@ -175,14 +201,7 @@ class AuthenticationRepository implements AuthenticationInterface {
   /// Throws an exception if no user is authenticated or if the operation fails.
   Future<void> updateDisplayName(String displayName) async {
     try {
-      final user = await getCurrentUser();
-      if (user == null) {
-        throw Exception('No hay usuario autenticado');
-      }
-
-      // This would require additional implementation in the service
-      // For now, we'll throw an exception indicating it's not implemented
-      throw Exception('Actualización de nombre no implementada aún');
+      await updateUserProfile(displayName: displayName);
     } catch (e) {
       throw Exception('Error al actualizar nombre: $e');
     }
