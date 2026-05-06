@@ -11,3 +11,4 @@ export 'package:core/src/turbo_core_repositories/review_repository/review_reposi
 export 'package:core/src/turbo_core_repositories/place_category_repository/place_category_repository_imports.dart';
 export 'package:core/src/turbo_core_repositories/reservation_repository/reservation_repository_imports.dart';
 export 'package:core/src/turbo_core_repositories/ai_repository/ai_repository_imports.dart';
+export 'package:core/src/turbo_core_repositories/payment_repository/payment_repository_imports.dart';
