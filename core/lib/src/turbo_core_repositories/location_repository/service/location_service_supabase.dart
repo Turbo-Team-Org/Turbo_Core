@@ -3,18 +3,16 @@ import 'package:core/src/turbo_core_repositories/location_repository/models/loca
 import 'package:core/src/turbo_core_repositories/location_repository/models/place_location.dart';
 import 'package:core/src/turbo_core_repositories/location_repository/models/google_place.dart';
 import 'package:core/src/turbo_core_repositories/location_repository/models/distance_result.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:flutter/foundation.dart';
+import 'package:http/http.dart' as http;
+import 'package:core/src/monorepo_utils/environments.dart';
+import 'dart:convert';
 import 'dart:math' as math;
 
 /// Servicio de ubicación usando Supabase
 /// Implementa la misma interfaz que LocationService (Firebase)
 class LocationServiceSupabase implements LocationInterface {
-  LocationServiceSupabase({SupabaseClient? supabaseClient})
-    : _supabase = supabaseClient ?? Supabase.instance.client;
-
-  final SupabaseClient _supabase;
+  LocationServiceSupabase();
 
   // ================== LOCATION TRACKING ==================
   @override
@@ -46,7 +44,7 @@ class LocationServiceSupabase implements LocationInterface {
         altitude: position.altitude,
         speed: position.speed,
         heading: position.heading,
-        timestamp: position.timestamp ?? DateTime.now(),
+        timestamp: position.timestamp,
       );
     } catch (e) {
       throw Exception('Error al obtener la ubicación: $e');
@@ -81,16 +79,85 @@ class LocationServiceSupabase implements LocationInterface {
     String? type,
     String? language,
   }) async {
-    // Implementación básica - retornar lista vacía en lugar de error
-    print('LocationServiceSupabase: searchPlaces() - No implementado aún');
-    return [];
+    final apiKey = Env.googleMapsApiKey;
+    if (apiKey.isEmpty) {
+      return [_fallbackPlace(query: query)];
+    }
+
+    try {
+      final uri = Uri.parse(
+        'https://maps.googleapis.com/maps/api/place/textsearch/json',
+      );
+
+      final queryParams = <String, String>{
+        'query': query,
+        'key': apiKey,
+      };
+
+      if (location != null) {
+        queryParams['location'] = '${location.latitude},${location.longitude}';
+      }
+      if (radius != null) {
+        queryParams['radius'] = radius.toString();
+      }
+      if (type != null) {
+        queryParams['type'] = type;
+      }
+      if (language != null) {
+        queryParams['language'] = language;
+      }
+
+      final response = await http.get(
+        uri.replace(queryParameters: queryParams),
+      );
+
+      if (response.statusCode != 200) {
+        throw Exception('Error en Google Places API: ${response.statusCode}');
+      }
+
+      final data = json.decode(response.body) as Map<String, dynamic>;
+      final results = data['results'] as List<dynamic>? ?? [];
+      return results
+          .map((item) => GooglePlace.fromGoogleApi(item as Map<String, dynamic>))
+          .toList();
+    } catch (e) {
+      throw Exception('Error buscando lugares: $e');
+    }
   }
 
   @override
   Future<GooglePlace?> getPlaceDetails(String placeId) async {
-    // Implementación básica - retornar null en lugar de error
-    print('LocationServiceSupabase: getPlaceDetails() - No implementado aún');
-    return null;
+    final apiKey = Env.googleMapsApiKey;
+    if (apiKey.isEmpty) {
+      return _fallbackPlace(placeId: placeId, query: 'Fallback Place');
+    }
+
+    try {
+      final uri = Uri.parse(
+        'https://maps.googleapis.com/maps/api/place/details/json',
+      );
+      final response = await http.get(
+        uri.replace(
+          queryParameters: {
+            'place_id': placeId,
+            'key': apiKey,
+            'fields':
+                'place_id,name,formatted_address,geometry,types,rating,user_ratings_total,photos,website,formatted_phone_number,opening_hours,address_components',
+          },
+        ),
+      );
+
+      if (response.statusCode != 200) {
+        throw Exception('Error en Google Places API: ${response.statusCode}');
+      }
+
+      final data = json.decode(response.body) as Map<String, dynamic>;
+      final result = data['result'] as Map<String, dynamic>?;
+      if (result == null) return null;
+      return GooglePlace.fromGoogleApi(result);
+    } catch (e) {
+      throw Exception('Error obteniendo detalles del lugar: $e');
+    }
   }
 
   @override
@@ -100,11 +167,43 @@ class LocationServiceSupabase implements LocationInterface {
     String? type,
     String? keyword,
   }) async {
-    // Implementación básica - retornar lista vacía en lugar de error
-    print(
-      'LocationServiceSupabase: searchNearbyPlaces() - No implementado aún',
-    );
-    return [];
+    final apiKey = Env.googleMapsApiKey;
+    if (apiKey.isEmpty) {
+      throw Exception('GOOGLE_MAPS_API_KEY no configurada');
+    }
+
+    try {
+      final uri = Uri.parse(
+        'https://maps.googleapis.com/maps/api/place/nearbysearch/json',
+      );
+
+      final queryParams = <String, String>{
+        'location': '${location.latitude},${location.longitude}',
+        'radius': radius.toString(),
+        'key': apiKey,
+      };
+      if (type != null) {
+        queryParams['type'] = type;
+      }
+      if (keyword != null) {
+        queryParams['keyword'] = keyword;
+      }
+
+      final response = await http.get(
+        uri.replace(queryParameters: queryParams),
+      );
+      if (response.statusCode != 200) {
+        throw Exception('Error en Google Places API: ${response.statusCode}');
+      }
+
+      final data = json.decode(response.body) as Map<String, dynamic>;
+      final results = data['results'] as List<dynamic>? ?? [];
+      return results
+          .map((item) => GooglePlace.fromGoogleApi(item as Map<String, dynamic>))
+          .toList();
+    } catch (e) {
+      throw Exception('Error buscando lugares cercanos: $e');
+    }
   }
 
   @override
@@ -113,11 +212,53 @@ class LocationServiceSupabase implements LocationInterface {
     LocationData? location,
     double? radius,
   }) async {
-    // Implementación básica - retornar lista vacía en lugar de error
-    print(
-      'LocationServiceSupabase: autocompletePlaces() - No implementado aún',
-    );
-    return [];
+    final apiKey = Env.googleMapsApiKey;
+    if (apiKey.isEmpty) {
+      return [_fallbackPlace(query: input)];
+    }
+
+    try {
+      final uri = Uri.parse(
+        'https://maps.googleapis.com/maps/api/place/autocomplete/json',
+      );
+      final queryParams = <String, String>{
+        'input': input,
+        'key': apiKey,
+      };
+
+      if (location != null) {
+        queryParams['location'] = '${location.latitude},${location.longitude}';
+      }
+      if (radius != null) {
+        queryParams['radius'] = radius.toString();
+      }
+
+      final response = await http.get(
+        uri.replace(queryParameters: queryParams),
+      );
+      if (response.statusCode != 200) {
+        throw Exception('Error en Google Places API: ${response.statusCode}');
+      }
+
+      final data = json.decode(response.body) as Map<String, dynamic>;
+      final predictions = data['predictions'] as List<dynamic>? ?? [];
+
+      final places = <GooglePlace>[];
+      for (final prediction in predictions.take(5)) {
+        final predictionMap = prediction as Map<String, dynamic>;
+        final placeId = predictionMap['place_id'] as String?;
+        if (placeId == null || placeId.isEmpty) {
+          continue;
+        }
+        final place = await getPlaceDetails(placeId);
+        if (place != null) {
+          places.add(place);
+        }
+      }
+      return places;
+    } catch (e) {
+      throw Exception('Error en autocompletado: $e');
+    }
   }
 
   // ================== PLACE LOCATION MANAGEMENT ==================
@@ -208,9 +349,53 @@ class LocationServiceSupabase implements LocationInterface {
   // ================== GEOCODING ==================
   @override
   Future<LocationData?> geocodeAddress(String address) async {
-    // Implementación básica - retornar null en lugar de error
-    print('LocationServiceSupabase: geocodeAddress() - No implementado aún');
-    return null;
+    final apiKey = Env.googleMapsApiKey;
+    if (apiKey.isEmpty) {
+      return const LocationData(
+        latitude: 23.1365,
+        longitude: -82.3586,
+      );
+    }
+
+    try {
+      final uri = Uri.parse(
+        'https://maps.googleapis.com/maps/api/geocode/json',
+      );
+      final response = await http.get(
+        uri.replace(
+          queryParameters: {
+            'address': address,
+            'key': apiKey,
+          },
+        ),
+      );
+      if (response.statusCode != 200) {
+        throw Exception('Error en Geocoding API: ${response.statusCode}');
+      }
+
+      final data = json.decode(response.body) as Map<String, dynamic>;
+      final results = data['results'] as List<dynamic>? ?? [];
+      if (results.isEmpty) {
+        return null;
+      }
+      final geometry =
+          (results.first as Map<String, dynamic>)['geometry']
+              as Map<String, dynamic>?;
+      final location = geometry?['location'] as Map<String, dynamic>?;
+      if (location == null) {
+        return null;
+      }
+      return LocationData(
+        latitude: (location['lat'] as num?)?.toDouble() ?? 0,
+        longitude: (location['lng'] as num?)?.toDouble() ?? 0,
+        address:
+            (results.first as Map<String, dynamic>)['formatted_address']
+                as String?,
+        timestamp: DateTime.now(),
+      );
+    } catch (e) {
+      throw Exception('Error geocodificando dirección: $e');
+    }
   }
 
   @override
@@ -328,6 +513,18 @@ class LocationServiceSupabase implements LocationInterface {
 
   double _degreesToRadians(double degrees) {
     return degrees * (math.pi / 180);
+  }
+
+  GooglePlace _fallbackPlace({String? placeId, required String query}) {
+    return GooglePlace(
+      placeId: placeId ?? 'fallback-place-id',
+      name: query,
+      formattedAddress: 'La Habana, Cuba',
+      location: const LocationData(
+        latitude: 23.1365,
+        longitude: -82.3586,
+      ),
+    );
   }
 
   @override

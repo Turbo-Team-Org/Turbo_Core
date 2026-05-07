@@ -191,6 +191,15 @@ class Env {
     }
   }
 
+  /// Google Maps / Places API Key
+  static String get googleMapsApiKey {
+    try {
+      return dotenv.env['GOOGLE_MAPS_API_KEY'] ?? '';
+    } catch (e) {
+      return '';
+    }
+  }
+
   // =====================================================
   // VALIDATION METHODS
   // =====================================================
