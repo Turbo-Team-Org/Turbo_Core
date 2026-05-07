@@ -1,5 +1,5 @@
+import 'package:core/src/turbo_core_repositories/category_repository/interface/category_interface.dart';
 import 'package:core/src/turbo_core_repositories/category_repository/model/category.dart';
-import 'package:core/src/turbo_core_repositories/category_repository/service/category_service.dart';
 import 'package:core/src/turbo_core_repositories/place_category_repository/place_category_repository_imports.dart';
 import 'package:core/src/turbo_core_repositories/place_repository/models/place/place.dart';
 
@@ -7,17 +7,17 @@ import 'package:core/src/turbo_core_repositories/place_repository/models/place/p
 class CategoryRepository {
   /// Constructor for the CategoryRepository.
   CategoryRepository({
-    required CategoryService categoryService,
-    required PlaceCategoryService placeCategoryService,
+    required CategoryInterface categoryService,
+    required PlaceCategoryRepositoryInterface placeCategoryService,
   })  : _categoryService = categoryService,
         _placeCategoryService = placeCategoryService;
-  final CategoryService _categoryService;
-  final PlaceCategoryService _placeCategoryService;
+  final CategoryInterface _categoryService;
+  final PlaceCategoryRepositoryInterface _placeCategoryService;
 
   /// Gets all categories.
   Future<List<Category>> getAllCategories() async {
     try {
-      return await _categoryService.getAllCategories();
+      return await _categoryService.getCategories();
     } catch (e) {
       throw Exception('Error al obtener categorías: $e');
     }

@@ -1,1 +1,13 @@
 include: package:very_good_analysis/analysis_options.6.0.0.yaml
+
+analyzer:
+  exclude:
+    # Scripts y ejemplos fuera de lib/ (no forman parte del API del paquete).
+    - debug_firestore_structure.dart
+    - debug_review_repository.dart
+    - ejemplo_business_owner_flow_completo.dart
+    - example_environment_switching.dart
+    - example_review_usage.dart
+    - verify_super_admin.dart
+    - documentation/**
+    - scripts/**

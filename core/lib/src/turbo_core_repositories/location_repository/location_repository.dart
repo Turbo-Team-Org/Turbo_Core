@@ -1,5 +1,4 @@
 import 'package:core/src/turbo_core_repositories/location_repository/interface/location_interface.dart';
-import 'package:core/src/turbo_core_repositories/location_repository/service/location_service.dart';
 import 'package:core/src/turbo_core_repositories/location_repository/models/location_data.dart';
 import 'package:core/src/turbo_core_repositories/location_repository/models/place_location.dart';
 import 'package:core/src/turbo_core_repositories/location_repository/models/google_place.dart';
@@ -16,14 +15,11 @@ import 'package:core/src/turbo_core_repositories/location_repository/models/dist
 class LocationRepository implements LocationInterface {
   /// Constructor
   LocationRepository({
-    LocationService? locationService,
-    String? googleMapsApiKey,
-  }) : _locationService =
-           locationService ??
-           LocationService(googleMapsApiKey: googleMapsApiKey);
+    required LocationInterface locationService,
+  }) : _locationService = locationService;
 
-  /// Location service
-  final LocationService _locationService;
+  /// Location service (now accepts interface for environment flexibility)
+  final LocationInterface _locationService;
 
   // ================== LOCATION TRACKING ==================
 

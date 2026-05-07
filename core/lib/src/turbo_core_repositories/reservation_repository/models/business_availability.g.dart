@@ -11,10 +11,9 @@ _BusinessAvailability _$BusinessAvailabilityFromJson(
 ) => _BusinessAvailability(
   id: json['id'] as String,
   placeId: json['placeId'] as String,
-  weeklySchedule:
-      (json['weeklySchedule'] as List<dynamic>)
-          .map((e) => WeeklySchedule.fromJson(e as Map<String, dynamic>))
-          .toList(),
+  weeklySchedule: (json['weeklySchedule'] as List<dynamic>)
+      .map((e) => WeeklySchedule.fromJson(e as Map<String, dynamic>))
+      .toList(),
   specialDays:
       (json['specialDays'] as List<dynamic>?)
           ?.map((e) => SpecialDay.fromJson(e as Map<String, dynamic>))
@@ -31,14 +30,12 @@ _BusinessAvailability _$BusinessAvailabilityFromJson(
   maxAdvanceBookingDays: (json['maxAdvanceBookingDays'] as num?)?.toInt() ?? 4,
   minAdvanceBookingHours:
       (json['minAdvanceBookingHours'] as num?)?.toInt() ?? 2,
-  createdAt:
-      json['createdAt'] == null
-          ? null
-          : DateTime.parse(json['createdAt'] as String),
-  updatedAt:
-      json['updatedAt'] == null
-          ? null
-          : DateTime.parse(json['updatedAt'] as String),
+  createdAt: json['createdAt'] == null
+      ? null
+      : DateTime.parse(json['createdAt'] as String),
+  updatedAt: json['updatedAt'] == null
+      ? null
+      : DateTime.parse(json['updatedAt'] as String),
   createdBy: json['createdBy'] as String?,
   metadata: json['metadata'] as Map<String, dynamic>?,
 );

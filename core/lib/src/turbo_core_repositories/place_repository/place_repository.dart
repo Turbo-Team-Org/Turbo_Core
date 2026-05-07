@@ -1,7 +1,8 @@
 import 'dart:math';
 
+import 'package:core/src/turbo_core_repositories/place_repository/interface/place_interface.dart';
 import 'package:core/src/turbo_core_repositories/place_repository/models/place/place.dart';
-import 'package:core/src/turbo_core_repositories/place_repository/service/place_service.dart';
+import 'package:core/src/turbo_core_repositories/place_repository/models/place_owner_analytics.dart';
 
 /// Repository for managing places and their operations.
 ///
@@ -12,8 +13,8 @@ class PlaceRepository {
   /// Constructor for the PlaceRepository.
   PlaceRepository({required this.placeService});
 
-  /// Place service instance for data operations
-  final PlaceService placeService;
+  /// Place service instance for data operations (now accepts interface for environment flexibility)
+  final PlaceInterface placeService;
 
   // ==================== READ OPERATIONS ====================
 
@@ -152,17 +153,122 @@ class PlaceRepository {
 
   /// 🏢 Adds a new place with admin ownership.
   ///
-  /// [place] The place object to be added.
-  /// [ownerId] The admin user ID who will own this place.
+  /// [place] The place to add.
+  /// [ownerId] The unique identifier of the admin user who will own the place.
   ///
-  /// Returns true if the place was successfully added with ownership.
-  /// This method ensures the place is automatically assigned to an admin.
-  Future<bool> addPlaceWithOwner(Place place, String ownerId) async {
+  /// This method is used by the Admin Panel when an admin user wants to
+  /// add a new place to their portfolio.
+  Future<void> addPlaceWithOwner(Place place, String ownerId) async {
     try {
       await placeService.addPlaceWithOwner(place, ownerId);
-      return true;
     } catch (e) {
       throw Exception('Error al agregar lugar con propietario: $e');
+    }
+  }
+
+  // ==================== ADVANCED SEARCH METHODS ====================
+
+  /// 🔍 Búsqueda robusta por texto con múltiples campos
+  Future<List<Place>> searchPlacesByText(
+    String query, {
+    String? categoryId,
+    double? minRating,
+    double? maxPrice,
+    double? minPrice,
+    bool? isOpen,
+    int limit = 50,
+  }) async {
+    try {
+      return await placeService.searchPlacesByText(
+        query,
+        categoryId: categoryId,
+        minRating: minRating,
+        maxPrice: maxPrice,
+        minPrice: minPrice,
+        isOpen: isOpen,
+        limit: limit,
+      );
+    } catch (e) {
+      throw Exception('Error al buscar lugares por texto: $e');
+    }
+  }
+
+  /// 🎤 Búsqueda por voz (convierte texto a búsqueda)
+  Future<List<Place>> searchPlacesByVoice(
+    String voiceQuery, {
+    String? categoryId,
+    double? minRating,
+    double? maxPrice,
+    double? minPrice,
+    bool? isOpen,
+    int limit = 50,
+  }) async {
+    try {
+      return await placeService.searchPlacesByVoice(
+        voiceQuery,
+        categoryId: categoryId,
+        minRating: minRating,
+        maxPrice: maxPrice,
+        minPrice: minPrice,
+        isOpen: isOpen,
+        limit: limit,
+      );
+    } catch (e) {
+      throw Exception('Error al buscar lugares por voz: $e');
+    }
+  }
+
+  /// 🔍 Búsqueda inteligente con múltiples estrategias
+  Future<List<Place>> intelligentSearch(
+    String query, {
+    String? categoryId,
+    double? minRating,
+    double? maxPrice,
+    double? minPrice,
+    bool? isOpen,
+    int limit = 50,
+  }) async {
+    try {
+      return await placeService.intelligentSearch(
+        query,
+        categoryId: categoryId,
+        minRating: minRating,
+        maxPrice: maxPrice,
+        minPrice: minPrice,
+        isOpen: isOpen,
+        limit: limit,
+      );
+    } catch (e) {
+      throw Exception('Error en búsqueda inteligente: $e');
+    }
+  }
+
+  /// 🎯 Búsqueda por ubicación con radio configurable
+  Future<List<Place>> searchPlacesByLocation({
+    required double latitude,
+    required double longitude,
+    double radiusKm = 10.0,
+    String? categoryId,
+    double? minRating,
+    double? maxPrice,
+    double? minPrice,
+    bool? isOpen,
+    int limit = 50,
+  }) async {
+    try {
+      return await placeService.searchPlacesByLocation(
+        latitude: latitude,
+        longitude: longitude,
+        radiusKm: radiusKm,
+        categoryId: categoryId,
+        minRating: minRating,
+        maxPrice: maxPrice,
+        minPrice: minPrice,
+        isOpen: isOpen,
+        limit: limit,
+      );
+    } catch (e) {
+      throw Exception('Error al buscar lugares por ubicación: $e');
     }
   }
 
@@ -358,80 +464,5 @@ class PlaceRepository {
   /// Converts degrees to radians.
   double _degreesToRadians(double degrees) {
     return degrees * (pi / 180);
-  }
-}
-
-/// 📊 Analytics data for places owned by an admin user
-class PlaceOwnerAnalytics {
-  const PlaceOwnerAnalytics({
-    required this.ownerId,
-    required this.totalPlaces,
-    required this.totalViews,
-    required this.totalReviews,
-    required this.averageRating,
-    required this.totalFavorites,
-    required this.placesWithHighRating,
-    required this.placesNeedingAttention,
-    required this.monthlyMetrics,
-  });
-
-  /// ID del propietario admin
-  final String ownerId;
-
-  /// Número total de lugares que posee
-  final int totalPlaces;
-
-  /// Total de visualizaciones en todos sus lugares
-  final int totalViews;
-
-  /// Total de reseñas en todos sus lugares
-  final int totalReviews;
-
-  /// Calificación promedio de todos sus lugares
-  final double averageRating;
-
-  /// Total de favoritos en todos sus lugares
-  final int totalFavorites;
-
-  /// Lugares con calificación alta (>= 4.0)
-  final int placesWithHighRating;
-
-  /// Lugares que necesitan atención (< 3.0 rating o sin reviews)
-  final int placesNeedingAttention;
-
-  /// Métricas mensuales de rendimiento
-  final Map<String, dynamic> monthlyMetrics;
-
-  /// Factory para crear desde datos de Firebase
-  factory PlaceOwnerAnalytics.fromAnalyticsData(
-    String ownerId,
-    Map<String, dynamic> data,
-  ) {
-    return PlaceOwnerAnalytics(
-      ownerId: ownerId,
-      totalPlaces: data['totalPlaces'] as int? ?? 0,
-      totalViews: data['totalViews'] as int? ?? 0,
-      totalReviews: data['totalReviews'] as int? ?? 0,
-      averageRating: (data['averageRating'] as num?)?.toDouble() ?? 0.0,
-      totalFavorites: data['totalFavorites'] as int? ?? 0,
-      placesWithHighRating: data['placesWithHighRating'] as int? ?? 0,
-      placesNeedingAttention: data['placesNeedingAttention'] as int? ?? 0,
-      monthlyMetrics: data['monthlyMetrics'] as Map<String, dynamic>? ?? {},
-    );
-  }
-
-  /// Convierte a JSON para storage
-  Map<String, dynamic> toJson() {
-    return {
-      'ownerId': ownerId,
-      'totalPlaces': totalPlaces,
-      'totalViews': totalViews,
-      'totalReviews': totalReviews,
-      'averageRating': averageRating,
-      'totalFavorites': totalFavorites,
-      'placesWithHighRating': placesWithHighRating,
-      'placesNeedingAttention': placesNeedingAttention,
-      'monthlyMetrics': monthlyMetrics,
-    };
   }
 }

@@ -40,14 +40,12 @@ _ReservationSettings _$ReservationSettingsFromJson(Map<String, dynamic> json) =>
       welcomeMessage: json['welcomeMessage'] as String?,
       cancellationPolicy: json['cancellationPolicy'] as String?,
       specialInstructions: json['specialInstructions'] as String?,
-      createdAt:
-          json['createdAt'] == null
-              ? null
-              : DateTime.parse(json['createdAt'] as String),
-      updatedAt:
-          json['updatedAt'] == null
-              ? null
-              : DateTime.parse(json['updatedAt'] as String),
+      createdAt: json['createdAt'] == null
+          ? null
+          : DateTime.parse(json['createdAt'] as String),
+      updatedAt: json['updatedAt'] == null
+          ? null
+          : DateTime.parse(json['updatedAt'] as String),
       createdBy: json['createdBy'] as String?,
       metadata: json['metadata'] as Map<String, dynamic>?,
     );

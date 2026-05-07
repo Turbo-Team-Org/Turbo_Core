@@ -4,3 +4,4 @@ export 'package:core/src/turbo_core_repositories/review_repository/models/review
 export 'package:core/src/turbo_core_repositories/review_repository/models/review_status.dart';
 export 'package:core/src/turbo_core_repositories/review_repository/review_repository.dart';
 export 'package:core/src/turbo_core_repositories/review_repository/service/review_service.dart';
+export 'package:core/src/turbo_core_repositories/review_repository/service/review_service_supabase.dart';

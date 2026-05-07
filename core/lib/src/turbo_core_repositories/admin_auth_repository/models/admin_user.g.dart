@@ -29,10 +29,9 @@ _AdminUser _$AdminUserFromJson(Map<String, dynamic> json) => _AdminUser(
         ),
       ) ??
       const {},
-  lastLogin:
-      json['lastLogin'] == null
-          ? null
-          : DateTime.parse(json['lastLogin'] as String),
+  lastLogin: json['lastLogin'] == null
+      ? null
+      : DateTime.parse(json['lastLogin'] as String),
   isActive: json['isActive'] as bool? ?? true,
   photoUrl: json['photoUrl'] as String?,
   phoneNumber: json['phoneNumber'] as String?,

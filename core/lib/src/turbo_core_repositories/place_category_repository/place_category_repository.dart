@@ -1,10 +1,11 @@
 import 'package:core/src/turbo_core_repositories/turbo_core_repositories.dart';
 
-class PlaceCategoryRepository {
-  PlaceCategoryRepository({PlaceCategoryService? placeCategoryService})
-      : _service = placeCategoryService ?? PlaceCategoryService();
+class PlaceCategoryRepository implements PlaceCategoryRepositoryInterface {
+  PlaceCategoryRepository(
+      {required PlaceCategoryRepositoryInterface placeCategoryService})
+      : _service = placeCategoryService;
 
-  final PlaceCategoryService _service;
+  final PlaceCategoryRepositoryInterface _service;
 
   Future<void> upsertPlaceCategory(PlaceCategory placeCategory) async {
     return await _service.upsertPlaceCategory(placeCategory);
@@ -26,5 +27,9 @@ class PlaceCategoryRepository {
   Future<bool> updatePlaceCategories(
       String placeId, List<String> categoryIds) async {
     return await updatePlaceCategories(placeId, categoryIds);
+  }
+
+  Future<List<Category>> getCategoriesForPlace(String placeId) async {
+    return await _service.getCategoriesForPlace(placeId);
   }
 }

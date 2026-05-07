@@ -1,6 +1,5 @@
-// dart format width=80
-// coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
+// coverage:ignore-file
 // ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
@@ -110,6 +109,130 @@ $LocationDataCopyWith<$Res> get location {
 }
 }
 
+
+/// Adds pattern-matching-related methods to [GooglePlace].
+extension GooglePlacePatterns on GooglePlace {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _GooglePlace value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _GooglePlace() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _GooglePlace value)  $default,){
+final _that = this;
+switch (_that) {
+case _GooglePlace():
+return $default(_that);}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _GooglePlace value)?  $default,){
+final _that = this;
+switch (_that) {
+case _GooglePlace() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String placeId,  String name,  String formattedAddress,  LocationData location,  List<String> types,  String? businessStatus,  String? vicinity,  double? rating,  int? userRatingsTotal,  String? photoReference,  List<String> photoReferences,  String? website,  String? phoneNumber,  String? internationalPhoneNumber,  List<Map<String, dynamic>> openingHours,  String? plusCode,  List<Map<String, dynamic>> addressComponents,  Map<String, dynamic>? geometry,  String? icon,  String? iconBackgroundColor,  String? iconMaskBaseUri,  bool? permanentlyClosed,  List<String> secondaryOpeningsHours,  String? utcOffset,  String? adrAddress,  String? formattedPhoneNumber,  String? url)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _GooglePlace() when $default != null:
+return $default(_that.placeId,_that.name,_that.formattedAddress,_that.location,_that.types,_that.businessStatus,_that.vicinity,_that.rating,_that.userRatingsTotal,_that.photoReference,_that.photoReferences,_that.website,_that.phoneNumber,_that.internationalPhoneNumber,_that.openingHours,_that.plusCode,_that.addressComponents,_that.geometry,_that.icon,_that.iconBackgroundColor,_that.iconMaskBaseUri,_that.permanentlyClosed,_that.secondaryOpeningsHours,_that.utcOffset,_that.adrAddress,_that.formattedPhoneNumber,_that.url);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String placeId,  String name,  String formattedAddress,  LocationData location,  List<String> types,  String? businessStatus,  String? vicinity,  double? rating,  int? userRatingsTotal,  String? photoReference,  List<String> photoReferences,  String? website,  String? phoneNumber,  String? internationalPhoneNumber,  List<Map<String, dynamic>> openingHours,  String? plusCode,  List<Map<String, dynamic>> addressComponents,  Map<String, dynamic>? geometry,  String? icon,  String? iconBackgroundColor,  String? iconMaskBaseUri,  bool? permanentlyClosed,  List<String> secondaryOpeningsHours,  String? utcOffset,  String? adrAddress,  String? formattedPhoneNumber,  String? url)  $default,) {final _that = this;
+switch (_that) {
+case _GooglePlace():
+return $default(_that.placeId,_that.name,_that.formattedAddress,_that.location,_that.types,_that.businessStatus,_that.vicinity,_that.rating,_that.userRatingsTotal,_that.photoReference,_that.photoReferences,_that.website,_that.phoneNumber,_that.internationalPhoneNumber,_that.openingHours,_that.plusCode,_that.addressComponents,_that.geometry,_that.icon,_that.iconBackgroundColor,_that.iconMaskBaseUri,_that.permanentlyClosed,_that.secondaryOpeningsHours,_that.utcOffset,_that.adrAddress,_that.formattedPhoneNumber,_that.url);}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String placeId,  String name,  String formattedAddress,  LocationData location,  List<String> types,  String? businessStatus,  String? vicinity,  double? rating,  int? userRatingsTotal,  String? photoReference,  List<String> photoReferences,  String? website,  String? phoneNumber,  String? internationalPhoneNumber,  List<Map<String, dynamic>> openingHours,  String? plusCode,  List<Map<String, dynamic>> addressComponents,  Map<String, dynamic>? geometry,  String? icon,  String? iconBackgroundColor,  String? iconMaskBaseUri,  bool? permanentlyClosed,  List<String> secondaryOpeningsHours,  String? utcOffset,  String? adrAddress,  String? formattedPhoneNumber,  String? url)?  $default,) {final _that = this;
+switch (_that) {
+case _GooglePlace() when $default != null:
+return $default(_that.placeId,_that.name,_that.formattedAddress,_that.location,_that.types,_that.businessStatus,_that.vicinity,_that.rating,_that.userRatingsTotal,_that.photoReference,_that.photoReferences,_that.website,_that.phoneNumber,_that.internationalPhoneNumber,_that.openingHours,_that.plusCode,_that.addressComponents,_that.geometry,_that.icon,_that.iconBackgroundColor,_that.iconMaskBaseUri,_that.permanentlyClosed,_that.secondaryOpeningsHours,_that.utcOffset,_that.adrAddress,_that.formattedPhoneNumber,_that.url);case _:
+  return null;
+
+}
+}
+
+}
 
 /// @nodoc
 @JsonSerializable()

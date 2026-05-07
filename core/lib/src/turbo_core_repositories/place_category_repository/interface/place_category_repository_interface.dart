@@ -12,4 +12,5 @@ abstract class PlaceCategoryRepositoryInterface {
     List<String> categoryIds,
   );
   Future<List<Place>> getPlacesInCategory(String categoryId);
+  Future<List<Category>> getCategoriesForPlace(String placeId);
 }

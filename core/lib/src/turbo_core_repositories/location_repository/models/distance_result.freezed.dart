@@ -1,6 +1,5 @@
-// dart format width=80
-// coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
+// coverage:ignore-file
 // ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
@@ -81,6 +80,130 @@ as Map<String, dynamic>?,
 
 }
 
+
+/// Adds pattern-matching-related methods to [DistanceResult].
+extension DistanceResultPatterns on DistanceResult {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _DistanceResult value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _DistanceResult() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _DistanceResult value)  $default,){
+final _that = this;
+switch (_that) {
+case _DistanceResult():
+return $default(_that);}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _DistanceResult value)?  $default,){
+final _that = this;
+switch (_that) {
+case _DistanceResult() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( double distanceKm,  double distanceMeters,  String formattedDistance,  Duration estimatedTravelTime,  String? travelMode,  Map<String, dynamic>? additionalInfo)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _DistanceResult() when $default != null:
+return $default(_that.distanceKm,_that.distanceMeters,_that.formattedDistance,_that.estimatedTravelTime,_that.travelMode,_that.additionalInfo);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( double distanceKm,  double distanceMeters,  String formattedDistance,  Duration estimatedTravelTime,  String? travelMode,  Map<String, dynamic>? additionalInfo)  $default,) {final _that = this;
+switch (_that) {
+case _DistanceResult():
+return $default(_that.distanceKm,_that.distanceMeters,_that.formattedDistance,_that.estimatedTravelTime,_that.travelMode,_that.additionalInfo);}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( double distanceKm,  double distanceMeters,  String formattedDistance,  Duration estimatedTravelTime,  String? travelMode,  Map<String, dynamic>? additionalInfo)?  $default,) {final _that = this;
+switch (_that) {
+case _DistanceResult() when $default != null:
+return $default(_that.distanceKm,_that.distanceMeters,_that.formattedDistance,_that.estimatedTravelTime,_that.travelMode,_that.additionalInfo);case _:
+  return null;
+
+}
+}
+
+}
 
 /// @nodoc
 @JsonSerializable()
@@ -252,6 +375,130 @@ $DistanceResultCopyWith<$Res> get distance {
 }
 }
 
+
+/// Adds pattern-matching-related methods to [NearbySearchResult].
+extension NearbySearchResultPatterns on NearbySearchResult {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _NearbySearchResult value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _NearbySearchResult() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _NearbySearchResult value)  $default,){
+final _that = this;
+switch (_that) {
+case _NearbySearchResult():
+return $default(_that);}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _NearbySearchResult value)?  $default,){
+final _that = this;
+switch (_that) {
+case _NearbySearchResult() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String placeId,  String name,  DistanceResult distance,  double latitude,  double longitude,  String? address,  double? rating,  List<String> types,  String? photoReference,  Map<String, dynamic>? additionalData)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _NearbySearchResult() when $default != null:
+return $default(_that.placeId,_that.name,_that.distance,_that.latitude,_that.longitude,_that.address,_that.rating,_that.types,_that.photoReference,_that.additionalData);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String placeId,  String name,  DistanceResult distance,  double latitude,  double longitude,  String? address,  double? rating,  List<String> types,  String? photoReference,  Map<String, dynamic>? additionalData)  $default,) {final _that = this;
+switch (_that) {
+case _NearbySearchResult():
+return $default(_that.placeId,_that.name,_that.distance,_that.latitude,_that.longitude,_that.address,_that.rating,_that.types,_that.photoReference,_that.additionalData);}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String placeId,  String name,  DistanceResult distance,  double latitude,  double longitude,  String? address,  double? rating,  List<String> types,  String? photoReference,  Map<String, dynamic>? additionalData)?  $default,) {final _that = this;
+switch (_that) {
+case _NearbySearchResult() when $default != null:
+return $default(_that.placeId,_that.name,_that.distance,_that.latitude,_that.longitude,_that.address,_that.rating,_that.types,_that.photoReference,_that.additionalData);case _:
+  return null;
+
+}
+}
+
+}
 
 /// @nodoc
 @JsonSerializable()
@@ -439,6 +686,130 @@ as bool?,
 
 }
 
+
+/// Adds pattern-matching-related methods to [ProximityFilter].
+extension ProximityFilterPatterns on ProximityFilter {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _ProximityFilter value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _ProximityFilter() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _ProximityFilter value)  $default,){
+final _that = this;
+switch (_that) {
+case _ProximityFilter():
+return $default(_that);}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _ProximityFilter value)?  $default,){
+final _that = this;
+switch (_that) {
+case _ProximityFilter() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( double latitude,  double longitude,  double radiusMeters,  int limit,  List<String> categories,  List<String> excludeIds,  String? sortBy,  double? minRating,  bool? openNow)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _ProximityFilter() when $default != null:
+return $default(_that.latitude,_that.longitude,_that.radiusMeters,_that.limit,_that.categories,_that.excludeIds,_that.sortBy,_that.minRating,_that.openNow);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( double latitude,  double longitude,  double radiusMeters,  int limit,  List<String> categories,  List<String> excludeIds,  String? sortBy,  double? minRating,  bool? openNow)  $default,) {final _that = this;
+switch (_that) {
+case _ProximityFilter():
+return $default(_that.latitude,_that.longitude,_that.radiusMeters,_that.limit,_that.categories,_that.excludeIds,_that.sortBy,_that.minRating,_that.openNow);}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( double latitude,  double longitude,  double radiusMeters,  int limit,  List<String> categories,  List<String> excludeIds,  String? sortBy,  double? minRating,  bool? openNow)?  $default,) {final _that = this;
+switch (_that) {
+case _ProximityFilter() when $default != null:
+return $default(_that.latitude,_that.longitude,_that.radiusMeters,_that.limit,_that.categories,_that.excludeIds,_that.sortBy,_that.minRating,_that.openNow);case _:
+  return null;
+
+}
+}
+
+}
 
 /// @nodoc
 @JsonSerializable()

@@ -3,6 +3,8 @@ import 'package:core/src/turbo_core_repositories/event_repository/event_reposito
 import 'package:core/src/turbo_core_repositories/event_repository/interface/event_interface.dart';
 import 'package:core/src/turbo_core_repositories/event_repository/models/event.dart';
 
+import '../models/event_analytics.dart';
+
 /// Service responsible for managing events from Firestore.
 class EventService implements EventInterface {
   /// Creates an [EventService] with the provided Firestore instance.
@@ -25,12 +27,11 @@ class EventService implements EventInterface {
     final startOfDay = DateTime(today.year, today.month, today.day);
     final endOfDay = DateTime(today.year, today.month, today.day, 23, 59, 59);
 
-    final snapshot =
-        await firestore
-            .collection('events')
-            .where('date', isGreaterThanOrEqualTo: startOfDay)
-            .where('date', isLessThanOrEqualTo: endOfDay)
-            .get();
+    final snapshot = await firestore
+        .collection('events')
+        .where('date', isGreaterThanOrEqualTo: startOfDay)
+        .where('date', isLessThanOrEqualTo: endOfDay)
+        .get();
 
     return snapshot.docs.map(Event.fromFirestore).toList();
   }
@@ -39,11 +40,10 @@ class EventService implements EventInterface {
   @override
   Future<List<Event>> getEventsByType(EventType type) async {
     final typeString = type.toString().split('.').last;
-    final snapshot =
-        await firestore
-            .collection('events')
-            .where('type', isEqualTo: typeString)
-            .get();
+    final snapshot = await firestore
+        .collection('events')
+        .where('type', isEqualTo: typeString)
+        .get();
 
     return snapshot.docs.map(Event.fromFirestore).toList();
   }
@@ -61,11 +61,10 @@ class EventService implements EventInterface {
   /// Returns all events for a specific [placeId] from Firestore.
   @override
   Future<List<Event>> getEventsByPlaceId(String placeId) async {
-    final snapshot =
-        await firestore
-            .collection('events')
-            .where('placeId', isEqualTo: placeId)
-            .get();
+    final snapshot = await firestore
+        .collection('events')
+        .where('placeId', isEqualTo: placeId)
+        .get();
 
     return snapshot.docs.map(Event.fromFirestore).toList();
   }
@@ -73,11 +72,10 @@ class EventService implements EventInterface {
   /// Returns all highlighted events from Firestore.
   @override
   Future<List<Event>> getHighlightedEvents() async {
-    final snapshot =
-        await firestore
-            .collection('events')
-            .where('isHighlighted', isEqualTo: true)
-            .get();
+    final snapshot = await firestore
+        .collection('events')
+        .where('isHighlighted', isEqualTo: true)
+        .get();
 
     return snapshot.docs.map(Event.fromFirestore).toList();
   }
@@ -148,11 +146,10 @@ class EventService implements EventInterface {
       for (int i = 0; i < placeIds.length; i += batchSize) {
         final batch = placeIds.skip(i).take(batchSize).toList();
 
-        final snapshot =
-            await firestore
-                .collection('events')
-                .where('placeId', whereIn: batch)
-                .get();
+        final snapshot = await firestore
+            .collection('events')
+            .where('placeId', whereIn: batch)
+            .get();
 
         final batchEvents = snapshot.docs.map(Event.fromFirestore).toList();
         events.addAll(batchEvents);
@@ -168,11 +165,10 @@ class EventService implements EventInterface {
   Future<List<Event>> getEventsByAdminUser(String adminUserId) async {
     try {
       // First, get all places owned by this admin
-      final placesSnapshot =
-          await firestore
-              .collection('places')
-              .where('ownerIds', arrayContains: adminUserId)
-              .get();
+      final placesSnapshot = await firestore
+          .collection('places')
+          .where('ownerIds', arrayContains: adminUserId)
+          .get();
 
       final placeIds = placesSnapshot.docs.map((doc) => doc.id).toList();
 
@@ -199,13 +195,12 @@ class EventService implements EventInterface {
       final filterEndDate = endDate ?? now;
 
       // Filter events by date range
-      final filteredEvents =
-          events.where((event) {
-            return event.date.isAfter(
-                  filterStartDate.subtract(const Duration(days: 1)),
-                ) &&
-                event.date.isBefore(filterEndDate.add(const Duration(days: 1)));
-          }).toList();
+      final filteredEvents = events.where((event) {
+        return event.date.isAfter(
+              filterStartDate.subtract(const Duration(days: 1)),
+            ) &&
+            event.date.isBefore(filterEndDate.add(const Duration(days: 1)));
+      }).toList();
 
       // Calculate analytics
       final totalEvents = filteredEvents.length;
@@ -235,20 +230,19 @@ class EventService implements EventInterface {
       }
 
       // Top performing events (simulation)
-      final topPerformingEvents =
-          filteredEvents
-              .take(5)
-              .map(
-                (event) => EventPerformance(
-                  eventId: event.id,
-                  eventName: event.title,
-                  attendees: 25, // Simulation
-                  views: 150, // Simulation
-                  conversionRate: 0.16,
-                  rating: 4.2,
-                ),
-              )
-              .toList();
+      final topPerformingEvents = filteredEvents
+          .take(5)
+          .map(
+            (event) => EventPerformance(
+              attendees: 100,
+              eventId: event.id,
+              eventTitle: event.title,
+              revenue: 1000, // Simulation
+              engagement: 0.16, // Simulation
+              rating: 4.2,
+            ),
+          )
+          .toList();
 
       return EventAnalytics(
         adminUserId: adminUserId,
@@ -279,38 +273,33 @@ class EventService implements EventInterface {
       final adminEvents = await getEventsByAdminUser(adminUserId);
       final lowercaseQuery = query.toLowerCase();
 
-      var filteredEvents =
-          adminEvents.where((event) {
-            // Text search with safe checking for empty values
-            final titleMatches = event.title.toLowerCase().contains(
+      var filteredEvents = adminEvents.where((event) {
+        // Text search with safe checking for empty values
+        final titleMatches = event.title.toLowerCase().contains(
               lowercaseQuery,
             );
-            final descriptionMatches =
-                event.description.isNotEmpty &&
-                event.description.toLowerCase().contains(lowercaseQuery);
-            final tagsMatch =
-                event.tags.isNotEmpty &&
-                event.tags.any(
-                  (tag) => tag.toLowerCase().contains(lowercaseQuery),
-                );
+        final descriptionMatches = event.description.isNotEmpty &&
+            event.description.toLowerCase().contains(lowercaseQuery);
+        final tagsMatch = event.tags.isNotEmpty &&
+            event.tags.any(
+              (tag) => tag.toLowerCase().contains(lowercaseQuery),
+            );
 
-            final matchesQuery =
-                titleMatches || descriptionMatches || tagsMatch;
+        final matchesQuery = titleMatches || descriptionMatches || tagsMatch;
 
-            // Type filter
-            final matchesType = eventType == null || event.type == eventType;
+        // Type filter
+        final matchesType = eventType == null || event.type == eventType;
 
-            // Date filters
-            final matchesStartDate =
-                startDate == null || event.date.isAfter(startDate);
-            final matchesEndDate =
-                endDate == null || event.date.isBefore(endDate);
+        // Date filters
+        final matchesStartDate =
+            startDate == null || event.date.isAfter(startDate);
+        final matchesEndDate = endDate == null || event.date.isBefore(endDate);
 
-            return matchesQuery &&
-                matchesType &&
-                matchesStartDate &&
-                matchesEndDate;
-          }).toList();
+        return matchesQuery &&
+            matchesType &&
+            matchesStartDate &&
+            matchesEndDate;
+      }).toList();
 
       return filteredEvents;
     } catch (e) {
