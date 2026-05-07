@@ -84,9 +84,25 @@ class EventService implements EventInterface {
 
   /// Adds a new event to Firestore.
   @override
-  Future<void> addEvent(Event event) async {
+  Future<String> addEvent(Event event) async {
     try {
-      await firestore.collection('events').doc(event.id).set(event.toJson());
+      final docRef = firestore.collection('events').doc();
+      final eventWithId = event.copyWith(id: docRef.id);
+      final eventData = eventWithId.toJson();
+      eventData['date'] = Timestamp.fromDate(eventWithId.date);
+      if (eventWithId.endDate != null) {
+        eventData['endDate'] = Timestamp.fromDate(eventWithId.endDate!);
+      }
+      if (eventWithId.createdAt != null) {
+        eventData['createdAt'] = Timestamp.fromDate(eventWithId.createdAt!);
+      }
+      if (eventWithId.lastUpdatedAt != null) {
+        eventData['lastUpdatedAt'] = Timestamp.fromDate(
+          eventWithId.lastUpdatedAt!,
+        );
+      }
+      await docRef.set(eventData);
+      return docRef.id;
     } catch (e) {
       throw Exception('Error adding event: $e');
     }

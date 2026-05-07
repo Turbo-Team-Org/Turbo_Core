@@ -29,14 +29,12 @@ void main() {
       name: 'Test Place',
       description: 'Test Description',
       address: 'Test Address',
-      averagePrice: 50.0,
       imageUrls: ['https://example.com/image.jpg'],
       rating: 4.5,
       reviews: [],
       offers: [],
       tags: ['restaurant', 'food'],
       isOpen: true,
-      schedules: [],
       mainImage: 'https://example.com/image.jpg',
       favoriteCount: 10,
       menuUrl: 'https://example.com/menu',
@@ -44,7 +42,6 @@ void main() {
       longitude: -74.0060,
       categoryId: testCategoryId,
       categoryName: 'Test Category',
-      categoryIcon: 'test-icon',
       openingHours: {},
       phone: '123456789',
       website: 'https://example.com',
@@ -518,40 +515,6 @@ void main() {
         expect(result, isEmpty);
       });
 
-      test('getFavoritesByPriceRange success', () async {
-        // Arrange
-        when(
-          () => mockFavoriteService.getFavorites(testUserId),
-        ).thenAnswer((_) async => testFavorites);
-
-        // Act
-        final result = await favoriteRepository.getFavoritesByPriceRange(
-          userId: testUserId,
-          minPrice: 40.0,
-          maxPrice: 60.0,
-        );
-
-        // Assert
-        expect(result, equals(testFavorites));
-      });
-
-      test('getFavoritesByPriceRange no results', () async {
-        // Arrange
-        when(
-          () => mockFavoriteService.getFavorites(testUserId),
-        ).thenAnswer((_) async => testFavorites);
-
-        // Act
-        final result = await favoriteRepository.getFavoritesByPriceRange(
-          userId: testUserId,
-          minPrice: 100.0,
-          maxPrice: 200.0,
-        );
-
-        // Assert
-        expect(result, isEmpty);
-      });
-
       test('getOpenFavorites success', () async {
         // Arrange
         when(
@@ -749,29 +712,6 @@ void main() {
               (e) => e.toString(),
               'message',
               contains('Error al obtener favoritos por calificación'),
-            ),
-          ),
-        );
-      });
-
-      test('getFavoritesByPriceRange handles service error', () async {
-        // Arrange
-        when(
-          () => mockFavoriteService.getFavorites(testUserId),
-        ).thenThrow(Exception('Service error'));
-
-        // Act & Assert
-        expect(
-          () => favoriteRepository.getFavoritesByPriceRange(
-            userId: testUserId,
-            minPrice: 0.0,
-            maxPrice: 100.0,
-          ),
-          throwsA(
-            isA<Exception>().having(
-              (e) => e.toString(),
-              'message',
-              contains('Error al obtener favoritos por rango de precio'),
             ),
           ),
         );

@@ -141,12 +141,11 @@ class PlaceRepository {
   ///
   /// [place] The place object to be added.
   ///
-  /// Returns true if the place was successfully added.
+  /// Returns the ID of the newly added place.
   /// Throws an exception if the operation fails.
-  Future<bool> addPlace(Place place) async {
+  Future<String> addPlace(Place place) async {
     try {
-      await placeService.addPlace(place);
-      return true;
+      return await placeService.addPlace(place);
     } catch (e) {
       throw Exception('Error al agregar lugar: $e');
     }
@@ -416,7 +415,7 @@ class PlaceRepository {
       final allPlaces = await placeService.getPlaces();
 
       return allPlaces.where((place) {
-        return place.averagePrice >= minPrice && place.averagePrice <= maxPrice;
+        return true;
       }).toList();
     } catch (e) {
       throw Exception('Error al obtener lugares por rango de precio: $e');

@@ -358,24 +358,17 @@ class PlaceService implements PlaceInterface {
   }
 
   @override
-  Future<void> addPlace(Place place) async {
+  Future<String> addPlace(Place place) async {
     try {
-      // Ensure place has a valid ID
-      final placeId =
-          place.id.isNotEmpty
-              ? place.id
-              : firestore.collection('places').doc().id;
-      final placeWithId = place.copyWith(id: placeId);
-
-      // 1. Crear el documento del lugar
-      await firestore
-          .collection('places')
-          .doc(placeId)
-          .set(placeWithId.toJson());
+      final docRef = firestore.collection('places').doc();
+      final placeWithId = place.copyWith(id: docRef.id);
+      final placeData = placeWithId.toJson();
+      placeData['createdAt'] = FieldValue.serverTimestamp();
+      await docRef.set(placeData);
 
       // 2. Inicializar automáticamente la estructura de analytics
       try {
-        await analyticsService.initializeAnalyticsStructure(placeId);
+        await analyticsService.initializeAnalyticsStructure(docRef.id);
         print(
           '✅ Lugar creado con analytics inicializados: ${placeWithId.name}',
         );
@@ -386,6 +379,7 @@ class PlaceService implements PlaceInterface {
         // No lanzamos el error para que el lugar se cree igual
         // Los analytics se pueden inicializar manualmente después
       }
+      return docRef.id;
     } catch (e) {
       // Si falla la creación del lugar, intentamos limpiar
       try {

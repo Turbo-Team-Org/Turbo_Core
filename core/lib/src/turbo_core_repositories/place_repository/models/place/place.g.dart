@@ -28,11 +28,6 @@ _Place _$PlaceFromJson(Map<String, dynamic> json) => _Place(
       (json['tags'] as List<dynamic>?)?.map((e) => e as String).toList() ??
       const [],
   isOpen: json['isOpen'] as bool? ?? false,
-  schedules:
-      (json['schedules'] as List<dynamic>?)
-          ?.map((e) => Schedule.fromJson(e as Map<String, dynamic>))
-          .toList() ??
-      const [],
   mainImage: json['mainImage'] as String? ?? '',
   favoriteCount: (json['favoriteCount'] as num?)?.toInt() ?? 0,
   menuUrl: json['menuUrl'] as String? ?? '',
@@ -40,7 +35,6 @@ _Place _$PlaceFromJson(Map<String, dynamic> json) => _Place(
   longitude: (json['longitude'] as num?)?.toDouble() ?? 0.0,
   categoryId: json['categoryId'] as String? ?? '',
   categoryName: json['categoryName'] as String? ?? '',
-  categoryIcon: json['categoryIcon'] as String? ?? '',
   openingHours:
       (json['openingHours'] as Map<String, dynamic>?)?.map(
         (k, e) => MapEntry(k, Map<String, String>.from(e as Map)),
@@ -67,14 +61,12 @@ Map<String, dynamic> _$PlaceToJson(_Place instance) => <String, dynamic>{
   'name': instance.name,
   'description': instance.description,
   'address': instance.address,
-  'averagePrice': instance.averagePrice,
   'imageUrls': instance.imageUrls,
   'rating': instance.rating,
   'reviews': instance.reviews,
   'offers': instance.offers,
   'tags': instance.tags,
   'isOpen': instance.isOpen,
-  'schedules': instance.schedules,
   'mainImage': instance.mainImage,
   'favoriteCount': instance.favoriteCount,
   'menuUrl': instance.menuUrl,
@@ -82,7 +74,6 @@ Map<String, dynamic> _$PlaceToJson(_Place instance) => <String, dynamic>{
   'longitude': instance.longitude,
   'categoryId': instance.categoryId,
   'categoryName': instance.categoryName,
-  'categoryIcon': instance.categoryIcon,
   'openingHours': instance.openingHours,
   'phone': instance.phone,
   'website': instance.website,

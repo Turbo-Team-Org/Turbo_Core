@@ -193,9 +193,9 @@ class EventRepository implements EventInterface {
   /// Returns true if the event was successfully added.
   /// Throws an exception if the operation fails.
   @override
-  Future<void> addEvent(Event event) async {
+  Future<String> addEvent(Event event) async {
     try {
-      await eventService.addEvent(event);
+      return await eventService.addEvent(event);
     } catch (e) {
       throw Exception('Error al agregar evento: $e');
     }

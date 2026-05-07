@@ -215,23 +215,23 @@ class FavoriteRepository implements FavoriteInterface {
   /// [maxPrice] The maximum average price (inclusive).
   ///
   /// Returns a list of favorites within the specified price range.
-  Future<List<Favorite>> getFavoritesByPriceRange({
-    required String userId,
-    required double minPrice,
-    required double maxPrice,
-  }) async {
-    try {
-      final allFavorites = await favoriteService.getFavorites(userId);
+  // Future<List<Favorite>> getFavoritesByPriceRange({
+  //   required String userId,
+  //   required double minPrice,
+  //   required double maxPrice,
+  // }) async {
+  //   try {
+  //     final allFavorites = await favoriteService.getFavorites(userId);
 
-      return allFavorites.where((favorite) {
-        final place = favorite.place;
-        if (place == null) return false;
-        return place.averagePrice >= minPrice && place.averagePrice <= maxPrice;
-      }).toList();
-    } catch (e) {
-      throw Exception('Error al obtener favoritos por rango de precio: $e');
-    }
-  }
+  //     return allFavorites.where((favorite) {
+  //       final place = favorite.place;
+  //       if (place == null) return false;
+  //       return place.averagePrice >= minPrice && place.averagePrice <= maxPrice;
+  //     }).toList();
+  //   } catch (e) {
+  //     throw Exception('Error al obtener favoritos por rango de precio: $e');
+  //   }
+  // }
 
   /// Gets only favorites of places that are currently open.
   ///
