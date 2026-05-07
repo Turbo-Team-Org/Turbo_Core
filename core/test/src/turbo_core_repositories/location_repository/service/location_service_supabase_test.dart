@@ -1,11 +1,17 @@
 import 'package:core/src/turbo_core_repositories/location_repository/service/location_service_supabase.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mocktail/mocktail.dart';
+import 'package:supabase/src/supabase_client.dart';
+
+class MockSupabaseClient extends Mock implements SupabaseClient {}
 
 void main() {
   late LocationServiceSupabase service;
+  late MockSupabaseClient mockSupabaseClient;
 
   setUp(() {
-    service = LocationServiceSupabase();
+    mockSupabaseClient = MockSupabaseClient();
+    service = LocationServiceSupabase(supabaseClient: mockSupabaseClient);
   });
 
   group('google-places-api RED', () {

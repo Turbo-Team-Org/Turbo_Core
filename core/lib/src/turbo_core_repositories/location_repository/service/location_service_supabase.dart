@@ -9,10 +9,12 @@ import 'package:core/src/monorepo_utils/environments.dart';
 import 'dart:convert';
 import 'dart:math' as math;
 
+import 'package:supabase/src/supabase_client.dart';
+
 /// Servicio de ubicación usando Supabase
 /// Implementa la misma interfaz que LocationService (Firebase)
 class LocationServiceSupabase implements LocationInterface {
-  LocationServiceSupabase();
+  LocationServiceSupabase({SupabaseClient? supabaseClient});
 
   // ================== LOCATION TRACKING ==================
   @override
