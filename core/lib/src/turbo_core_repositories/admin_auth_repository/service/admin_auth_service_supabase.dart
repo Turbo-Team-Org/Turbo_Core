@@ -58,15 +58,27 @@ class AdminAuthServiceSupabase implements AdminAuthInterface {
 
   BusinessOwnerRequest _businessOwnerRequestFromSupabase(
       Map<String, dynamic> data) {
+    final businessMetadata = _jsonObject(data['business_metadata']);
+    final contactInfo = _jsonObject(data['contact_info']);
+
+    final displayName = (data['display_name'] ?? data['owner_name'] ?? '')
+        .toString();
+    final businessDescription =
+        (data['business_description'] ?? data['description'] ?? '')
+            .toString();
+    final businessAddress =
+        (data['business_address'] ?? data['address'] ?? '').toString();
+    final userId = (data['user_id'] ?? data['userId'] ?? '').toString();
+
     return BusinessOwnerRequest(
       id: data['id'] as String? ?? '',
-      userId: data['user_id'] as String? ?? '',
+      userId: userId,
       email: data['email'] as String? ?? '',
-      displayName: data['display_name'] as String? ?? '',
+      displayName: displayName,
       businessName: data['business_name'] as String? ?? '',
-      businessDescription: data['business_description'] as String? ?? '',
-      businessAddress: data['business_address'] as String? ?? '',
-      phoneNumber: data['phone_number'] as String?,
+      businessDescription: businessDescription,
+      businessAddress: businessAddress,
+      phoneNumber: (data['phone_number'] ?? data['phone']) as String?,
       website: data['website'] as String?,
       status: BusinessOwnerRequestStatus.values.firstWhere(
         (status) => status.name == data['status'],
@@ -75,11 +87,15 @@ class AdminAuthServiceSupabase implements AdminAuthInterface {
       createdAt: data['created_at'] != null
           ? DateTime.parse(data['created_at'] as String)
           : DateTime.now(),
-      businessMetadata:
-          Map<String, dynamic>.from(data['business_metadata'] as Map? ?? {}),
-      contactInfo:
-          Map<String, dynamic>.from(data['contact_info'] as Map? ?? {}),
+      businessMetadata: businessMetadata,
+      contactInfo: contactInfo,
     );
+  }
+
+  Map<String, dynamic> _jsonObject(Object? raw) {
+    if (raw is Map<String, dynamic>) return Map<String, dynamic>.from(raw);
+    if (raw is Map) return Map<String, dynamic>.from(raw);
+    return {};
   }
 
   Map<String, dynamic> _businessOwnerRequestToSupabase(
@@ -89,10 +105,14 @@ class AdminAuthServiceSupabase implements AdminAuthInterface {
       'user_id': request.userId,
       'email': request.email,
       'display_name': request.displayName,
+      'owner_name': request.displayName,
       'business_name': request.businessName,
       'business_description': request.businessDescription,
       'business_address': request.businessAddress,
       'phone_number': request.phoneNumber,
+      'phone': request.phoneNumber,
+      'address': request.businessAddress,
+      'description': request.businessDescription,
       'website': request.website,
       'status': request.status.name,
       'created_at': request.createdAt.toIso8601String(),
@@ -136,6 +156,35 @@ class AdminAuthServiceSupabase implements AdminAuthInterface {
     }
   }
 
+  Future<BusinessOwnerRequest?> _getBusinessOwnerRequestForSession({
+    required String userId,
+    required String email,
+  }) async {
+    try {
+      final byUid = await _supabase
+          .from('business_owner_requests')
+          .select('*')
+          .eq('user_id', userId)
+          .maybeSingle();
+      if (byUid != null) {
+        return _businessOwnerRequestFromSupabase(byUid);
+      }
+
+      final byEmail = await _supabase
+          .from('business_owner_requests')
+          .select('*')
+          .eq('email', email)
+          .maybeSingle();
+      if (byEmail != null) {
+        return _businessOwnerRequestFromSupabase(byEmail);
+      }
+      return null;
+    } catch (e) {
+      print('Error al cargar solicitud business owner: $e');
+      return null;
+    }
+  }
+
   @override
   Future<AdminUser> signInWithEmailAndPassword({
     required String email,
@@ -166,15 +215,33 @@ class AdminAuthServiceSupabase implements AdminAuthInterface {
     required String email,
     required String password,
   }) async {
-    try {
-      final adminUser = await signInWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
-      return AuthResult.admin(adminUser);
-    } catch (e) {
-      throw Exception('Error en login unificado: $e');
+    final response = await _supabase.auth.signInWithPassword(
+      email: email,
+      password: password,
+    );
+
+    final sessionUser = response.user;
+    if (sessionUser == null) {
+      throw Exception('Error en autenticación');
     }
+
+    final adminUser = await getAdminUserByUid(sessionUser.id);
+    if (adminUser != null) {
+      return AuthResult.admin(adminUser);
+    }
+
+    final businessRequest = await _getBusinessOwnerRequestForSession(
+      userId: sessionUser.id,
+      email: email,
+    );
+    if (businessRequest != null) {
+      return AuthResult.businessOwner(businessRequest);
+    }
+
+    await _supabase.auth.signOut();
+    throw Exception(
+      'Usuario no autorizado: no hay rol admin ni solicitud de negocio asociada.',
+    );
   }
 
   @override

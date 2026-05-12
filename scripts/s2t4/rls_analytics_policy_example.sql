@@ -1,0 +1,22 @@
+-- =============================================================================
+-- OPCIONAL — Solo si habilitaste RLS en tablas analytics_* y el Admin no lee.
+-- Revisa y adapta a tu modelo de auth (JWT claims, tabla places.owner_ids).
+-- No ejecutar a ciegas en producción.
+-- =============================================================================
+--
+-- Ejemplo (comentado): lectura para usuarios autenticados dueños del lugar
+--
+-- CREATE POLICY "analytics_places_select_owner"
+-- ON analytics_places FOR SELECT TO authenticated
+-- USING (
+--   EXISTS (
+--     SELECT 1 FROM places p
+--     WHERE p.id = analytics_places.place_id
+--       AND auth.uid()::text = ANY (p.owner_ids)
+--   )
+-- );
+--
+-- Repetir patrón similar para analytics_traffic, analytics_reviews, etc., o
+-- usar un rol service_role solo en Edge Functions y mantener tablas sin RLS.
+
+SELECT 1;
