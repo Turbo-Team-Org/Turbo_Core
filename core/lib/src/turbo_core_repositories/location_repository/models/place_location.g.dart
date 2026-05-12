@@ -28,12 +28,14 @@ _PlaceLocation _$PlaceLocationFromJson(Map<String, dynamic> json) =>
               .toList() ??
           const [],
       plusCode: json['plusCode'] as String?,
-      createdAt: json['createdAt'] == null
-          ? null
-          : DateTime.parse(json['createdAt'] as String),
-      updatedAt: json['updatedAt'] == null
-          ? null
-          : DateTime.parse(json['updatedAt'] as String),
+      createdAt:
+          json['createdAt'] == null
+              ? null
+              : DateTime.parse(json['createdAt'] as String),
+      updatedAt:
+          json['updatedAt'] == null
+              ? null
+              : DateTime.parse(json['updatedAt'] as String),
       createdBy: json['createdBy'] as String?,
       metadata: json['metadata'] as Map<String, dynamic>?,
     );

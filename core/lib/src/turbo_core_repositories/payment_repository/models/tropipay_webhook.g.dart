@@ -21,11 +21,12 @@ _TropipayWebhook _$TropipayWebhookFromJson(Map<String, dynamic> json) =>
       timestamp: DateTime.parse(json['timestamp'] as String),
       signature: json['signature'] as String?,
       metadata: json['metadata'] as Map<String, dynamic>? ?? const {},
-      eventData: json['eventData'] == null
-          ? null
-          : TropipayWebhookEventData.fromJson(
-              json['eventData'] as Map<String, dynamic>,
-            ),
+      eventData:
+          json['eventData'] == null
+              ? null
+              : TropipayWebhookEventData.fromJson(
+                json['eventData'] as Map<String, dynamic>,
+              ),
     );
 
 Map<String, dynamic> _$TropipayWebhookToJson(_TropipayWebhook instance) =>

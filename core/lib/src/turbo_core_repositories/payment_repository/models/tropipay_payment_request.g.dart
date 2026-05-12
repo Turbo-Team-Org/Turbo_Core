@@ -12,11 +12,12 @@ _TropipayPaymentRequest _$TropipayPaymentRequestFromJson(
   amount: (json['amount'] as num).toDouble(),
   currency: json['currency'] as String? ?? 'CUP',
   description: json['description'] as String,
-  paymentMethod: json['paymentMethod'] == null
-      ? const PaymentMethod.card()
-      : const PaymentMethodConverter().fromJson(
-          json['paymentMethod'] as String,
-        ),
+  paymentMethod:
+      json['paymentMethod'] == null
+          ? const PaymentMethod.card()
+          : const PaymentMethodConverter().fromJson(
+            json['paymentMethod'] as String,
+          ),
   userId: json['userId'] as String,
   placeId: json['placeId'] as String,
   reservationId: json['reservationId'] as String?,
@@ -25,12 +26,16 @@ _TropipayPaymentRequest _$TropipayPaymentRequestFromJson(
   cancelUrl: json['cancelUrl'] as String?,
   webhookUrl: json['webhookUrl'] as String?,
   expirationMinutes: (json['expirationMinutes'] as num?)?.toInt() ?? 30,
-  customer: json['customer'] == null
-      ? null
-      : TropipayCustomerData.fromJson(json['customer'] as Map<String, dynamic>),
-  cardData: json['cardData'] == null
-      ? null
-      : TropipayCardData.fromJson(json['cardData'] as Map<String, dynamic>),
+  customer:
+      json['customer'] == null
+          ? null
+          : TropipayCustomerData.fromJson(
+            json['customer'] as Map<String, dynamic>,
+          ),
+  cardData:
+      json['cardData'] == null
+          ? null
+          : TropipayCardData.fromJson(json['cardData'] as Map<String, dynamic>),
   metadata: json['metadata'] as Map<String, dynamic>? ?? const {},
   isTestMode: json['isTestMode'] as bool? ?? false,
 );

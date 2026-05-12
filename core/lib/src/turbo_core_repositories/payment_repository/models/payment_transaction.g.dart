@@ -10,9 +10,10 @@ _PaymentTransaction _$PaymentTransactionFromJson(Map<String, dynamic> json) =>
     _PaymentTransaction(
       id: json['id'] as String,
       paymentId: json['paymentId'] as String,
-      payment: json['payment'] == null
-          ? null
-          : Payment.fromJson(json['payment'] as Map<String, dynamic>),
+      payment:
+          json['payment'] == null
+              ? null
+              : Payment.fromJson(json['payment'] as Map<String, dynamic>),
       type: const PaymentTransactionTypeConverter().fromJson(
         json['type'] as String,
       ),
@@ -23,15 +24,18 @@ _PaymentTransaction _$PaymentTransactionFromJson(Map<String, dynamic> json) =>
       gatewayTransactionId: json['gatewayTransactionId'] as String?,
       authorizationCode: json['authorizationCode'] as String?,
       externalReference: json['externalReference'] as String?,
-      transactionDate: json['transactionDate'] == null
-          ? null
-          : DateTime.parse(json['transactionDate'] as String),
-      createdAt: json['createdAt'] == null
-          ? null
-          : DateTime.parse(json['createdAt'] as String),
-      updatedAt: json['updatedAt'] == null
-          ? null
-          : DateTime.parse(json['updatedAt'] as String),
+      transactionDate:
+          json['transactionDate'] == null
+              ? null
+              : DateTime.parse(json['transactionDate'] as String),
+      createdAt:
+          json['createdAt'] == null
+              ? null
+              : DateTime.parse(json['createdAt'] as String),
+      updatedAt:
+          json['updatedAt'] == null
+              ? null
+              : DateTime.parse(json['updatedAt'] as String),
       metadata: json['metadata'] as Map<String, dynamic>? ?? const {},
       failureReason: json['failureReason'] as String?,
       fee: (json['fee'] as num?)?.toDouble(),

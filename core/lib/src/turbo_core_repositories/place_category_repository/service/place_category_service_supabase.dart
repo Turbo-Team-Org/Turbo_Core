@@ -205,7 +205,6 @@ class PlaceCategoryServiceSupabase implements PlaceCategoryRepositoryInterface {
       name: asString(data['name']),
       description: asString(data['description']),
       address: asString(data['address']),
-      averagePrice: asDouble(data['average_price']),
       imageUrls: asStringList(data['image_urls']),
       rating: asDouble(data['rating']),
       reviews: [], // Reviews are loaded separately
@@ -218,7 +217,6 @@ class PlaceCategoryServiceSupabase implements PlaceCategoryRepositoryInterface {
       longitude: asDouble(data['longitude']),
       categoryId: asString(data['category_id']),
       categoryName: asString(data['category_name']),
-      categoryIcon: asString(data['category_icon']),
       openingHours:
           asMap(data['opening_hours']).cast<String, Map<String, String>>(),
       phone: asString(data['phone']),

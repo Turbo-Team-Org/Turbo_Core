@@ -25,12 +25,14 @@ _BusinessOwnerRequest _$BusinessOwnerRequestFromJson(
       ) ??
       BusinessOwnerRequestStatus.pending,
   createdAt: DateTime.parse(json['createdAt'] as String),
-  lastLogin: json['lastLogin'] == null
-      ? null
-      : DateTime.parse(json['lastLogin'] as String),
-  reviewedAt: json['reviewedAt'] == null
-      ? null
-      : DateTime.parse(json['reviewedAt'] as String),
+  lastLogin:
+      json['lastLogin'] == null
+          ? null
+          : DateTime.parse(json['lastLogin'] as String),
+  reviewedAt:
+      json['reviewedAt'] == null
+          ? null
+          : DateTime.parse(json['reviewedAt'] as String),
   reviewedBy: json['reviewedBy'] as String?,
   rejectionReason: json['rejectionReason'] as String?,
   approvalNotes: json['approvalNotes'] as String?,

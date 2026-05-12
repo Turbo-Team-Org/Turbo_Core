@@ -1,6 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:core/src/turbo_core_repositories/place_repository/models/offer/offer.dart';
-import 'package:core/src/turbo_core_repositories/place_repository/models/schedule/schedule.dart';
 import 'package:core/src/turbo_core_repositories/review_repository/models/review.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 

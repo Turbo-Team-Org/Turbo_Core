@@ -176,10 +176,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String name,  String description,  String address,  double averagePrice,  List<String> imageUrls,  double rating,  List<Review> reviews,  List<Offer> offers,  List<String> tags,  bool isOpen,  List<Schedule> schedules,  String mainImage,  int favoriteCount,  String menuUrl,  double latitude,  double longitude,  String categoryId,  String categoryName,  String categoryIcon,  Map<String, Map<String, String>> openingHours,  String phone,  String website,  int priceLevel,  Map<String, dynamic> metadata,  List<String> ownerIds,  String createdBy,  DateTime? createdAt,  DateTime? lastUpdated)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String name,  String description,  String address,  List<String> imageUrls,  double rating,  List<Review> reviews,  List<Offer> offers,  List<String> tags,  bool isOpen,  String mainImage,  int favoriteCount,  String menuUrl,  double latitude,  double longitude,  String categoryId,  String categoryName,  Map<String, Map<String, String>> openingHours,  String phone,  String website,  int priceLevel,  Map<String, dynamic> metadata,  List<String> ownerIds,  String createdBy,  DateTime? createdAt,  DateTime? lastUpdated)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _Place() when $default != null:
-return $default(_that.id,_that.name,_that.description,_that.address,_that.averagePrice,_that.imageUrls,_that.rating,_that.reviews,_that.offers,_that.tags,_that.isOpen,_that.schedules,_that.mainImage,_that.favoriteCount,_that.menuUrl,_that.latitude,_that.longitude,_that.categoryId,_that.categoryName,_that.categoryIcon,_that.openingHours,_that.phone,_that.website,_that.priceLevel,_that.metadata,_that.ownerIds,_that.createdBy,_that.createdAt,_that.lastUpdated);case _:
+return $default(_that.id,_that.name,_that.description,_that.address,_that.imageUrls,_that.rating,_that.reviews,_that.offers,_that.tags,_that.isOpen,_that.mainImage,_that.favoriteCount,_that.menuUrl,_that.latitude,_that.longitude,_that.categoryId,_that.categoryName,_that.openingHours,_that.phone,_that.website,_that.priceLevel,_that.metadata,_that.ownerIds,_that.createdBy,_that.createdAt,_that.lastUpdated);case _:
   return orElse();
 
 }
@@ -197,10 +197,10 @@ return $default(_that.id,_that.name,_that.description,_that.address,_that.averag
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String name,  String description,  String address,  double averagePrice,  List<String> imageUrls,  double rating,  List<Review> reviews,  List<Offer> offers,  List<String> tags,  bool isOpen,  List<Schedule> schedules,  String mainImage,  int favoriteCount,  String menuUrl,  double latitude,  double longitude,  String categoryId,  String categoryName,  String categoryIcon,  Map<String, Map<String, String>> openingHours,  String phone,  String website,  int priceLevel,  Map<String, dynamic> metadata,  List<String> ownerIds,  String createdBy,  DateTime? createdAt,  DateTime? lastUpdated)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String name,  String description,  String address,  List<String> imageUrls,  double rating,  List<Review> reviews,  List<Offer> offers,  List<String> tags,  bool isOpen,  String mainImage,  int favoriteCount,  String menuUrl,  double latitude,  double longitude,  String categoryId,  String categoryName,  Map<String, Map<String, String>> openingHours,  String phone,  String website,  int priceLevel,  Map<String, dynamic> metadata,  List<String> ownerIds,  String createdBy,  DateTime? createdAt,  DateTime? lastUpdated)  $default,) {final _that = this;
 switch (_that) {
 case _Place():
-return $default(_that.id,_that.name,_that.description,_that.address,_that.averagePrice,_that.imageUrls,_that.rating,_that.reviews,_that.offers,_that.tags,_that.isOpen,_that.schedules,_that.mainImage,_that.favoriteCount,_that.menuUrl,_that.latitude,_that.longitude,_that.categoryId,_that.categoryName,_that.categoryIcon,_that.openingHours,_that.phone,_that.website,_that.priceLevel,_that.metadata,_that.ownerIds,_that.createdBy,_that.createdAt,_that.lastUpdated);}
+return $default(_that.id,_that.name,_that.description,_that.address,_that.imageUrls,_that.rating,_that.reviews,_that.offers,_that.tags,_that.isOpen,_that.mainImage,_that.favoriteCount,_that.menuUrl,_that.latitude,_that.longitude,_that.categoryId,_that.categoryName,_that.openingHours,_that.phone,_that.website,_that.priceLevel,_that.metadata,_that.ownerIds,_that.createdBy,_that.createdAt,_that.lastUpdated);}
 }
 /// A variant of `when` that fallback to returning `null`
 ///
@@ -214,10 +214,10 @@ return $default(_that.id,_that.name,_that.description,_that.address,_that.averag
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String name,  String description,  String address,  double averagePrice,  List<String> imageUrls,  double rating,  List<Review> reviews,  List<Offer> offers,  List<String> tags,  bool isOpen,  List<Schedule> schedules,  String mainImage,  int favoriteCount,  String menuUrl,  double latitude,  double longitude,  String categoryId,  String categoryName,  String categoryIcon,  Map<String, Map<String, String>> openingHours,  String phone,  String website,  int priceLevel,  Map<String, dynamic> metadata,  List<String> ownerIds,  String createdBy,  DateTime? createdAt,  DateTime? lastUpdated)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String name,  String description,  String address,  List<String> imageUrls,  double rating,  List<Review> reviews,  List<Offer> offers,  List<String> tags,  bool isOpen,  String mainImage,  int favoriteCount,  String menuUrl,  double latitude,  double longitude,  String categoryId,  String categoryName,  Map<String, Map<String, String>> openingHours,  String phone,  String website,  int priceLevel,  Map<String, dynamic> metadata,  List<String> ownerIds,  String createdBy,  DateTime? createdAt,  DateTime? lastUpdated)?  $default,) {final _that = this;
 switch (_that) {
 case _Place() when $default != null:
-return $default(_that.id,_that.name,_that.description,_that.address,_that.averagePrice,_that.imageUrls,_that.rating,_that.reviews,_that.offers,_that.tags,_that.isOpen,_that.schedules,_that.mainImage,_that.favoriteCount,_that.menuUrl,_that.latitude,_that.longitude,_that.categoryId,_that.categoryName,_that.categoryIcon,_that.openingHours,_that.phone,_that.website,_that.priceLevel,_that.metadata,_that.ownerIds,_that.createdBy,_that.createdAt,_that.lastUpdated);case _:
+return $default(_that.id,_that.name,_that.description,_that.address,_that.imageUrls,_that.rating,_that.reviews,_that.offers,_that.tags,_that.isOpen,_that.mainImage,_that.favoriteCount,_that.menuUrl,_that.latitude,_that.longitude,_that.categoryId,_that.categoryName,_that.openingHours,_that.phone,_that.website,_that.priceLevel,_that.metadata,_that.ownerIds,_that.createdBy,_that.createdAt,_that.lastUpdated);case _:
   return null;
 
 }

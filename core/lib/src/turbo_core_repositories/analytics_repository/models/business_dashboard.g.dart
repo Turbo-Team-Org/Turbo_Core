@@ -11,18 +11,21 @@ _BusinessDashboard _$BusinessDashboardFromJson(Map<String, dynamic> json) =>
       placeId: json['placeId'] as String,
       placeName: json['placeName'] as String,
       dateRange: DateRange.fromJson(json['dateRange'] as Map<String, dynamic>),
-      kpiMetrics: (json['kpiMetrics'] as List<dynamic>)
-          .map((e) => KpiMetric.fromJson(e as Map<String, dynamic>))
-          .toList(),
+      kpiMetrics:
+          (json['kpiMetrics'] as List<dynamic>)
+              .map((e) => KpiMetric.fromJson(e as Map<String, dynamic>))
+              .toList(),
       summary: DashboardSummary.fromJson(
         json['summary'] as Map<String, dynamic>,
       ),
-      hourlyTraffic: (json['hourlyTraffic'] as List<dynamic>)
-          .map((e) => HourlyData.fromJson(e as Map<String, dynamic>))
-          .toList(),
-      dailyTraffic: (json['dailyTraffic'] as List<dynamic>)
-          .map((e) => DailyData.fromJson(e as Map<String, dynamic>))
-          .toList(),
+      hourlyTraffic:
+          (json['hourlyTraffic'] as List<dynamic>)
+              .map((e) => HourlyData.fromJson(e as Map<String, dynamic>))
+              .toList(),
+      dailyTraffic:
+          (json['dailyTraffic'] as List<dynamic>)
+              .map((e) => DailyData.fromJson(e as Map<String, dynamic>))
+              .toList(),
       reviewInsights: ReviewInsights.fromJson(
         json['reviewInsights'] as Map<String, dynamic>,
       ),
@@ -127,27 +130,26 @@ Map<String, dynamic> _$DailyDataToJson(_DailyData instance) =>
       'avgRating': instance.avgRating,
     };
 
-_ReviewInsights _$ReviewInsightsFromJson(Map<String, dynamic> json) =>
-    _ReviewInsights(
-      totalReviews: (json['totalReviews'] as num).toInt(),
-      averageRating: (json['averageRating'] as num).toDouble(),
-      ratingDistribution: (json['ratingDistribution'] as Map<String, dynamic>)
-          .map((k, e) => MapEntry(int.parse(k), (e as num).toInt())),
-      topKeywords: (json['topKeywords'] as List<dynamic>)
-          .map((e) => e as String)
-          .toList(),
-      topComplaints: (json['topComplaints'] as List<dynamic>)
-          .map((e) => e as String)
-          .toList(),
-      topPraises: (json['topPraises'] as List<dynamic>)
-          .map((e) => e as String)
-          .toList(),
-      sentimentAnalysis: SentimentAnalysis.fromJson(
-        json['sentimentAnalysis'] as Map<String, dynamic>,
-      ),
-      pendingReviews: (json['pendingReviews'] as num?)?.toInt() ?? 0,
-      thisWeekReviews: (json['thisWeekReviews'] as num?)?.toInt() ?? 0,
-    );
+_ReviewInsights _$ReviewInsightsFromJson(
+  Map<String, dynamic> json,
+) => _ReviewInsights(
+  totalReviews: (json['totalReviews'] as num).toInt(),
+  averageRating: (json['averageRating'] as num).toDouble(),
+  ratingDistribution: (json['ratingDistribution'] as Map<String, dynamic>).map(
+    (k, e) => MapEntry(int.parse(k), (e as num).toInt()),
+  ),
+  topKeywords:
+      (json['topKeywords'] as List<dynamic>).map((e) => e as String).toList(),
+  topComplaints:
+      (json['topComplaints'] as List<dynamic>).map((e) => e as String).toList(),
+  topPraises:
+      (json['topPraises'] as List<dynamic>).map((e) => e as String).toList(),
+  sentimentAnalysis: SentimentAnalysis.fromJson(
+    json['sentimentAnalysis'] as Map<String, dynamic>,
+  ),
+  pendingReviews: (json['pendingReviews'] as num?)?.toInt() ?? 0,
+  thisWeekReviews: (json['thisWeekReviews'] as num?)?.toInt() ?? 0,
+);
 
 Map<String, dynamic> _$ReviewInsightsToJson(_ReviewInsights instance) =>
     <String, dynamic>{
@@ -200,18 +202,22 @@ const _$SentimentTrendEnumMap = {
 
 _PopularContent _$PopularContentFromJson(Map<String, dynamic> json) =>
     _PopularContent(
-      topCategories: (json['topCategories'] as List<dynamic>)
-          .map((e) => PopularItem.fromJson(e as Map<String, dynamic>))
-          .toList(),
-      topProducts: (json['topProducts'] as List<dynamic>)
-          .map((e) => PopularItem.fromJson(e as Map<String, dynamic>))
-          .toList(),
-      topServices: (json['topServices'] as List<dynamic>)
-          .map((e) => PopularItem.fromJson(e as Map<String, dynamic>))
-          .toList(),
-      topOffers: (json['topOffers'] as List<dynamic>)
-          .map((e) => PopularItem.fromJson(e as Map<String, dynamic>))
-          .toList(),
+      topCategories:
+          (json['topCategories'] as List<dynamic>)
+              .map((e) => PopularItem.fromJson(e as Map<String, dynamic>))
+              .toList(),
+      topProducts:
+          (json['topProducts'] as List<dynamic>)
+              .map((e) => PopularItem.fromJson(e as Map<String, dynamic>))
+              .toList(),
+      topServices:
+          (json['topServices'] as List<dynamic>)
+              .map((e) => PopularItem.fromJson(e as Map<String, dynamic>))
+              .toList(),
+      topOffers:
+          (json['topOffers'] as List<dynamic>)
+              .map((e) => PopularItem.fromJson(e as Map<String, dynamic>))
+              .toList(),
       topSearchTerms:
           (json['topSearchTerms'] as List<dynamic>?)
               ?.map((e) => PopularItem.fromJson(e as Map<String, dynamic>))
