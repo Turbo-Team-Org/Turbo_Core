@@ -62,9 +62,9 @@ class ReservationServiceSupabase implements ReservationInterface {
     try {
       await _supabase.from('reservations').update({
         'status': ReservationStatus.cancelled.value,
-        'cancelReason': reason,
-        'cancelledAt': DateTime.now().toIso8601String(),
-        'updatedAt': DateTime.now().toIso8601String(),
+        'cancel_reason': reason,
+        'cancelled_at': DateTime.now().toIso8601String(),
+        'updated_at': DateTime.now().toIso8601String(),
       }).eq('id', reservationId);
     } catch (e) {
       throw Exception('Error cancelling reservation: $e');
@@ -80,10 +80,10 @@ class ReservationServiceSupabase implements ReservationInterface {
     try {
       await _supabase.from('reservations').update({
         'status': ReservationStatus.confirmed.value,
-        'tableNumber': tableNumber,
+        'table_number': tableNumber,
         'notes': notes,
-        'confirmedAt': DateTime.now().toIso8601String(),
-        'updatedAt': DateTime.now().toIso8601String(),
+        'confirmed_at': DateTime.now().toIso8601String(),
+        'updated_at': DateTime.now().toIso8601String(),
       }).eq('id', reservationId);
     } catch (e) {
       throw Exception('Error confirming reservation: $e');
@@ -95,9 +95,9 @@ class ReservationServiceSupabase implements ReservationInterface {
     try {
       await _supabase.from('reservations').update({
         'status': ReservationStatus.rejected.value,
-        'cancelReason': reason,
-        'cancelledAt': DateTime.now().toIso8601String(),
-        'updatedAt': DateTime.now().toIso8601String(),
+        'cancel_reason': reason,
+        'cancelled_at': DateTime.now().toIso8601String(),
+        'updated_at': DateTime.now().toIso8601String(),
       }).eq('id', reservationId);
     } catch (e) {
       throw Exception('Error rejecting reservation: $e');
@@ -109,9 +109,9 @@ class ReservationServiceSupabase implements ReservationInterface {
     try {
       await _supabase.from('reservations').update({
         'status': ReservationStatus.checkedIn.value,
-        'checkedInAt': DateTime.now().toIso8601String(),
-        'adminNotes': notes,
-        'updatedAt': DateTime.now().toIso8601String(),
+        'checked_in_at': DateTime.now().toIso8601String(),
+        'admin_notes': notes,
+        'updated_at': DateTime.now().toIso8601String(),
       }).eq('id', reservationId);
     } catch (e) {
       throw Exception('Error checking in reservation: $e');
@@ -124,8 +124,8 @@ class ReservationServiceSupabase implements ReservationInterface {
     try {
       await _supabase.from('reservations').update({
         'status': ReservationStatus.completed.value,
-        'adminNotes': notes,
-        'updatedAt': DateTime.now().toIso8601String(),
+        'admin_notes': notes,
+        'updated_at': DateTime.now().toIso8601String(),
       }).eq('id', reservationId);
     } catch (e) {
       throw Exception('Error completing reservation: $e');
@@ -137,8 +137,8 @@ class ReservationServiceSupabase implements ReservationInterface {
     try {
       await _supabase.from('reservations').update({
         'status': ReservationStatus.noShow.value,
-        'adminNotes': notes,
-        'updatedAt': DateTime.now().toIso8601String(),
+        'admin_notes': notes,
+        'updated_at': DateTime.now().toIso8601String(),
       }).eq('id', reservationId);
     } catch (e) {
       throw Exception('Error marking no-show: $e');
@@ -154,13 +154,13 @@ class ReservationServiceSupabase implements ReservationInterface {
   }) async {
     try {
       var query =
-          _supabase.from('reservations').select('*').eq('userId', userId);
+          _supabase.from('reservations').select('*').eq('user_id', userId);
 
       if (status != null) {
         query = query.eq('status', status.value);
       }
 
-      final response = await query.order('reservationDate', ascending: false);
+      final response = await query.order('reservation_date', ascending: false);
       return response.map((data) => _reservationFromSupabase(data)).toList();
     } catch (e) {
       throw Exception('Error getting user reservations: $e');
@@ -174,13 +174,13 @@ class ReservationServiceSupabase implements ReservationInterface {
   }) async {
     try {
       var query =
-          _supabase.from('reservations').select('*').eq('placeId', placeId);
+          _supabase.from('reservations').select('*').eq('place_id', placeId);
 
       if (status != null) {
         query = query.eq('status', status.value);
       }
 
-      final response = await query.order('reservationDate', ascending: false);
+      final response = await query.order('reservation_date', ascending: false);
       return response.map((data) => _reservationFromSupabase(data)).toList();
     } catch (e) {
       throw Exception('Error getting place reservations: $e');
@@ -199,10 +199,10 @@ class ReservationServiceSupabase implements ReservationInterface {
       final response = await _supabase
           .from('reservations')
           .select('*')
-          .eq('placeId', placeId)
-          .gte('reservationDate', startOfDay.toIso8601String())
-          .lte('reservationDate', endOfDay.toIso8601String())
-          .order('startTime');
+          .eq('place_id', placeId)
+          .gte('reservation_date', startOfDay.toIso8601String())
+          .lte('reservation_date', endOfDay.toIso8601String())
+          .order('start_time');
 
       return response.map((data) => _reservationFromSupabase(data)).toList();
     } catch (e) {
@@ -220,10 +220,10 @@ class ReservationServiceSupabase implements ReservationInterface {
       final response = await _supabase
           .from('reservations')
           .select('*')
-          .eq('placeId', placeId)
-          .gte('reservationDate', startDate.toIso8601String())
-          .lte('reservationDate', endDate.toIso8601String())
-          .order('reservationDate');
+          .eq('place_id', placeId)
+          .gte('reservation_date', startDate.toIso8601String())
+          .lte('reservation_date', endDate.toIso8601String())
+          .order('reservation_date');
 
       return response.map((data) => _reservationFromSupabase(data)).toList();
     } catch (e) {
@@ -244,9 +244,9 @@ class ReservationServiceSupabase implements ReservationInterface {
       final response = await _supabase
           .from('reservations')
           .select('*')
-          .eq('userId', userId)
-          .gte('reservationDate', now.toIso8601String())
-          .order('reservationDate');
+          .eq('user_id', userId)
+          .gte('reservation_date', now.toIso8601String())
+          .order('reservation_date');
 
       return response.map((data) => _reservationFromSupabase(data)).toList();
     } catch (e) {
@@ -259,8 +259,8 @@ class ReservationServiceSupabase implements ReservationInterface {
     return _supabase
         .from('reservations')
         .stream(primaryKey: ['id'])
-        .eq('placeId', placeId)
-        .order('reservationDate')
+        .eq('place_id', placeId)
+        .order('reservation_date')
         .map((response) =>
             response.map((data) => _reservationFromSupabase(data)).toList());
   }
@@ -303,13 +303,13 @@ class ReservationServiceSupabase implements ReservationInterface {
       final existingReservations = await _supabase
           .from('reservations')
           .select('partySize')
-          .eq('placeId', placeId)
-          .gte('startTime', startTime.toIso8601String())
-          .lt('endTime', endTime.toIso8601String())
+          .eq('place_id', placeId)
+          .gte('start_time', startTime.toIso8601String())
+          .lt('end_time', endTime.toIso8601String())
           .not('status', 'in', ['cancelled', 'rejected', 'noShow']);
 
       final totalExistingSize = existingReservations.fold<int>(
-          0, (sum, reservation) => sum + (reservation['partySize'] as int));
+          0, (sum, reservation) => sum + (reservation['party_size'] as int));
 
       // Asumir capacidad máxima de 50 personas
       return (totalExistingSize + partySize) <= 50;
@@ -697,9 +697,9 @@ class ReservationServiceSupabase implements ReservationInterface {
       final response = await _supabase
           .from('reservations')
           .select('*')
-          .eq('placeId', placeId)
-          .gte('startTime', startTime.toIso8601String())
-          .lt('endTime', endTime.toIso8601String())
+          .eq('place_id', placeId)
+          .gte('start_time', startTime.toIso8601String())
+          .lt('end_time', endTime.toIso8601String())
           .not('status', 'in', ['cancelled', 'rejected', 'noShow']);
 
       return response.map((data) => _reservationFromSupabase(data)).toList();
@@ -736,7 +736,7 @@ class ReservationServiceSupabase implements ReservationInterface {
       await _supabase
           .from('reservations')
           .delete()
-          .lt('reservationDate', cutoffDate.toIso8601String())
+          .lt('reservation_date', cutoffDate.toIso8601String())
           .inFilter('status', ['cancelled', 'rejected', 'noShow']);
     } catch (e) {
       throw Exception('Error cleaning up old reservations: $e');
@@ -821,40 +821,42 @@ class ReservationServiceSupabase implements ReservationInterface {
   Reservation _reservationFromSupabase(Map<String, dynamic> data) {
     return Reservation(
       id: data['id'] as String,
-      placeId: data['placeId'] as String,
-      userId: data['userId'] as String,
-      reservationDate: DateTime.parse(data['reservationDate'] as String),
-      startTime: DateTime.parse(data['startTime'] as String),
-      endTime: DateTime.parse(data['endTime'] as String),
-      partySize: data['partySize'] as int,
+      placeId: (data['place_id'] ?? data['placeId']) as String,
+      userId: (data['user_id'] ?? data['userId']) as String,
+      reservationDate: DateTime.parse(
+        (data['reservation_date'] ?? data['reservationDate']) as String,
+      ),
+      startTime: DateTime.parse((data['start_time'] ?? data['startTime']) as String),
+      endTime: DateTime.parse((data['end_time'] ?? data['endTime']) as String),
+      partySize: (data['party_size'] ?? data['partySize']) as int,
       status: ReservationStatus.fromString(data['status'] as String),
-      customerName: data['customerName'] as String? ?? '',
-      customerEmail: data['customerEmail'] as String? ?? '',
-      customerPhone: data['customerPhone'] as String? ?? '',
-      placeName: data['placeName'] as String?,
-      specialRequests: data['specialRequests'] as String?,
+      customerName: (data['customer_name'] ?? data['customerName']) as String? ?? '',
+      customerEmail: (data['customer_email'] ?? data['customerEmail']) as String? ?? '',
+      customerPhone: (data['customer_phone'] ?? data['customerPhone']) as String? ?? '',
+      placeName: (data['place_name'] ?? data['placeName']) as String?,
+      specialRequests: (data['special_requests'] ?? data['specialRequests']) as String?,
       notes: data['notes'] as String?,
-      tableNumber: data['tableNumber'] as String?,
-      confirmationCode: data['confirmationCode'] as String?,
-      createdAt: data['createdAt'] != null
-          ? DateTime.parse(data['createdAt'] as String)
+      tableNumber: (data['table_number'] ?? data['tableNumber']) as String?,
+      confirmationCode: (data['confirmation_code'] ?? data['confirmationCode']) as String?,
+      createdAt: (data['created_at'] ?? data['createdAt']) != null
+          ? DateTime.parse((data['created_at'] ?? data['createdAt']) as String)
           : null,
-      updatedAt: data['updatedAt'] != null
-          ? DateTime.parse(data['updatedAt'] as String)
+      updatedAt: (data['updated_at'] ?? data['updatedAt']) != null
+          ? DateTime.parse((data['updated_at'] ?? data['updatedAt']) as String)
           : null,
-      confirmedAt: data['confirmedAt'] != null
-          ? DateTime.parse(data['confirmedAt'] as String)
+      confirmedAt: (data['confirmed_at'] ?? data['confirmedAt']) != null
+          ? DateTime.parse((data['confirmed_at'] ?? data['confirmedAt']) as String)
           : null,
-      checkedInAt: data['checkedInAt'] != null
-          ? DateTime.parse(data['checkedInAt'] as String)
+      checkedInAt: (data['checked_in_at'] ?? data['checkedInAt']) != null
+          ? DateTime.parse((data['checked_in_at'] ?? data['checkedInAt']) as String)
           : null,
-      cancelledAt: data['cancelledAt'] != null
-          ? DateTime.parse(data['cancelledAt'] as String)
+      cancelledAt: (data['cancelled_at'] ?? data['cancelledAt']) != null
+          ? DateTime.parse((data['cancelled_at'] ?? data['cancelledAt']) as String)
           : null,
-      cancelReason: data['cancelReason'] as String?,
-      adminNotes: data['adminNotes'] as String?,
-      reminderSent: data['reminderSent'] as bool?,
-      customerInfo: data['customerInfo'] as Map<String, dynamic>? ?? {},
+      cancelReason: (data['cancel_reason'] ?? data['cancelReason']) as String?,
+      adminNotes: (data['admin_notes'] ?? data['adminNotes']) as String?,
+      reminderSent: (data['reminder_sent'] ?? data['reminderSent']) as bool?,
+      customerInfo: (data['customer_info'] ?? data['customerInfo']) as Map<String, dynamic>? ?? {},
       metadata: data['metadata'] as Map<String, dynamic>? ?? {},
     );
   }
@@ -862,30 +864,30 @@ class ReservationServiceSupabase implements ReservationInterface {
   Map<String, dynamic> _reservationToSupabase(Reservation reservation) {
     return {
       'id': reservation.id,
-      'placeId': reservation.placeId,
-      'userId': reservation.userId,
-      'reservationDate': reservation.reservationDate.toIso8601String(),
-      'startTime': reservation.startTime.toIso8601String(),
-      'endTime': reservation.endTime.toIso8601String(),
-      'partySize': reservation.partySize,
+      'place_id': reservation.placeId,
+      'user_id': reservation.userId,
+      'reservation_date': reservation.reservationDate.toIso8601String(),
+      'start_time': reservation.startTime.toIso8601String(),
+      'end_time': reservation.endTime.toIso8601String(),
+      'party_size': reservation.partySize,
       'status': reservation.status.value,
-      'customerName': reservation.customerName,
-      'customerEmail': reservation.customerEmail,
-      'customerPhone': reservation.customerPhone,
-      'placeName': reservation.placeName,
-      'specialRequests': reservation.specialRequests,
+      'customer_name': reservation.customerName,
+      'customer_email': reservation.customerEmail,
+      'customer_phone': reservation.customerPhone,
+      'place_name': reservation.placeName,
+      'special_requests': reservation.specialRequests,
       'notes': reservation.notes,
-      'tableNumber': reservation.tableNumber,
-      'confirmationCode': reservation.confirmationCode,
-      'createdAt': reservation.createdAt?.toIso8601String(),
-      'updatedAt': reservation.updatedAt?.toIso8601String(),
-      'confirmedAt': reservation.confirmedAt?.toIso8601String(),
-      'checkedInAt': reservation.checkedInAt?.toIso8601String(),
-      'cancelledAt': reservation.cancelledAt?.toIso8601String(),
-      'cancelReason': reservation.cancelReason,
-      'adminNotes': reservation.adminNotes,
-      'reminderSent': reservation.reminderSent,
-      'customerInfo': reservation.customerInfo,
+      'table_number': reservation.tableNumber,
+      'confirmation_code': reservation.confirmationCode,
+      'created_at': reservation.createdAt?.toIso8601String(),
+      'updated_at': reservation.updatedAt?.toIso8601String(),
+      'confirmed_at': reservation.confirmedAt?.toIso8601String(),
+      'checked_in_at': reservation.checkedInAt?.toIso8601String(),
+      'cancelled_at': reservation.cancelledAt?.toIso8601String(),
+      'cancel_reason': reservation.cancelReason,
+      'admin_notes': reservation.adminNotes,
+      'reminder_sent': reservation.reminderSent,
+      'customer_info': reservation.customerInfo,
       'metadata': reservation.metadata,
     };
   }

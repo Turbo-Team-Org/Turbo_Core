@@ -242,6 +242,17 @@ Future<void> _registerFirebaseServices(GetIt sl) async {
     print('   ✅ PlaceService (Firebase)');
   }
 
+  // Analytics interface binding (required by AnalyticsRepository).
+  if (!sl.isRegistered<AnalyticsInterface>()) {
+    if (!sl.isRegistered<AnalyticsService>()) {
+      sl.registerLazySingleton<AnalyticsService>(
+        () => AnalyticsService(firestore: sl<FirebaseFirestore>()),
+      );
+    }
+    sl.registerLazySingleton<AnalyticsInterface>(() => sl<AnalyticsService>());
+    print('   ✅ AnalyticsInterface -> Firebase');
+  }
+
   // Review Service
   if (!sl.isRegistered<ReviewInterface>()) {
     sl.registerLazySingleton<ReviewInterface>(
@@ -912,11 +923,10 @@ void _registerSupabaseRepositories(GetIt sl) {
   // Admin Auth Repository
   if (!sl.isRegistered<AdminAuthRepository>()) {
     sl.registerLazySingleton<AdminAuthRepository>(
-      () => AdminAuthRepositoryImpl(adminAuthService: sl<AdminAuthService>()),
+      () =>
+          AdminAuthRepositoryImpl(adminAuthService: sl<AdminAuthInterface>()),
     );
-    print(
-      '   ✅ AdminAuthRepository (Supabase - usando Firebase temporalmente)',
-    );
+    print('   ✅ AdminAuthRepository (Supabase)');
   }
 
   // AI Repository

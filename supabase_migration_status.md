@@ -1,8 +1,8 @@
-# Supabase Migration Status Report - FINAL
+# Supabase Migration Status Report
 
-## ✅ **MIGRATION COMPLETED SUCCESSFULLY**
+## ⚠️ **MIGRATION IN PROGRESS (NOT FULLY UNIFIED)**
 
-### 🎯 **Core Services - 100% Functional**
+### 🎯 **Core Services - current state**
 
 1. ✅ **AuthenticationServiceSupabase** - COMPLETO Y FUNCIONAL
 
@@ -77,9 +77,9 @@
 7. ✅ **DateTime parsing** - Corregido con validaciones tipo-seguras
 8. ✅ **Review model mapping** - Corregido userAvatar vs userPhotoUrl
 
-## 📊 **Database Schema - Production Ready**
+## 📊 **Database Schema - Partial readiness**
 
-### Tablas Principales
+### Tablas principales verificadas
 
 - ✅ `users` - Usuarios con autenticación
 - ✅ `admin_users` - Usuarios administrativos
@@ -91,14 +91,14 @@
 - ✅ `place_categories` - Relaciones many-to-many
 - ✅ `place_locations` - Ubicaciones geoespaciales
 
-### Funciones PostgreSQL
+### Funciones PostgreSQL disponibles
 
 - ✅ `increment_category_places_count()`
 - ✅ `decrement_category_places_count()`
 - ✅ Triggers automáticos para timestamps
 - ✅ Row Level Security policies
 
-## 🎯 **Migration Results**
+## 🎯 **Migration progress**
 
 ### **Performance Gains**
 
@@ -157,14 +157,14 @@ core/lib/src/turbo_core_repositories/
     └── hybrid_database_config.dart (✅ COMPLETO)
 ```
 
-## 🚀 **Ready for Production**
+## 🚀 **Readiness status**
 
-### **Immediate Deployment (Phase 1)**
+### **Current status**
 
-- ✅ All core services are production-ready
-- ✅ Database schema is complete
-- ✅ Error handling is comprehensive
-- ✅ Type safety is ensured
+- ⚠️ Core services coexist with Firebase/Edge/Supabase paths
+- ⚠️ Schema and naming alignment is still in progress
+- ⚠️ RLS coverage is partial for some runtime tables
+- ⚠️ Supabase-first test coverage is incomplete
 
 ### **Migration Steps**
 
@@ -197,25 +197,17 @@ core/lib/src/turbo_core_repositories/
 - 🔄 **Location Service** - Google Maps integration
 - 🔄 **Real-time Features** - Live updates
 
-## 📈 **Success Metrics Achieved**
+## 📈 **Current metrics**
 
-- ✅ **90% of core functionality** migrated and working
-- ✅ **100% of CRUD operations** implemented
-- ✅ **0 critical errors** in production code
-- ✅ **Type-safe implementation** across all services
-- ✅ **Comprehensive error handling** implemented
-- ✅ **Production-ready database schema** created
-- ✅ **Documentation and guides** provided
+- ✅ Cobertura amplia de servicios Supabase implementados
+- ⚠️ Persisten gaps de unificación (DI, naming SQL, RLS, documentación y tests)
 
-## 🎉 **MIGRATION STATUS: COMPLETE AND PRODUCTION READY**
+## 🔜 **Next required steps before claiming production-ready**
 
-La migración de Firebase a Supabase ha sido **exitosamente completada** para todos los servicios core de Turbo Platform. Los servicios están listos para producción con:
+1. Unificar contratos de columnas SQL (snake_case) en servicios críticos.
+2. Cerrar wiring DI para interfaces/servicios en entorno Supabase.
+3. Completar RLS en tablas runtime pendientes (reservations/analytics).
+4. Alinear documentación de edge functions con archivos existentes.
+5. Añadir validación CI de ruta Supabase y tests específicos.
 
-- **Funcionalidad completa** ✅
-- **Sin errores críticos** ✅
-- **Type safety** ✅
-- **Error handling robusto** ✅
-- **Database schema optimizado** ✅
-- **Documentación completa** ✅
-
-**El sistema está listo para deployar en producción.**
+**Estado real recomendado:** _staging-ready with pending hardening_.
