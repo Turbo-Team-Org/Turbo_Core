@@ -8,9 +8,10 @@ part of 'paginated_reviews.dart';
 
 _PaginatedReviews _$PaginatedReviewsFromJson(Map<String, dynamic> json) =>
     _PaginatedReviews(
-      reviews: (json['reviews'] as List<dynamic>)
-          .map((e) => Review.fromJson(e as Map<String, dynamic>))
-          .toList(),
+      reviews:
+          (json['reviews'] as List<dynamic>)
+              .map((e) => Review.fromJson(e as Map<String, dynamic>))
+              .toList(),
       pageSize: (json['pageSize'] as num).toInt(),
       hasMore: json['hasMore'] as bool,
       nextPageToken: json['nextPageToken'] as String?,

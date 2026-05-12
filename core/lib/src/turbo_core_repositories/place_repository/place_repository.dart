@@ -401,12 +401,9 @@ class PlaceRepository {
     }
   }
 
-  /// Gets places filtered by price range.
-  ///
-  /// [minPrice] The minimum average price (inclusive).
-  /// [maxPrice] The maximum average price (inclusive).
-  ///
-  /// Returns a list of places within the specified price range.
+  /// Gets places filtered by an approximate price band derived from
+  /// [Place.priceLevel] (MVP: no `averagePrice` on the model). Each level is
+  /// mapped to a nominal amount: `priceLevel * 25` within [minPrice, maxPrice].
   Future<List<Place>> getPlacesByPriceRange({
     required double minPrice,
     required double maxPrice,
@@ -415,7 +412,8 @@ class PlaceRepository {
       final allPlaces = await placeService.getPlaces();
 
       return allPlaces.where((place) {
-        return true;
+        final nominal = place.priceLevel * 25.0;
+        return nominal >= minPrice && nominal <= maxPrice;
       }).toList();
     } catch (e) {
       throw Exception('Error al obtener lugares por rango de precio: $e');

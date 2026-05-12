@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:core/src/turbo_core_repositories/event_repository/event_repository.dart';
 import 'package:core/src/turbo_core_repositories/event_repository/interface/event_interface.dart';
 import 'package:core/src/turbo_core_repositories/event_repository/models/event.dart';
 
@@ -84,7 +83,7 @@ class EventService implements EventInterface {
 
   /// Adds a new event to Firestore.
   @override
-  Future<String> addEvent(Event event) async {
+  Future<void> addEvent(Event event) async {
     try {
       final docRef = firestore.collection('events').doc();
       final eventWithId = event.copyWith(id: docRef.id);
@@ -102,7 +101,6 @@ class EventService implements EventInterface {
         );
       }
       await docRef.set(eventData);
-      return docRef.id;
     } catch (e) {
       throw Exception('Error adding event: $e');
     }

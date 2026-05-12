@@ -22,18 +22,21 @@ _Event _$EventFromJson(Map<String, dynamic> json) => _Event(
       const [],
   organizerName: json['organizerName'] as String?,
   organizerContact: json['organizerContact'] as String?,
-  endDate: json['endDate'] == null
-      ? null
-      : DateTime.parse(json['endDate'] as String),
+  endDate:
+      json['endDate'] == null
+          ? null
+          : DateTime.parse(json['endDate'] as String),
   link: json['link'] as String?,
   createdBy: json['createdBy'] as String? ?? '',
-  createdAt: json['createdAt'] == null
-      ? null
-      : DateTime.parse(json['createdAt'] as String),
+  createdAt:
+      json['createdAt'] == null
+          ? null
+          : DateTime.parse(json['createdAt'] as String),
   lastUpdatedBy: json['lastUpdatedBy'] as String?,
-  lastUpdatedAt: json['lastUpdatedAt'] == null
-      ? null
-      : DateTime.parse(json['lastUpdatedAt'] as String),
+  lastUpdatedAt:
+      json['lastUpdatedAt'] == null
+          ? null
+          : DateTime.parse(json['lastUpdatedAt'] as String),
 );
 
 Map<String, dynamic> _$EventToJson(_Event instance) => <String, dynamic>{

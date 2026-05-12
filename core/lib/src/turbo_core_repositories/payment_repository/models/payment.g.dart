@@ -23,18 +23,22 @@ _Payment _$PaymentFromJson(Map<String, dynamic> json) => _Payment(
   cancelUrl: json['cancelUrl'] as String?,
   gatewayTransactionId: json['gatewayTransactionId'] as String?,
   externalReference: json['externalReference'] as String?,
-  createdAt: json['createdAt'] == null
-      ? null
-      : DateTime.parse(json['createdAt'] as String),
-  updatedAt: json['updatedAt'] == null
-      ? null
-      : DateTime.parse(json['updatedAt'] as String),
-  processedAt: json['processedAt'] == null
-      ? null
-      : DateTime.parse(json['processedAt'] as String),
-  expiresAt: json['expiresAt'] == null
-      ? null
-      : DateTime.parse(json['expiresAt'] as String),
+  createdAt:
+      json['createdAt'] == null
+          ? null
+          : DateTime.parse(json['createdAt'] as String),
+  updatedAt:
+      json['updatedAt'] == null
+          ? null
+          : DateTime.parse(json['updatedAt'] as String),
+  processedAt:
+      json['processedAt'] == null
+          ? null
+          : DateTime.parse(json['processedAt'] as String),
+  expiresAt:
+      json['expiresAt'] == null
+          ? null
+          : DateTime.parse(json['expiresAt'] as String),
   failureReason: json['failureReason'] as String?,
   cardLastFourDigits: json['cardLastFourDigits'] as String?,
   cardType: json['cardType'] as String?,

@@ -6,7 +6,6 @@ import 'package:core/src/turbo_core_repositories/place_repository/models/place_o
 import 'package:core/src/turbo_core_repositories/review_repository/models/review.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:uuid/uuid.dart';
-import 'dart:math' as math;
 
 /// Place service for Supabase
 class PlaceServiceSupabase implements PlaceInterface {
@@ -348,7 +347,7 @@ class PlaceServiceSupabase implements PlaceInterface {
   }
 
   @override
-  Future<void> addPlace(Place place) async {
+  Future<String> addPlace(Place place) async {
     try {
       // Ensure place has a valid ID
       final placeId = place.id.isNotEmpty ? place.id : _uuid.v4();
@@ -370,6 +369,7 @@ class PlaceServiceSupabase implements PlaceInterface {
         // No lanzamos el error para que el lugar se cree igual
         // Los analytics se pueden inicializar manualmente después
       }
+      return placeId;
     } catch (e) {
       // Si falla la creación del lugar, intentamos limpiar
       try {
@@ -477,7 +477,6 @@ class PlaceServiceSupabase implements PlaceInterface {
       name: asString(data['name']),
       description: asString(data['description']),
       address: asString(data['address']),
-      averagePrice: asDouble(data['average_price']),
       imageUrls: asStringList(data['image_urls']),
       rating: asDouble(data['rating']),
       reviews: [], // Reviews are loaded separately
@@ -490,7 +489,6 @@ class PlaceServiceSupabase implements PlaceInterface {
       longitude: asDouble(data['longitude']),
       categoryId: asString(data['category_id']),
       categoryName: asString(data['category_name']),
-      categoryIcon: asString(data['category_icon']),
       openingHours:
           asMap(data['opening_hours']).cast<String, Map<String, String>>(),
       phone: asString(data['phone']),
@@ -517,7 +515,6 @@ class PlaceServiceSupabase implements PlaceInterface {
       'name': place.name,
       'description': place.description,
       'address': place.address,
-      'average_price': place.averagePrice,
       'image_urls': place.imageUrls,
       'rating': place.rating,
       'tags': place.tags,
@@ -529,7 +526,6 @@ class PlaceServiceSupabase implements PlaceInterface {
       'longitude': place.longitude,
       'category_id': place.categoryId,
       'category_name': place.categoryName,
-      'category_icon': place.categoryIcon,
       'opening_hours': place.openingHours,
       'phone': place.phone,
       'website': place.website,

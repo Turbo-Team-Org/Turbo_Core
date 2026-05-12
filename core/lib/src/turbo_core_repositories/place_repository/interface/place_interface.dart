@@ -15,8 +15,8 @@ abstract class PlaceInterface {
   /// Get places by category
   Future<List<Place>> getPlacesByCategory(String categoryId);
 
-  /// Add a new place
-  Future<void> addPlace(Place place);
+  /// Add a new place. Returns the persisted place id.
+  Future<String> addPlace(Place place);
 
   /// Update an existing place
   Future<void> updatePlace(Place place);

@@ -23,21 +23,26 @@ _Reservation _$ReservationFromJson(Map<String, dynamic> json) => _Reservation(
   notes: json['notes'] as String?,
   tableNumber: json['tableNumber'] as String?,
   confirmationCode: json['confirmationCode'] as String?,
-  createdAt: json['createdAt'] == null
-      ? null
-      : DateTime.parse(json['createdAt'] as String),
-  updatedAt: json['updatedAt'] == null
-      ? null
-      : DateTime.parse(json['updatedAt'] as String),
-  confirmedAt: json['confirmedAt'] == null
-      ? null
-      : DateTime.parse(json['confirmedAt'] as String),
-  checkedInAt: json['checkedInAt'] == null
-      ? null
-      : DateTime.parse(json['checkedInAt'] as String),
-  cancelledAt: json['cancelledAt'] == null
-      ? null
-      : DateTime.parse(json['cancelledAt'] as String),
+  createdAt:
+      json['createdAt'] == null
+          ? null
+          : DateTime.parse(json['createdAt'] as String),
+  updatedAt:
+      json['updatedAt'] == null
+          ? null
+          : DateTime.parse(json['updatedAt'] as String),
+  confirmedAt:
+      json['confirmedAt'] == null
+          ? null
+          : DateTime.parse(json['confirmedAt'] as String),
+  checkedInAt:
+      json['checkedInAt'] == null
+          ? null
+          : DateTime.parse(json['checkedInAt'] as String),
+  cancelledAt:
+      json['cancelledAt'] == null
+          ? null
+          : DateTime.parse(json['cancelledAt'] as String),
   cancelReason: json['cancelReason'] as String?,
   adminNotes: json['adminNotes'] as String?,
   reminderSent: json['reminderSent'] as bool?,

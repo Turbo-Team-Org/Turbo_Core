@@ -11,9 +11,10 @@ _Favorite _$FavoriteFromJson(Map<String, dynamic> json) => _Favorite(
   userId: json['userId'] as String,
   placeId: json['placeId'] as String,
   date: DateTime.parse(json['date'] as String),
-  place: json['place'] == null
-      ? null
-      : Place.fromJson(json['place'] as Map<String, dynamic>),
+  place:
+      json['place'] == null
+          ? null
+          : Place.fromJson(json['place'] as Map<String, dynamic>),
 );
 
 Map<String, dynamic> _$FavoriteToJson(_Favorite instance) => <String, dynamic>{

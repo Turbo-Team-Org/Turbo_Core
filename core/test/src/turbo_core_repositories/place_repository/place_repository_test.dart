@@ -152,13 +152,13 @@ void main() {
         // Arrange
         when(
           () => mockPlaceService.addPlace(testPlace),
-        ).thenAnswer((_) async {});
+        ).thenAnswer((_) async => testPlaceId);
 
         // Act
         final result = await placeRepository.addPlace(testPlace);
 
         // Assert
-        expect(result, isTrue);
+        expect(result, testPlaceId);
         verify(() => mockPlaceService.addPlace(testPlace)).called(1);
       });
 

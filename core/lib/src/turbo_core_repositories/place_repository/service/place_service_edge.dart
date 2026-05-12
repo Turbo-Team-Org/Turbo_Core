@@ -64,7 +64,7 @@ class PlaceServiceEdge implements PlaceInterface {
   }
 
   @override
-  Future<void> addPlace(Place place) async {
+  Future<String> addPlace(Place place) async {
     final Response<Map<String, dynamic>> res = await httpClient
         .post<Map<String, dynamic>>(
           _url('/admin_add_place'),
@@ -75,6 +75,7 @@ class PlaceServiceEdge implements PlaceInterface {
     try {
       await analyticsService.initializeAnalyticsStructure(createdId);
     } catch (_) {}
+    return createdId;
   }
 
   @override
@@ -176,7 +177,6 @@ class PlaceServiceEdge implements PlaceInterface {
       name: asString(data['name']),
       description: asString(data['description']),
       address: asString(data['address']),
-      averagePrice: asDouble(data['average_price'] ?? data['averagePrice']),
       imageUrls: asStringList(data['image_urls'] ?? data['imageUrls']),
       rating: asDouble(data['rating']),
       reviews:
@@ -194,7 +194,6 @@ class PlaceServiceEdge implements PlaceInterface {
       longitude: asDouble(data['longitude']),
       categoryId: asString(data['category_id'] ?? data['categoryId']),
       categoryName: asString(data['category_name'] ?? data['categoryName']),
-      categoryIcon: asString(data['category_icon'] ?? data['categoryIcon']),
       openingHours:
           (asMap(
             data['opening_hours'] ?? data['openingHours'],
@@ -226,7 +225,6 @@ class PlaceServiceEdge implements PlaceInterface {
       'name': place.name,
       'description': place.description,
       'address': place.address,
-      'average_price': place.averagePrice,
       'image_urls': place.imageUrls,
       'rating': place.rating,
       'tags': place.tags,
@@ -238,7 +236,6 @@ class PlaceServiceEdge implements PlaceInterface {
       'longitude': place.longitude,
       'category_id': place.categoryId,
       'category_name': place.categoryName,
-      'category_icon': place.categoryIcon,
       'opening_hours': place.openingHours,
       'phone': place.phone,
       'website': place.website,

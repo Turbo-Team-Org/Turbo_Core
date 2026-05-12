@@ -23,26 +23,31 @@ _TropipayPaymentResponse _$TropipayPaymentResponseFromJson(
   message: json['message'] as String?,
   errorCode: json['errorCode'] as String?,
   errorDetails: json['errorDetails'] as String?,
-  createdAt: json['createdAt'] == null
-      ? null
-      : DateTime.parse(json['createdAt'] as String),
-  expiresAt: json['expiresAt'] == null
-      ? null
-      : DateTime.parse(json['expiresAt'] as String),
+  createdAt:
+      json['createdAt'] == null
+          ? null
+          : DateTime.parse(json['createdAt'] as String),
+  expiresAt:
+      json['expiresAt'] == null
+          ? null
+          : DateTime.parse(json['expiresAt'] as String),
   metadata: json['metadata'] as Map<String, dynamic>? ?? const {},
-  customer: json['customer'] == null
-      ? null
-      : TropipayResponseCustomerData.fromJson(
-          json['customer'] as Map<String, dynamic>,
-        ),
-  cardData: json['cardData'] == null
-      ? null
-      : TropipayResponseCardData.fromJson(
-          json['cardData'] as Map<String, dynamic>,
-        ),
-  fees: json['fees'] == null
-      ? null
-      : TropipayFeeData.fromJson(json['fees'] as Map<String, dynamic>),
+  customer:
+      json['customer'] == null
+          ? null
+          : TropipayResponseCustomerData.fromJson(
+            json['customer'] as Map<String, dynamic>,
+          ),
+  cardData:
+      json['cardData'] == null
+          ? null
+          : TropipayResponseCardData.fromJson(
+            json['cardData'] as Map<String, dynamic>,
+          ),
+  fees:
+      json['fees'] == null
+          ? null
+          : TropipayFeeData.fromJson(json['fees'] as Map<String, dynamic>),
 );
 
 Map<String, dynamic> _$TropipayPaymentResponseToJson(

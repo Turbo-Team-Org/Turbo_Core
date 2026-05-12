@@ -10,9 +10,10 @@ _PaymentResult _$PaymentResultFromJson(Map<String, dynamic> json) =>
     _PaymentResult(
       success: json['success'] as bool,
       status: const PaymentStatusConverter().fromJson(json['status'] as String),
-      payment: json['payment'] == null
-          ? null
-          : Payment.fromJson(json['payment'] as Map<String, dynamic>),
+      payment:
+          json['payment'] == null
+              ? null
+              : Payment.fromJson(json['payment'] as Map<String, dynamic>),
       transactionId: json['transactionId'] as String?,
       redirectUrl: json['redirectUrl'] as String?,
       paymentUrl: json['paymentUrl'] as String?,
@@ -20,9 +21,10 @@ _PaymentResult _$PaymentResultFromJson(Map<String, dynamic> json) =>
       errorCode: json['errorCode'] as String?,
       errorDetails: json['errorDetails'] as String?,
       metadata: json['metadata'] as Map<String, dynamic>? ?? const {},
-      timestamp: json['timestamp'] == null
-          ? null
-          : DateTime.parse(json['timestamp'] as String),
+      timestamp:
+          json['timestamp'] == null
+              ? null
+              : DateTime.parse(json['timestamp'] as String),
     );
 
 Map<String, dynamic> _$PaymentResultToJson(_PaymentResult instance) =>
